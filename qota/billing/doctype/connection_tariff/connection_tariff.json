@@ -1,0 +1,95 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "CNT-.YYYY.#####",
+ "creation": "2026-01-28 23:46:18.213174",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "tariff_name",
+  "total_fee",
+  "column_break_4",
+  "min_down_payment",
+  "max_installments",
+  "disabled",
+  "description__materials_section",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "tariff_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Tariff Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "total_fee",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Connection Fee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "min_down_payment",
+   "fieldtype": "Currency",
+   "label": "Minimum Down Payment",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "max_installments",
+   "fieldtype": "Int",
+   "label": "Maximum Installments Allowed",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text"
+  },
+  {
+   "fieldname": "description__materials_section",
+   "fieldtype": "Section Break",
+   "label": "Description / Materials"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-29 02:46:54.860402",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Connection Tariff",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

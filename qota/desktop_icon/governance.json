@@ -1,0 +1,23 @@
+{
+ "app": "qota",
+ "creation": "2026-01-26 02:06:56.927019",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon": "landmark",
+ "icon_type": "Link",
+ "idx": 10,
+ "label": "Governance",
+ "link_to": "Governance",
+ "link_type": "Workspace Sidebar",
+ "logo_url": "",
+ "modified": "2026-01-26 10:54:17.927722",
+ "modified_by": "Administrator",
+ "name": "Governance",
+ "owner": "Administrator",
+ "parent_icon": "",
+ "restrict_removal": 0,
+ "roles": [],
+ "sidebar": "",
+ "standard": 1
+}

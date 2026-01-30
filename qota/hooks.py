@@ -2,6 +2,8 @@ app_name = "qota"
 app_title = "Qota"
 app_publisher = "Edwin Carrillo"
 app_description = "Community water board management and billing system"
+app_icon = "fa fa-th"
+app_color = "#00a8b5"
 app_email = "edwinalonso162@hotmail.com"
 app_license = "mit"
 
@@ -11,22 +13,21 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "qota",
-# 		"logo": "/assets/qota/logo.png",
-# 		"title": "Qota",
-# 		"route": "/qota",
-# 		"has_permission": "qota.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+ 		"name": "qota",
+ 		"logo": "/assets/qota/logo.png",
+		"title": "Qota",
+		"route": "/qota",
+  	}
+ ]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/qota/css/qota.css"
-# app_include_js = "/assets/qota/js/qota.js"
+app_include_js = "qota.bundle.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/qota/css/qota.css"
@@ -51,7 +52,9 @@ app_license = "mit"
 # Svg Icons
 # ------------------
 # include app icons in desk
-# app_include_icons = "qota/public/icons.svg"
+app_include_icons = [
+    "/assets/qota/icons/icons.svg"
+]
 
 # Home Pages
 # ----------
@@ -239,7 +242,7 @@ app_license = "mit"
 # ]
 
 # Automatically update python controller files with type annotations for this app.
-# export_python_type_annotations = True
+export_python_type_annotations = True
 
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs

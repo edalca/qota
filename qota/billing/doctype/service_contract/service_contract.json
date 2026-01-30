@@ -1,0 +1,197 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SC-.YY.###",
+ "creation": "2026-01-30 00:10:19.196557",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "details_section",
+  "subscriber",
+  "full_name",
+  "premises",
+  "column_break_4",
+  "service_category",
+  "billing_basis",
+  "status",
+  "last_status_change",
+  "timeline_section",
+  "start_date",
+  "end_date",
+  "meter_section",
+  "meter_id",
+  "column_break_lffv",
+  "start_reading",
+  "physical_section",
+  "has_cistern",
+  "cistern_capacity",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "Service Details"
+  },
+  {
+   "fieldname": "subscriber",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Subscriber",
+   "options": "Subscriber",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "subscriber.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Subscriber Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Premises",
+   "options": "Premises",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "service_category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Category",
+   "options": "Service Category",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Flat Rate",
+   "fieldname": "billing_basis",
+   "fieldtype": "Select",
+   "label": "Billing Basis",
+   "options": "Flat Rate\nMetered"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Active",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nSuspended\nClosed\nCancelled",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "last_status_change",
+   "fieldtype": "Date",
+   "label": "Last Status Change",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.billing_basis=='Metered'",
+   "fieldname": "meter_section",
+   "fieldtype": "Section Break",
+   "label": "Meter Information"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "meter_id",
+   "fieldtype": "Data",
+   "label": "Meter ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_lffv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "start_reading",
+   "fieldtype": "Float",
+   "label": "Initial Reading"
+  },
+  {
+   "fieldname": "physical_section",
+   "fieldtype": "Section Break",
+   "label": "Physical Characteristics"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "has_cistern",
+   "fieldtype": "Check",
+   "label": "Has Cistern?"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.has_cistern==1",
+   "fieldname": "cistern_capacity",
+   "fieldtype": "Float",
+   "label": "Cistern Capacity (m\u00b3)"
+  },
+  {
+   "fieldname": "timeline_section",
+   "fieldtype": "Section Break",
+   "label": "Timeline"
+  },
+  {
+   "default": "Today",
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Start Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Contract",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-30 01:09:29.701412",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Service Contract",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,88 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-01-30 00:16:49.520119",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "operation_date",
+  "service_contract",
+  "column_break_3",
+  "change_type",
+  "field_changed",
+  "section_break_6",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  },
+  {
+   "fieldname": "operation_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Operation Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "change_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Change Type",
+   "options": "Cistern Update\nBilling Basis Change\nStatus Change",
+   "reqd": 1
+  },
+  {
+   "fieldname": "field_changed",
+   "fieldtype": "Data",
+   "label": "Field Changed"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description/Reason"
+  }
+ ],
+ "grid_page_length": 50,
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-30 01:13:45.666080",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Service Contract Log",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "read_only": 1,
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "autoname": "READ-.YY.-.#####",
+ "creation": "2026-01-27 11:30:24.105662",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_n8vt",
+  "service_contract",
+  "subscriber",
+  "full_name",
+  "premises",
+  "column_break_4",
+  "reading_date",
+  "readings_section",
+  "previous_reading",
+  "current_reading",
+  "column_break_10",
+  "consumption",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_n8vt",
+   "fieldtype": "Section Break",
+   "label": "Contract Information"
+  },
+  {
+   "fetch_from": "service_contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "reading_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Reading Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "readings_section",
+   "fieldtype": "Section Break",
+   "label": "Consumption Details"
+  },
+  {
+   "fieldname": "previous_reading",
+   "fieldtype": "Float",
+   "label": "Previous Reading",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current_reading",
+   "fieldtype": "Float",
+   "label": "Current Reading",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "consumption",
+   "fieldtype": "Float",
+   "label": "Consumption (m\u00b3)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Meter Reading",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.subscriber",
+   "fieldname": "subscriber",
+   "fieldtype": "Link",
+   "label": "Subscriber",
+   "options": "Subscriber",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name / Company Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-30 09:38:58.291155",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Meter Reading",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "reading_date",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "subscriber"
+}

@@ -1,0 +1,174 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SVT-.YYYY.#####",
+ "creation": "2026-01-27 11:01:47.702530",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "general_info_sb",
+  "tariff_name",
+  "service_category",
+  "column_break_3",
+  "effective_from",
+  "status",
+  "flat_rate_config_sb",
+  "flat_rate_price",
+  "cistern_fee",
+  "metered_config_sb",
+  "fixed_charge",
+  "min_consumption",
+  "ranges",
+  "additional_fees_sb",
+  "additional_fees",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "general_info_sb",
+   "fieldtype": "Section Break",
+   "label": "General Information"
+  },
+  {
+   "fieldname": "tariff_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Tariff Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "effective_from",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Effective From",
+   "reqd": 1
+  },
+  {
+   "default": "Active",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Active\nInactive"
+  },
+  {
+   "fieldname": "metered_config_sb",
+   "fieldtype": "Section Break",
+   "label": "Metered Configuration"
+  },
+  {
+   "default": "0",
+   "description": "Base amount if the connection has a meter.",
+   "fieldname": "fixed_charge",
+   "fieldtype": "Currency",
+   "label": "Fixed Charge (Base)"
+  },
+  {
+   "default": "0",
+   "description": "m3 already included in the fixed charge.",
+   "fieldname": "min_consumption",
+   "fieldtype": "Float",
+   "label": "Included m3"
+  },
+  {
+   "fieldname": "ranges",
+   "fieldtype": "Table",
+   "label": "Consumption Ranges",
+   "options": "Service Tariff Range"
+  },
+  {
+   "fieldname": "flat_rate_config_sb",
+   "fieldtype": "Section Break",
+   "label": "Flat Rate Configuration"
+  },
+  {
+   "default": "0",
+   "description": "Total monthly amount if NO meter is present.",
+   "fieldname": "flat_rate_price",
+   "fieldtype": "Currency",
+   "label": "Flat Rate Price"
+  },
+  {
+   "default": "0",
+   "description": "Extra charge applied if the connection has a cistern and is Flat Rate.",
+   "fieldname": "cistern_fee",
+   "fieldtype": "Currency",
+   "label": "Additional Cistern Fee"
+  },
+  {
+   "fieldname": "additional_fees_sb",
+   "fieldtype": "Section Break",
+   "label": "Additional Monthly Fees"
+  },
+  {
+   "fieldname": "additional_fees",
+   "fieldtype": "Table",
+   "options": "Service Tariff Additional Fee"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Tariff",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "service_category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Category",
+   "options": "Service Category",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-30 10:01:56.294503",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Service Tariff",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Green",
+   "title": "Active"
+  },
+  {
+   "color": "Gray",
+   "title": "Inactive"
+  }
+ ],
+ "title_field": "tariff_name"
+}

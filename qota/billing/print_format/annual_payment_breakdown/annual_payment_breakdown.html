@@ -1,0 +1,217 @@
+<style>
+	.report-wrapper {
+		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+		color: #333;
+	}
+	.report-header {
+		text-align: center;
+		border-bottom: 3px solid #2c3e50;
+		padding-bottom: 10px;
+		margin-bottom: 20px;
+	}
+	.company-name {
+		font-size: 1.6em;
+		font-weight: bold;
+		color: #2c3e50;
+		text-transform: uppercase;
+	}
+	.report-title {
+		font-size: 1.1em;
+		letter-spacing: 2px;
+		color: #7f8c8d;
+	}
+
+	.info-grid {
+		display: flex;
+		flex-wrap: wrap;
+		margin-bottom: 25px;
+		border: 1px solid #ddd;
+		padding: 15px;
+		border-radius: 5px;
+	}
+	.info-item {
+		width: 50%;
+		margin-bottom: 5px;
+		font-size: 9.5pt;
+	}
+	.info-label {
+		font-weight: bold;
+		color: #2c3e50;
+		min-width: 100px;
+		display: inline-block;
+	}
+
+	.detailed-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 9pt;
+	}
+	.detailed-table th {
+		background-color: #2c3e50;
+		color: white;
+		padding: 10px 5px;
+		text-align: left;
+		text-transform: uppercase;
+	}
+	.detailed-table td {
+		border: 1px solid #eee;
+		padding: 8px 5px;
+		vertical-align: top;
+	}
+
+	.item-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		font-size: 8.5pt;
+	}
+	.item-list li {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 2px;
+		border-bottom: 1px solid #f9f9f9;
+	}
+
+	.text-right {
+		text-align: right;
+	}
+	.amount-col {
+		font-family: "Courier New", Courier, monospace;
+		font-weight: bold;
+	}
+	.discount-val {
+		color: #c0392b;
+	}
+	.total-row {
+		background-color: #f2f2f2;
+		font-weight: bold;
+		font-size: 10pt;
+	}
+	.grand-total-section {
+		margin-top: 20px;
+		text-align: right;
+		font-size: 12pt;
+		border-top: 2px solid #2c3e50;
+		padding-top: 10px;
+	}
+</style>
+
+{% set settings = frappe.get_doc("Billing Settings") %} {% set selected_year =
+frappe.form_dict.year or frappe.utils.nowdate()[:4] %} {% set billing_year_doc =
+frappe.get_doc("Billing Year", selected_year) %} {# CARGA DE DOCUMENTOS #} {% set sub_doc =
+frappe.get_doc("Subscriber", doc.subscriber) if doc.subscriber else None %} {% set premises_doc =
+frappe.get_doc("Premises", doc.premises) if doc.premises else None %} {% set st_doc =
+frappe.get_doc("Service Type", doc.service_type) %}
+
+<div class="report-wrapper">
+	<div class="report-header">
+		<div class="company-name">{{ settings.company_name }}</div>
+		<div class="report-title">
+			{{ _("Detailed Annual Payment Breakdown") }} - {{ selected_year }}
+		</div>
+	</div>
+
+	<div class="info-grid">
+		<div class="info-item">
+			<span class="info-label">{{ _("Subscriber") }}:</span> {{ doc.full_name }}
+		</div>
+		<div class="info-item">
+			<span class="info-label">{{ _("Contract") }}:</span> {{ doc.name }}
+		</div>
+		<div class="info-item">
+			<span class="info-label">{{ _("ID Number") }}:</span> {{ sub_doc.id_number if sub_doc
+			else "N/A" }}
+		</div>
+		<div class="info-item">
+			<span class="info-label">{{ _("Service") }}:</span> {{ doc.service_type }}
+		</div>
+		<div class="info-item">
+			<span class="info-label">{{ _("Location") }}:</span>
+			S:{{ premises_doc.sector or "" }} | B:{{ premises_doc.block or "" }} | C:{{
+			premises_doc.house_number or "" }}
+		</div>
+		<div class="info-item">
+			<span class="info-label">{{ _("Issue Date") }}:</span> {{ frappe.utils.nowdate() }}
+		</div>
+	</div>
+
+	<table class="detailed-table">
+		<thead>
+			<tr>
+				<th style="width: 12%">{{ _("Month") }}</th>
+				<th style="width: 15%">
+					{{ settings.water_service_label or _("Water Service") }}
+				</th>
+				<th>{{ _("Additional Charges") }}</th>
+				<th>{{ _("Applied Benefits") }}</th>
+				<th style="width: 15%" class="text-right">{{ _("Monthly Total") }}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% set annual_totals = [] %} {% for i in range(12) %} {% set month_start_date =
+			frappe.utils.add_months(billing_year_doc.start_date, i) %} {% set month_name =
+			frappe.utils.get_datetime(month_start_date).strftime("%B") %} {% set tariff_list =
+			frappe.get_all("Tariff", filters={"service_type": doc.service_type, "effective_from":
+			["<=", month_start_date], "docstatus": 1}, fields=["name", "flat_rate_price"],
+			order_by="effective_from desc", limit=1) %} {% if tariff_list %} {% set tariff_doc =
+			frappe.get_doc("Tariff", tariff_list[0].name) %} {% set base_val =
+			tariff_doc.flat_rate_price or 0 %} {# 1. DESGLOSE DE CARGOS #} {% set extras_sum =
+			tariff_doc.additional_fees | map(attribute='amount') | sum %} {# 2. DESGLOSE DE
+			DESCUENTOS (EDAD + MANUALES) #} {% set social_val = 0 %} {% if st_doc.allow_discounts
+			and doc.allow_discounts and doc.age and doc.age >= 60 %} {% set social_val = base_val *
+			0.25 %} {% endif %} {% set manual_benefits_sum = doc.applied_benefits |
+			map(attribute='discount_percentage') | sum %} {% set manual_discount_val = base_val *
+			(manual_benefits_sum / 100) %} {% set month_total = base_val + extras_sum - social_val
+			- manual_discount_val %} {% set void = annual_totals.append(month_total) %}
+
+			<tr>
+				<td><strong>{{ _(month_name) }}</strong></td>
+				<td class="amount-col">L. {{ "{:,.2f}".format(base_val) }}</td>
+
+				{# Columna de Cargos Extras Detallados #}
+				<td>
+					<ul class="item-list">
+						{% for fee in tariff_doc.additional_fees %}
+						<li>
+							<span>{{ fee.description }}</span>
+							<span class="amount-col">{{ "{:,.2f}".format(fee.amount) }}</span>
+						</li>
+						{% endfor %}
+					</ul>
+				</td>
+
+				{# Columna de Descuentos Detallados #}
+				<td>
+					<ul class="item-list">
+						{% if social_val > 0 %}
+						<li class="discount-val">
+							<span>{{ _("Social Discount (Age)") }}</span>
+							<span class="amount-col">-{{ "{:,.2f}".format(social_val) }}</span>
+						</li>
+						{% endif %} {% for benefit in doc.applied_benefits %}
+						<li class="discount-val">
+							<span>{{ benefit.benefit_name or _("Benefit") }}</span>
+							<span class="amount-col"
+								>-{{ "{:,.2f}".format(base_val * (benefit.discount_percentage /
+								100)) }}</span
+							>
+						</li>
+						{% endfor %}
+					</ul>
+				</td>
+
+				<td class="text-right amount-col" style="font-size: 11pt">
+					L. {{ "{:,.2f}".format(month_total) }}
+				</td>
+			</tr>
+			{% endif %} {% endfor %}
+		</tbody>
+	</table>
+
+	<div class="grand-total-section">
+		<strong>{{ _("Total Annual Projection") }}:</strong>
+		<span style="color: #2c3e50; font-size: 1.4em; margin-left: 20px">
+			L. {{ "{:,.2f}".format(annual_totals | sum) }}
+		</span>
+	</div>
+</div>

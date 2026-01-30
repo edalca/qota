@@ -1,0 +1,41 @@
+{
+ "app": "qota",
+ "creation": "2026-01-26 02:06:46.624051",
+ "docstatus": 0,
+ "doctype": "Workspace Sidebar",
+ "header_icon": "landmark",
+ "idx": 1,
+ "items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "book-user",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Abonado",
+   "link_to": "Subscriber",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "land-plot",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Predio / Inmueble",
+   "link_to": "Premises",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-01-28 23:11:52.409827",
+ "modified_by": "Administrator",
+ "module": "Governance",
+ "name": "Governance",
+ "owner": "Administrator",
+ "standard": 1,
+ "title": "Governance"
+}

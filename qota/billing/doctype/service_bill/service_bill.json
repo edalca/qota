@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SRV-BILL-.YY.-.#####",
+ "creation": "2026-01-28 01:08:37.116845",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "contract",
+  "subscriber",
+  "full_name",
+  "premises",
+  "column_break_3",
+  "posting_date",
+  "billing_month",
+  "billing_year",
+  "amended_from",
+  "billing_sb",
+  "billing_entry",
+  "total_amount"
+ ],
+ "fields": [
+  {
+   "fieldname": "contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Contract",
+   "options": "Water Connection",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "contract.subscriber",
+   "fieldname": "subscriber",
+   "fieldtype": "Link",
+   "label": "Subscriber",
+   "options": "Subscriber",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "billing_month",
+   "fieldtype": "Select",
+   "label": "Billing Month",
+   "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+   "reqd": 1
+  },
+  {
+   "fieldname": "billing_year",
+   "fieldtype": "Link",
+   "label": "Billing Year",
+   "options": "Billing Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "billing_sb",
+   "fieldtype": "Section Break",
+   "label": "Result"
+  },
+  {
+   "fieldname": "billing_entry",
+   "fieldtype": "Link",
+   "label": "Billing Entry",
+   "options": "Billing Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Bill",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fetch_from": "contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "contract.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name / Company Name",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-29 01:31:22.425116",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Service Bill",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

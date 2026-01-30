@@ -1,0 +1,142 @@
+{
+ "actions": [],
+ "autoname": "BILL-CYC-.year.-.###",
+ "creation": "2026-01-28 13:46:16.528240",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "info_sb",
+  "month",
+  "year",
+  "column_break_3",
+  "posting_date",
+  "amended_from",
+  "period_sb",
+  "period_start",
+  "period_end",
+  "summary_sb",
+  "total_entries",
+  "total_amount",
+  "entries_sb",
+  "generated_entries"
+ ],
+ "fields": [
+  {
+   "fieldname": "info_sb",
+   "fieldtype": "Section Break",
+   "label": "Cycle Information"
+  },
+  {
+   "fieldname": "month",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Billing Month",
+   "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+   "reqd": 1
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Billing Year",
+   "options": "Billing Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "Billing Cycle",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "period_sb",
+   "fieldtype": "Section Break",
+   "label": "Billing Period (Calculated)"
+  },
+  {
+   "fieldname": "period_start",
+   "fieldtype": "Date",
+   "label": "Period Start",
+   "read_only": 1
+  },
+  {
+   "fieldname": "period_end",
+   "fieldtype": "Date",
+   "label": "Period End",
+   "read_only": 1
+  },
+  {
+   "fieldname": "summary_sb",
+   "fieldtype": "Section Break",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "total_entries",
+   "fieldtype": "Int",
+   "label": "Total Entries Generated",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount Billed",
+   "read_only": 1
+  },
+  {
+   "fieldname": "entries_sb",
+   "fieldtype": "Section Break",
+   "label": "Detailed Entries"
+  },
+  {
+   "fieldname": "generated_entries",
+   "fieldtype": "Table",
+   "label": "Entries",
+   "options": "Billing Cycle Item",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-28 14:17:53.184578",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Billing Cycle",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "month"
+}

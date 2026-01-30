@@ -1,0 +1,20 @@
+{
+ "app": "qota",
+ "creation": "2026-01-27 11:51:46.470641",
+ "docstatus": 0,
+ "doctype": "Desktop Icon",
+ "hidden": 0,
+ "icon": "receipt-text",
+ "icon_type": "Link",
+ "idx": 11,
+ "label": "Billing",
+ "link_to": "Billing",
+ "link_type": "Workspace Sidebar",
+ "modified": "2026-01-27 11:52:38.742103",
+ "modified_by": "Administrator",
+ "name": "Billing",
+ "owner": "Administrator",
+ "restrict_removal": 0,
+ "roles": [],
+ "standard": 1
+}

@@ -1,0 +1,226 @@
+{
+  "actions": [],
+  "allow_rename": 1,
+  "creation": "2026-01-28 12:51:26.373548",
+  "doctype": "DocType",
+  "engine": "InnoDB",
+  "field_order": [
+    "general_sb",
+    "company_name",
+    "water_service_label",
+    "column_break_kkpg",
+    "default_currency",
+    "cycle_sb",
+    "cycle_start_day",
+    "column_break_8",
+    "reading_window_days",
+    "show_debt_details",
+    "separate_cistern_fee",
+    "rules_sb",
+    "days_until_due",
+    "column_break_lkbt",
+    "grace_period",
+    "discounts_sb",
+    "max_discounts_per_subscriber",
+    "column_break_disc",
+    "max_discounts_per_connection",
+    "taxes_sb",
+    "apply_isv",
+    "isv_percent",
+    "fees_sb",
+    "apply_late_fee",
+    "late_fee_type",
+    "late_fee_value",
+    "section_break_focd",
+    "bill_footer_message"
+  ],
+  "fields": [
+    {
+      "fieldname": "general_sb",
+      "fieldtype": "Section Break",
+      "label": "General Configuration"
+    },
+    {
+      "fieldname": "company_name",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Organization Name",
+      "reqd": 1
+    },
+    {
+      "fieldname": "water_service_label",
+      "fieldtype": "Data",
+      "in_list_view": 1,
+      "label": "Water Service Label",
+      "reqd": 1
+    },
+    {
+      "fieldname": "default_currency",
+      "fieldtype": "Link",
+      "in_list_view": 1,
+      "label": "Currency",
+      "options": "Currency",
+      "reqd": 1
+    },
+    {
+      "fieldname": "cycle_sb",
+      "fieldtype": "Section Break",
+      "label": "Cycle & Operations"
+    },
+    {
+      "default": "1",
+      "fieldname": "cycle_start_day",
+      "fieldtype": "Int",
+      "in_list_view": 1,
+      "label": "Cycle Start Day",
+      "reqd": 1
+    },
+    {
+      "default": "5",
+      "fieldname": "reading_window_days",
+      "fieldtype": "Int",
+      "label": "Reading Window (Days)"
+    },
+    {
+      "fieldname": "column_break_8",
+      "fieldtype": "Column Break"
+    },
+    {
+      "default": "1",
+      "fieldname": "show_debt_details",
+      "fieldtype": "Check",
+      "label": "Show Arrears Details on Bill?"
+    },
+    {
+      "fieldname": "separate_cistern_fee",
+      "fieldtype": "Check",
+      "label": "Show Cistern Fee as separate line item?",
+      "default": "0",
+      "description": "If unchecked, the cistern fee will be added to the Base Service amount in a single line."
+    },
+    {
+      "fieldname": "rules_sb",
+      "fieldtype": "Section Break",
+      "label": "Payment Terms"
+    },
+    {
+      "default": "15",
+      "fieldname": "days_until_due",
+      "fieldtype": "Int",
+      "label": "Days until Due Date"
+    },
+    {
+      "default": "0",
+      "fieldname": "grace_period",
+      "fieldtype": "Int",
+      "label": "Grace Period (Days)"
+    },
+    {
+      "fieldname": "column_break_lkbt",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "discounts_sb",
+      "fieldtype": "Section Break",
+      "label": "Discounts & Benefits"
+    },
+    {
+      "default": "1",
+      "description": "Maximum number of connections a single subscriber can have discounts on.",
+      "fieldname": "max_discounts_per_subscriber",
+      "fieldtype": "Int",
+      "label": "Max Discounts per Subscriber"
+    },
+    {
+      "default": "1",
+      "description": "How many different benefit rules can apply to a single connection.",
+      "fieldname": "max_discounts_per_connection",
+      "fieldtype": "Int",
+      "label": "Max Benefits per Connection"
+    },
+    {
+      "fieldname": "column_break_disc",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "taxes_sb",
+      "fieldtype": "Section Break",
+      "label": "Taxes"
+    },
+    {
+      "default": "0",
+      "fieldname": "apply_isv",
+      "fieldtype": "Check",
+      "label": "Apply Sales Tax (ISV/IVA)?"
+    },
+    {
+      "depends_on": "eval:doc.apply_isv==1",
+      "fieldname": "isv_percent",
+      "fieldtype": "Percent",
+      "label": "Tax Percentage"
+    },
+    {
+      "fieldname": "fees_sb",
+      "fieldtype": "Section Break",
+      "label": "Late Fees / Penalties"
+    },
+    {
+      "default": "0",
+      "fieldname": "apply_late_fee",
+      "fieldtype": "Check",
+      "label": "Apply Late Fees automatically?"
+    },
+    {
+      "depends_on": "eval:doc.apply_late_fee==1",
+      "fieldname": "late_fee_type",
+      "fieldtype": "Select",
+      "label": "Late Fee Type",
+      "options": "Fixed Amount\nPercentage"
+    },
+    {
+      "depends_on": "eval:doc.apply_late_fee==1",
+      "fieldname": "late_fee_value",
+      "fieldtype": "Currency",
+      "label": "Late Fee Value"
+    },
+    {
+      "fieldname": "section_break_focd",
+      "fieldtype": "Section Break",
+      "label": "Bill Footer Message"
+    },
+    {
+      "fieldname": "bill_footer_message",
+      "fieldtype": "Text Editor"
+    },
+    {
+      "fieldname": "column_break_kkpg",
+      "fieldtype": "Column Break"
+    }
+  ],
+  "grid_page_length": 50,
+  "index_web_pages_for_search": 1,
+  "issingle": 1,
+  "links": [],
+  "modified": "2026-01-29 02:31:54.374482",
+  "modified_by": "Administrator",
+  "module": "Billing",
+  "name": "Billing Settings",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "delete": 1,
+      "email": 1,
+      "print": 1,
+      "read": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "row_format": "Dynamic",
+  "rows_threshold_for_grid_search": 20,
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "states": []
+}

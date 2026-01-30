@@ -1,0 +1,265 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-01-28 13:38:18.982823",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "info_sb",
+  "contract",
+  "subscriber",
+  "subscriber_name",
+  "column_break_4",
+  "posting_date",
+  "due_date",
+  "billing_month",
+  "billing_year",
+  "location_sb",
+  "premises",
+  "address_html",
+  "consumption_sb",
+  "meter_reading",
+  "previous_reading",
+  "column_break_14",
+  "current_reading",
+  "consumption",
+  "financial_sb",
+  "lines",
+  "column_break_20",
+  "fixed_charge",
+  "excess_charge",
+  "total_discount",
+  "additional_fees",
+  "previous_balance",
+  "total_amount",
+  "audit_sb",
+  "source_type",
+  "source_reference",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "info_sb",
+   "fieldtype": "Section Break",
+   "label": "General Information"
+  },
+  {
+   "fieldname": "contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Contract",
+   "options": "Water Connection",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "contract.subscriber",
+   "fieldname": "subscriber",
+   "fieldtype": "Link",
+   "label": "Subscriber",
+   "options": "Subscriber",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "subscriber.subscriber_name",
+   "fieldname": "subscriber_name",
+   "fieldtype": "Data",
+   "label": "Subscriber Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "billing_month",
+   "fieldtype": "Select",
+   "label": "Billing Month",
+   "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
+   "read_only": 1
+  },
+  {
+   "fieldname": "billing_year",
+   "fieldtype": "Link",
+   "label": "Billing Year",
+   "options": "Billing Year",
+   "read_only": 1
+  },
+  {
+   "fieldname": "location_sb",
+   "fieldtype": "Section Break",
+   "label": "Location Details"
+  },
+  {
+   "fetch_from": "contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "fieldname": "address_html",
+   "fieldtype": "HTML",
+   "label": "Detailed Address"
+  },
+  {
+   "fieldname": "consumption_sb",
+   "fieldtype": "Section Break",
+   "label": "Consumption Details"
+  },
+  {
+   "fieldname": "meter_reading",
+   "fieldtype": "Link",
+   "label": "Meter Reading Ref",
+   "options": "Meter Reading",
+   "read_only": 1
+  },
+  {
+   "fieldname": "previous_reading",
+   "fieldtype": "Float",
+   "label": "Previous Reading",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "current_reading",
+   "fieldtype": "Float",
+   "label": "Current Reading",
+   "read_only": 1
+  },
+  {
+   "fieldname": "consumption",
+   "fieldtype": "Float",
+   "label": "Consumption (m3)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "financial_sb",
+   "fieldtype": "Section Break",
+   "label": "Charges & Breakdown"
+  },
+  {
+   "fieldname": "lines",
+   "fieldtype": "Table",
+   "label": "Bill Lines",
+   "options": "Billing Entry Line",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "fixed_charge",
+   "fieldtype": "Currency",
+   "label": "Fixed Charge",
+   "read_only": 1
+  },
+  {
+   "fieldname": "excess_charge",
+   "fieldtype": "Currency",
+   "label": "Excess Charge",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_discount",
+   "fieldtype": "Currency",
+   "label": "Total Discount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_fees",
+   "fieldtype": "Currency",
+   "label": "Additional Fees",
+   "read_only": 1
+  },
+  {
+   "fieldname": "previous_balance",
+   "fieldtype": "Currency",
+   "label": "Previous Balance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "audit_sb",
+   "fieldtype": "Section Break",
+   "label": "Audit Trail"
+  },
+  {
+   "fieldname": "source_type",
+   "fieldtype": "Select",
+   "label": "Source Type",
+   "options": "Service Bill\nBilling Cycle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "source_reference",
+   "fieldtype": "Dynamic Link",
+   "label": "Source Reference",
+   "options": "source_type",
+   "read_only": 1
+  },
+  {
+   "default": "Unpaid",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Unpaid\nPaid\nOverdue",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-01-29 01:31:22.066463",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Billing Entry",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "read_only": 1,
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
