@@ -8,7 +8,10 @@ frappe.ui.form.on("Service Contract", {
 			return { filters: { status: "Active" } };
 		});
 		frm.set_query("premises", () => {
-			return { filters: { status: "Active" } };
+			return {
+				query: "qota.governance.doctype.premises.premises.premises_search",
+				filters: { status: "Active", docstatus: 0 },
+			};
 		});
 	},
 
@@ -25,6 +28,9 @@ frappe.ui.form.on("Service Contract", {
 			fields_to_lock.forEach((field) => {
 				frm.set_df_property(field, "read_only", 1);
 			});
+		}
+		if (window.qota && qota.utils && qota.utils.set_premises_description) {
+			qota.utils.set_premises_description(frm);
 		}
 		// 1. Buttons for new records
 		if (frm.is_new()) {
@@ -221,6 +227,9 @@ frappe.ui.form.on("Service Contract", {
 					}
 				},
 			});
+		}
+		if (window.qota && qota.utils && qota.utils.set_premises_description) {
+			qota.utils.set_premises_description(frm);
 		}
 	},
 

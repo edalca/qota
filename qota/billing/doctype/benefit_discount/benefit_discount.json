@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "autoname": "BD-.YY.-.####",
+ "creation": "2026-01-30 18:46:39.669375",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "effective_date",
+  "service_contract",
+  "full_name",
+  "premises",
+  "column_break_gori",
+  "status",
+  "benefit_information_section",
+  "discount_rule",
+  "discount_percentage",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  },
+  {
+   "fieldname": "discount_rule",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Discount Rule",
+   "link_filters": "[[\"Discount Rule\",\"condition_type\",\"=\",\"Manual Tag\"]]",
+   "options": "Discount Rule",
+   "reqd": 1
+  },
+  {
+   "fieldname": "effective_date",
+   "fieldtype": "Date",
+   "label": "Effective Date",
+   "reqd": 1
+  },
+  {
+   "default": "Active",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nInactive",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "service_contract.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name / Company Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_gori",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "service_contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "fieldname": "benefit_information_section",
+   "fieldtype": "Section Break",
+   "label": "Benefit Information"
+  },
+  {
+   "fetch_from": "discount_rule.discount_percentage",
+   "fieldname": "discount_percentage",
+   "fieldtype": "Percent",
+   "label": "Discount Percentage",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Benefit Discount",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-30 19:02:15.060473",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Benefit Discount",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Green",
+   "title": "Active"
+  },
+  {
+   "color": "Gray",
+   "title": "Inactive"
+  }
+ ],
+ "title_field": "full_name"
+}

@@ -1,88 +1,105 @@
 <style>
-    .page-container {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        color: #333;
-        width: 100%;
-    }
-    .month-row {
-        display: flex;
-        width: 100%;
-        border: 1.5px solid #000;
-        margin-bottom: 20px; /* Espacio para el corte */
-        min-height: 280px; /* Altura ideal para 3 por página carta */
-        page-break-inside: avoid;
-        background-color: #fff;
-    }
-    .coupon-copy {
-        width: 50%;
-        padding: 15px;
-        position: relative;
-        box-sizing: border-box;
-    }
-    .subscriber-side {
-        border-right: 2px dashed #000;
-    }
-    .cut-indicator {
-        position: absolute;
-        right: -10px;
-        top: 10px;
-        background: #fff;
-        z-index: 10;
-        font-size: 14pt;
-    }
-    .header-area {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 2px solid #000;
-        margin-bottom: 10px;
-        padding-bottom: 5px;
-    }
-    .company-title {
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 10pt;
-    }
-    .copy-label {
-        font-size: 8pt;
-        font-weight: bold;
-        text-transform: uppercase;
-        border: 1px solid #000;
-        padding: 2px 6px;
-    }
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-        margin-bottom: 10px;
-        font-size: 9pt;
-    }
-    .full-width { grid-column: span 2; }
-    .service-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 8.5pt;
-    }
-    .service-table td {
-        border: 1px solid #ccc;
-        padding: 5px;
-    }
-    .text-right { text-align: right; }
-    .total-box {
-        margin-top: 10px;
-        background: #f2f2f2;
-        padding: 8px;
-        border: 2px solid #000;
-        text-align: right;
-        font-weight: bold;
-        font-size: 11pt;
-    }
-    .footer-note {
-        margin-top: 12px;
-        font-size: 7.5pt;
-        display: flex;
-        justify-content: space-between;
-    }
-    .page-break { page-break-after: always; }
+	.page-container {
+		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+		color: #333;
+		width: 100%;
+		background-color: #fff;
+	}
+
+	.month-row {
+		display: flex;
+		width: 100%;
+		border: 1.5px solid #000;
+		margin-bottom: 20px;
+		min-height: 290px;
+		page-break-inside: avoid;
+		background-color: #fff;
+		box-sizing: border-box;
+	}
+
+	.coupon-copy {
+		width: 50%;
+		padding: 12px;
+		position: relative;
+		box-sizing: border-box;
+	}
+
+	.subscriber-side {
+		border-right: 2px dashed #000;
+	}
+
+	.cut-indicator {
+		position: absolute;
+		right: -10px;
+		top: 10px;
+		background: #fff;
+		z-index: 10;
+		font-size: 14pt;
+	}
+
+	.header-area {
+		display: flex;
+		justify-content: space-between;
+		border-bottom: 2px solid #000;
+		margin-bottom: 8px;
+		padding-bottom: 5px;
+	}
+
+	.company-title {
+		font-weight: bold;
+		text-transform: uppercase;
+		font-size: 9.5pt;
+	}
+
+	.copy-label {
+		font-size: 7.5pt;
+		font-weight: bold;
+		text-transform: uppercase;
+		border: 1px solid #000;
+		padding: 2px 5px;
+	}
+
+	.info-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 3px;
+		margin-bottom: 8px;
+		font-size: 8.5pt;
+	}
+
+	.full-width {
+		grid-column: span 2;
+	}
+
+	.service-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 8.5pt;
+	}
+
+	.service-table td {
+		border: 1px solid #ccc;
+		padding: 4px;
+	}
+
+	.text-right {
+		text-align: right;
+	}
+
+	.total-box {
+		margin-top: 10px;
+		background: #f2f2f2;
+		padding: 8px;
+		border: 2px solid #000;
+		text-align: right;
+		font-weight: bold;
+		font-size: 11pt;
+	}
+
+	.page-break {
+		page-break-after: always;
+		clear: both;
+	}
 </style>
 
 {% set settings = frappe.get_doc("Billing Settings") %}
@@ -90,124 +107,135 @@
 {% set premises_doc = frappe.get_doc("Premises", doc.premises) if doc.premises else None %}
 {% set sub_doc = frappe.get_doc("Subscriber", doc.subscriber) if doc.subscriber else None %}
 
-{% if doc.service_category %}
-    {% set st_doc = frappe.get_doc("Service Category", doc.service_category) %}
+{# --- LÓGICA DE DESCUENTOS --- #}
+{% set is_natural_person = sub_doc and sub_doc.subscriber_type == "Natural Person" %}
+{% set ns = namespace(best_rule=None, social_discount=0, grand_total=0) %}
+{% set benefit_list = frappe.get_all("Benefit Discount",
+filters={
+"service_contract": doc.name,
+"docstatus": 1,
+"status": "Active"
+},
+fields=["discount_rule"],
+order_by="discount_percentage desc",
+limit=1)
+%}
+{% set manual_rule_id = benefit_list[0].discount_rule if benefit_list else None %}
 
-    <div class="page-container">
-        {% for i in range(12) %}
-            {% set month_num = i + 1 %}
-            {% set month_date = selected_year ~ "-" ~ "{:02d}".format(month_num) ~ "-01" %}
-            {% set month_name = frappe.utils.get_datetime(month_date).strftime("%B") %}
-            
-            {% set tariff_list = frappe.get_all("Service Tariff", 
-                filters={
-                    "service_type": doc.service_category, 
-                    "effective_from": ["<=", month_date], 
-                    "status": "Active", 
-                    "docstatus": 1
-                }, 
-                fields=["name", "flat_rate_price"], 
-                order_by="effective_from desc", 
-                limit=1) 
-            %}
+{% set age_rules = frappe.get_all("Discount Rule",
+filters={
+"minimum_age": ["<=", sub_doc.age | int], "condition_type" : "Age" }, fields=["discount_percentage"],
+	order_by="discount_percentage desc" , limit=1 ) %} {% set manual_rules=frappe.get_all("Discount Rule",
+	filters={ "name" : manual_rule_id }, fields=["discount_percentage"], order_by="discount_percentage desc" , limit=1 )
+	%} {% set rules=age_rules + manual_rules %} {% for r in rules %} {% if not ns.best_rule %} {% set ns.best_rule=r %}
+	{% endif %} {% endfor %} {% if doc.service_category %} {% set st_doc=frappe.get_doc("Service Category",
+	doc.service_category) %} <div class="page-container">
+	{% for i in range(12) %}
+	{% set month_num = i + 1 %}
+	{% set month_date = selected_year ~ "-" ~ "{:02d}".format(month_num) ~ "-01" %}
+	{% set month_name = frappe.utils.get_datetime(month_date).strftime("%B") %}
 
-            {% if tariff_list and tariff_list|length > 0 %}
-                {% set tariff_doc = frappe.get_doc("Service Tariff", tariff_list[0].name) %}
-                {% set base_price = tariff_doc.flat_rate_price | float %}
-                {% set extra_sum = 0 %}{% if tariff_doc.additional_fees %}{% for row in tariff_doc.additional_fees %}{% set extra_sum = extra_sum + (row.amount | float) %}{% endfor %}{% endif %}
+	{% set tariff_list = frappe.get_all("Service Tariff",
+	filters={ "service_category": doc.service_category, "docstatus": 1, "effective_from": ["<=", month_date] },
+		fields=["name", "flat_rate_price" ], order_by="effective_from desc" , limit=1) %} {% if tariff_list %} {% set
+		tariff_doc=frappe.get_doc("Service Tariff", tariff_list[0].name) %} {% set
+		tariff_additional_fees=tariff_doc.additional_fees %} {% set base_price=tariff_doc.flat_rate_price | float %} {%
+		set extra_sum=tariff_additional_fees | map(attribute='amount' ) | sum if tariff_additional_fees else 0 %} {# ---
+		REINICIO DE CÁLCULOS MENSUALES --- #} {% set ns.social_discount=0 %} {% if st_doc.allow_discounts and
+		ns.best_rule %} {% set ns.social_discount=base_price * (ns.best_rule.discount_percentage / 100) %} {% endif %}
+		{% for fee in tariff_additional_fees %} {% if fee.allow_discounts and ns.best_rule %} {% set
+		ns.social_discount=ns.social_discount + (fee.amount * (ns.best_rule.discount_percentage / 100)) %} {% endif %}
+		{% endfor %} {% set ns.grand_total=base_price + extra_sum - ns.social_discount %} <div class="month-row">
+		<div class="coupon-copy subscriber-side">
+			<div class="cut-indicator">✂</div>
+			<div class="header-area">
+				<span class="company-title">{{ settings.company_name }}</span>
+				<span class="copy-label">{{ _("Subscriber") }}</span>
+			</div>
 
-                {% set social_discount = 0 %}
-                {% if st_doc.allow_social_discounts and doc.age and doc.age|int >= 60 %}
-                    {% set social_discount = base_price * 0.25 %}
-                {% endif %}
-                
-                {% set grand_total = base_price + extra_sum - social_discount %}
+			<div class="info-grid">
+				<div class="full-width"><strong>{{ _("Name") }}:</strong> {{ doc.full_name }}</div>
+				<div class="full-width">
+					<strong>{{ _("ID Number") }}:</strong> {{ sub_doc.id_number if sub_doc else "N/A" }}
+				</div>
+				<div><strong>{{ _("Contract") }}:</strong> {{ doc.name }}</div>
+				<div class="text-right">
+					<strong>{{ _("Month") }}:</strong> {{ _(month_name) }} {{ selected_year }}
+				</div>
 
-                <div class="month-row">
-                    <div class="coupon-copy subscriber-side">
-                        <div class="cut-indicator">✂</div>
-                        <div class="header-area">
-                            <span class="company-title">{{ settings.company_name }}</span>
-                            <span class="copy-label">{{ _("Subscriber") }}</span>
-                        </div>
-                        
-                        <div class="info-grid">
-                            <div class="full-width"><strong>{{ _("Name") }}:</strong> {{ doc.full_name }}</div>
-                            <div class="full-width"><strong>{{ _("ID Number") }}:</strong> {{ sub_doc.id_number if sub_doc else "N/A" }}</div>
-                            <div><strong>{{ _("Contract") }}:</strong> {{ doc.name }}</div>
-                            <div class="text-right"><strong>{{ _("Month") }}:</strong> {{ _(month_name) }} {{ selected_year }}</div>
-                            <div class="full-width">
-                                <strong>{{ _("Location") }}:</strong> 
-                                {{ _("Block") }}: {{ premises_doc.block if premises_doc else "N/A" }} | 
-                                {{ _("House") }}: {{ premises_doc.house_number if premises_doc else "N/A" }}
-                            </div>
-                        </div>
+				{% if is_natural_person %}
+				<div><strong>{{ _("Age") }}:</strong> {{ sub_doc.age }}</div>
+				{% endif %}
 
-                        <table class="service-table">
-                            <tr>
-                                <td>{{ settings.water_service_label or _("Water Service") }}</td>
-                                <td class="text-right">{{ "{:,.2f}".format(base_price) }}</td>
-                            </tr>
-                            {% for extra in tariff_doc.additional_fees %}
-                            <tr>
-                                <td>{{ extra.description or _("Fee") }}</td>
-                                <td class="text-right">{{ "{:,.2f}".format(extra.amount) }}</td>
-                            </tr>
-                            {% endfor %}
-                            {% if social_discount > 0 %}
-                            <tr style="color: #d00">
-                                <td>{{ _("Discount (60+)") }}</td>
-                                <td class="text-right">-{{ "{:,.2f}".format(social_discount) }}</td>
-                            </tr>
-                            {% endif %}
-                        </table>
-                        
-                        <div class="total-box">
-                            {{ _("Total") }}: {{ settings.default_currency or "L." }} {{ "{:,.2f}".format(grand_total) }}
-                        </div>
-                        <div class="footer-note">
-                            <span>{{ _("Date:") }} {{ frappe.utils.nowdate() }}</span>
-                            <span>{{ _("Collector Signature") }}: ________________</span>
-                        </div>
-                    </div>
+				<div class="text-right">
+					<strong>{{ _("Location") }}:</strong>
+					B:{{ premises_doc.block if premises_doc else "-" }} | C:{{ premises_doc.house_number if
+					premises_doc else "-" }}
+				</div>
+			</div>
 
-                    <div class="coupon-copy">
-                        <div class="header-area">
-                            <span class="company-title">{{ settings.company_name }}</span>
-                            <span class="copy-label">{{ _("Board") }}</span>
-                        </div>
-                        
-                        <div class="info-grid">
-                            <div class="full-width"><strong>{{ _("Subscriber") }}:</strong> {{ doc.full_name }}</div>
-                            <div class="full-width"><strong>{{ _("ID") }}:</strong> {{ sub_doc.id_number if sub_doc else "N/A" }}</div>
-                            <div><strong>{{ _("Ref") }}:</strong> {{ doc.name }}</div>
-                            <div class="text-right"><strong>{{ _("Month") }}:</strong> {{ _(month_name) }}</div>
-                            <div class="full-width"><strong>{{ _("Location") }}:</strong> {{ premises_doc.block }} | {{ premises_doc.house_number }}</div>
-                        </div>
+			<table class="service-table">
+				<tr>
+					<td>{{ settings.water_service_label or _("Water Service") }}</td>
+					<td class="text-right">{{ "{:,.2f}".format(base_price) }}</td>
+				</tr>
+				{% for extra in tariff_additional_fees %}
+				<tr>
+					<td>{{ extra.description or _("Fee") }}</td>
+					<td class="text-right">{{ "{:,.2f}".format(extra.amount) }}</td>
+				</tr>
+				{% endfor %}
 
-                        <div style="margin-top: 15px; border: 2px solid #000; padding: 12px; text-align: center; background-color: #f9f9f9;">
-                            <span style="font-size: 13pt; font-weight: bold;">
-                                {{ _("Total Paid") }}: {{ "{:,.2f}".format(grand_total) }}
-                            </span>
-                        </div>
-                        
-                        <div style="margin-top: 20px; font-size: 8.5pt;">
-                            <strong>{{ _("Payment Date") }}:</strong> ________________<br><br>
-                            <strong>{{ _("Signature") }}:</strong> ________________
-                        </div>
-                        
-                        <div class="footer-note">
-                            <span>ID: {{ doc.name }}-{{ i+1 }}</span>
-                            <span style="font-weight: bold;">{{ selected_year }}</span>
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
+				{% if ns.social_discount > 0 %}
+				<tr style="color: #d00">
+					<td>{{ _("Discount") }} ({{ ns.best_rule.discount_percentage | int }}%)</td>
+					<td class="text-right">-{{ "{:,.2f}".format(ns.social_discount) }}</td>
+				</tr>
+				{% endif %}
+			</table>
 
-            {# SALTO DE PÁGINA CADA 3 MESES #}
-            {% if (i + 1) % 3 == 0 and not loop.last %}
-                <div class="page-break"></div>
-            {% endif %}
-        {% endfor %}
-    </div>
-{% endif %}
+			<div class="total-box">
+				{{ _("Total") }}: {{ settings.default_currency or "L." }}
+				{{ "{:,.2f}".format(ns.grand_total) }}
+			</div>
+		</div>
+
+		<div class="coupon-copy">
+			<div class="header-area">
+				<span class="company-title">{{ settings.company_name }}</span>
+				<span class="copy-label">{{ _("Board") }}</span>
+			</div>
+
+			<div class="info-grid">
+				<div class="full-width"><strong>{{ _("Subscriber") }}:</strong> {{ doc.full_name }}</div>
+				<div class="full-width"><strong>{{ _("ID") }}:</strong> {{ sub_doc.id_number if sub_doc else "N/A"
+					}}</div>
+				<div><strong>{{ _("Ref") }}:</strong> {{ doc.name }}</div>
+				<div class="text-right"><strong>{{ _("Month") }}:</strong> {{ _(month_name) }}</div>
+				<div class="full-width">
+					<strong>{{ _("Location") }}:</strong> B:{{ premises_doc.block }} | C:{{
+					premises_doc.house_number }}
+				</div>
+			</div>
+
+			<div
+				style="margin-top: 15px; border: 2px solid #000; padding: 12px; text-align: center; background-color: #f9f9f9;">
+				<span style="font-size: 13pt; font-weight: bold">
+					{{ _("Total Paid") }}: {{ "{:,.2f}".format(ns.grand_total) }}
+				</span>
+			</div>
+
+			<div style="margin-top: 25px; font-size: 8.5pt">
+				<strong>{{ _("Date") }}:</strong> ________________<br /><br />
+				<strong>{{ _("Signature") }}:</strong> ________________
+			</div>
+		</div>
+		</div>
+
+		{% if (i + 1) % 3 == 0 and not loop.last %}
+		<div class="page-break"></div>
+		{% endif %}
+		{% endif %}
+		{% endfor %}
+		</div>
+		{% endif %}

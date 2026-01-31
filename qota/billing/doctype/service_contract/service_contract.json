@@ -168,7 +168,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-30 01:09:29.701412",
+ "modified": "2026-01-30 18:48:28.445542",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Service Contract",
@@ -176,6 +176,7 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -193,5 +194,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "full_name"
 }
