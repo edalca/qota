@@ -1,0 +1,62 @@
+{
+  "actions": [],
+  "allow_rename": 1,
+  "autoname": "hash",
+  "creation": "2026-01-31 05:38:59.824676",
+  "doctype": "DocType",
+  "editable_grid": 1,
+  "engine": "InnoDB",
+  "field_order": ["due_date", "amount", "status", "billed_invoice"],
+  "fields": [
+    {
+      "fieldname": "due_date",
+      "fieldtype": "Date",
+      "in_list_view": 1,
+      "label": "Due Date",
+      "reqd": 1,
+      "columns": 3
+    },
+    {
+      "fieldname": "amount",
+      "fieldtype": "Currency",
+      "in_list_view": 1,
+      "label": "Amount",
+      "reqd": 1,
+      "columns": 3
+    },
+    {
+      "default": "Pending",
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "in_list_view": 1,
+      "label": "Status",
+      "options": "Pending\nBilled\nPaid",
+      "read_only": 1,
+      "columns": 2
+    },
+    {
+      "fieldname": "billed_invoice",
+      "fieldtype": "Link",
+      "label": "Billed In",
+      "options": "Service Bill",
+      "read_only": 1,
+      "columns": 3
+    }
+  ],
+  "grid_page_length": 50,
+  "index_web_pages_for_search": 1,
+  "istable": 1,
+  "links": [],
+  "modified": "2026-01-31 05:39:11.798783",
+  "modified_by": "Administrator",
+  "module": "Billing",
+  "name": "Amortization Schedule Item",
+  "naming_rule": "Random",
+  "owner": "Administrator",
+  "permissions": [],
+  "row_format": "Dynamic",
+  "rows_threshold_for_grid_search": 20,
+  "sort_field": "creation",
+  "sort_order": "DESC",
+  "states": []
+}

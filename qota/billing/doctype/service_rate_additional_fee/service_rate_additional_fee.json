@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-01-30 09:24:46.200265",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_godq",
+  "description",
+  "amount",
+  "allow_discounts",
+  "is_late_fee_applicable"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_godq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "If unchecked, NO discounts (Age, Disability, etc.) will be applied to this service type.",
+   "fieldname": "allow_discounts",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Allow Social/Legal Discounts"
+  },
+  {
+   "default": "0",
+   "description": "If checked, this amount will be included in the base calculation for percentage-based late fees.",
+   "fieldname": "is_late_fee_applicable",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Subject to Late Fee?"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-01-31 06:27:54.707131",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Service Rate Additional Fee",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

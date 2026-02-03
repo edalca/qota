@@ -1,0 +1,173 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "REF-.YY.#####",
+ "creation": "2026-01-31 05:35:21.757999",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "contract_section",
+  "service_contract",
+  "subscriber",
+  "premises",
+  "column_break_mmty",
+  "posting_date",
+  "current_total_debt",
+  "terms_section",
+  "down_payment",
+  "new_financed_debt",
+  "column_break_5",
+  "installments",
+  "monthly_installment_amount",
+  "start_payment_date",
+  "schedule_section",
+  "amortization_schedule",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "contract_section",
+   "fieldtype": "Section Break",
+   "label": "Current Status"
+  },
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "service_contract.full_name",
+   "fieldname": "subscriber",
+   "fieldtype": "Data",
+   "label": "Subscriber",
+   "read_only": 1
+  },
+  {
+   "description": "Total outstanding debt fetched from Ledger.",
+   "fieldname": "current_total_debt",
+   "fieldtype": "Currency",
+   "label": "Current Total Debt",
+   "read_only": 1
+  },
+  {
+   "fieldname": "terms_section",
+   "fieldtype": "Section Break",
+   "label": "Refinancing Terms"
+  },
+  {
+   "default": "0",
+   "description": "Amount paid immediately",
+   "fieldname": "down_payment",
+   "fieldtype": "Currency",
+   "label": "Down Payment (Paid Now)",
+   "reqd": 1
+  },
+  {
+   "description": "The amount that will be split into installments (Total - Down Payment).",
+   "fieldname": "new_financed_debt",
+   "fieldtype": "Currency",
+   "label": "Amount to Finance",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "installments",
+   "fieldtype": "Int",
+   "label": "Number of Installments",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "monthly_installment_amount",
+   "fieldtype": "Currency",
+   "label": "Monthly Installment",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "description": "Date when the first installment will be charged in the bill.",
+   "fieldname": "start_payment_date",
+   "fieldtype": "Date",
+   "label": "First Installment Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "schedule_section",
+   "fieldtype": "Section Break",
+   "label": "New Payment Schedule"
+  },
+  {
+   "fieldname": "amortization_schedule",
+   "fieldtype": "Table",
+   "label": "Schedule",
+   "options": "Amortization Schedule Item"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Debt Refinancing",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_mmty",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "service_contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "description": "Date when the debt is formally restructured.",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Transaction Date",
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-31 23:22:03.595643",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Debt Refinancing",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
