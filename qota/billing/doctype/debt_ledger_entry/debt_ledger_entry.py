@@ -3,7 +3,8 @@
 
 import frappe
 from frappe.model.document import Document
-from frappe.utils import today
+from frappe.utils import today, flt
+
 
 class DebtLedgerEntry(Document):
     # begin: auto-generated types
@@ -14,48 +15,41 @@ class DebtLedgerEntry(Document):
     if TYPE_CHECKING:
         from frappe.types import DF
 
+        amended_from: DF.Link | None
         amount: DF.Currency
-        entry_type: DF.Literal["Connection Fee", "Monthly Fee", "Late Fee", "Payment", "Reconnection Fee"]
-        fiscal_month: DF.Literal["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-        fiscal_year: DF.Int
-        full_name: DF.Data | None
-        posting_date: DF.Date
-        premises: DF.Link | None
+        description: DF.SmallText | None
+        due_date: DF.Date | None
+        entry_type: DF.Literal["Monthly Fee", "Connection Fee", "Late Fee", "Reconnection Fee", "Other Fee"]
+        outstanding_amount: DF.Currency
+        paid_amount: DF.Currency
         reference_doctype: DF.Link | None
         reference_name: DF.DynamicLink | None
         service_contract: DF.Link
-        subscriber: DF.Link | None
+        status: DF.Literal["Unpaid", "Partially Paid", "Paid"]
     # end: auto-generated types
 
-    @staticmethod
-    def create_entry(contract, entry_type, amount, ref_dt, ref_dn, posting_date=None, fiscal_year=None, fiscal_month=None,description=None):
+    def validate(self):
         """
-        Método centralizado para registrar deudas o pagos en el historial del contrato.
-        
-        Args:
-            contract (str): ID del Service Contract.
-            entry_type (str): Tipo de movimiento (Connection Fee, Monthly Bill, Payment...).
-            amount (float): Monto (Positivo = Deuda, Negativo = Abono).
-            ref_dt (str): DocType de origen (ej. 'Service Contract', 'Service Bill').
-            ref_dn (str): ID del documento origen.
-            posting_date (date, optional): Fecha del movimiento. Default: Hoy.
+        Calculate the outstanding balance and update the status automatically.
         """
+        self.amount = flt(self.amount)
+        self.paid_amount = flt(self.paid_amount)
         
-        if not amount:
-            return
+        # Balance Formula: Outstanding = Original - Paid
+        self.outstanding_amount = self.amount - self.paid_amount
+        
+        # Status Management
+        if self.outstanding_amount <= 0.01:
+            self.status = "Paid"
+        elif self.paid_amount > 0:
+            self.status = "Partially Paid"
+        else:
+            self.status = "Unpaid"
 
-        entry = frappe.new_doc("Debt Ledger Entry")
-        entry.posting_date = posting_date or today()
-        entry.service_contract = contract
-        entry.entry_type = entry_type
-        entry.amount = amount
-        entry.reference_doctype = ref_dt
-        entry.reference_name = ref_dn
-        entry.fiscal_year = fiscal_year
-        entry.fiscal_month = fiscal_month
-        entry.description = description
-        
-        # Insertar ignorando permisos (porque es un proceso del sistema)
-        entry.insert(ignore_permissions=True)
-        
-        return entry.name
+    def on_cancel(self):
+        """
+        Prevent cancellation if there are active payment allocations.
+        """
+        allocations_exist = frappe.db.exists("Payment Allocation", {"debt_ledger_entry": self.name})
+        if allocations_exist:
+            frappe.throw(_("Cannot cancel this debt because it has allocated payments. Please cancel the associated payment receipts first."))

@@ -1,45 +1,54 @@
 {
  "actions": [],
- "autoname": "BILL-CYC-.year.-.###",
- "creation": "2026-01-28 13:46:16.528240",
+ "allow_rename": 1,
+ "autoname": "BC-.YY.-.#####",
+ "creation": "2026-02-02 07:17:01.342695",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "info_sb",
-  "month",
-  "year",
+  "section_break_1",
+  "fiscal_year",
+  "fiscal_month",
+  "billing_basis",
   "column_break_3",
   "posting_date",
-  "amended_from",
-  "period_sb",
-  "period_start",
-  "period_end",
-  "summary_sb",
-  "total_entries",
-  "total_amount",
-  "entries_sb",
-  "generated_entries"
+  "status",
+  "service_period_sb",
+  "service_start_date",
+  "column_break_7",
+  "service_end_date",
+  "summary_section",
+  "total_generated",
+  "column_break_11",
+  "total_contracts",
+  "amended_from"
  ],
  "fields": [
   {
-   "fieldname": "info_sb",
+   "fieldname": "section_break_1",
    "fieldtype": "Section Break",
-   "label": "Cycle Information"
+   "label": "Cycle Identification"
   },
   {
-   "fieldname": "month",
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "label": "Billing Year",
+   "options": "Billing Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "fiscal_month",
    "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Billing Month",
+   "label": "Fiscal Month",
    "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
    "reqd": 1
   },
   {
-   "fieldname": "year",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Billing Year",
-   "options": "Billing Year",
+   "default": "Flat Rate",
+   "fieldname": "billing_basis",
+   "fieldtype": "Select",
+   "label": "Billing Basis",
+   "options": "Flat Rate\nMetered\nAll",
    "reqd": 1
   },
   {
@@ -54,57 +63,53 @@
    "reqd": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "options": "Billing Cycle",
-   "print_hide": 1,
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nCompleted\nCancelled",
    "read_only": 1
   },
   {
-   "fieldname": "period_sb",
+   "fieldname": "service_period_sb",
    "fieldtype": "Section Break",
-   "label": "Billing Period (Calculated)"
+   "label": "Coverage Period"
   },
   {
-   "fieldname": "period_start",
+   "fieldname": "service_start_date",
    "fieldtype": "Date",
-   "label": "Period Start",
-   "read_only": 1
+   "label": "Start Date",
+   "read_only": 0
   },
   {
-   "fieldname": "period_end",
+   "fieldname": "column_break_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "service_end_date",
    "fieldtype": "Date",
-   "label": "Period End",
-   "read_only": 1
+   "label": "End Date",
+   "read_only": 0
   },
   {
-   "fieldname": "summary_sb",
+   "fieldname": "summary_section",
    "fieldtype": "Section Break",
-   "label": "Summary"
+   "label": "Execution Summary"
   },
   {
-   "fieldname": "total_entries",
-   "fieldtype": "Int",
-   "label": "Total Entries Generated",
-   "read_only": 1
-  },
-  {
-   "fieldname": "total_amount",
+   "fieldname": "total_generated",
    "fieldtype": "Currency",
-   "label": "Total Amount Billed",
+   "label": "Total Amount Generated",
    "read_only": 1
   },
   {
-   "fieldname": "entries_sb",
-   "fieldtype": "Section Break",
-   "label": "Detailed Entries"
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
   },
   {
-   "fieldname": "generated_entries",
-   "fieldtype": "Table",
-   "label": "Entries",
-   "options": "Billing Cycle Item",
+   "fieldname": "total_contracts",
+   "fieldtype": "Int",
+   "label": "Total Contracts Processed",
    "read_only": 1
   }
  ],
@@ -112,7 +117,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-28 14:17:53.184578",
+ "modified": "2026-02-02 07:43:18.097938",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing Cycle",
@@ -138,5 +143,5 @@
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": [],
- "title_field": "month"
+ "title_field": "fiscal_year"
 }

@@ -16,7 +16,7 @@
  "fields": [
   {
    "fieldname": "year_name",
-   "fieldtype": "Data",
+   "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Year",
    "reqd": 1,
@@ -59,7 +59,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-28 14:02:03.041747",
+ "modified": "2026-02-02 16:40:31.076287",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing Year",

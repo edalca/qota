@@ -72,6 +72,7 @@ class ServiceRate(Document):
         if self.status == "Active":
             existing = frappe.db.exists("Service Rate", {
                 "service_category": self.service_category,
+                "effective_from": ["=", self.effective_from],
                 "status": "Active",
                 "docstatus": ["<", 2], # Excluye cancelados
                 "name": ["!=", self.name]

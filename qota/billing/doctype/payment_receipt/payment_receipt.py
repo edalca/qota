@@ -4,8 +4,10 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, today
-from qota.billing.doctype.debt_ledger_entry.debt_ledger_entry import DebtLedgerEntry
+from frappe.utils import flt, today, getdate
+
+# Importamos las herramientas centralizadas del archivo utils.py
+from qota.billing.utils import allocate_payment_to_debt, get_monthly_billing_breakdown, make_debt_ledger_entry
 
 
 class PaymentReceipt(Document):
@@ -18,366 +20,200 @@ class PaymentReceipt(Document):
         from frappe.types import DF
         from qota.billing.doctype.payment_receipt_item.payment_receipt_item import PaymentReceiptItem
 
+        advance_items: DF.Table[PaymentReceiptItem]
         amended_from: DF.Link | None
         amount_paid: DF.Currency
         current_debt: DF.Currency
-        is_reconnection_payment: DF.Check
+        full_name: DF.Data | None
         mode_of_payment: DF.Literal["Cash", "Bank Transfer", "Check", "Credit Card"]
-        monthly_rate_estimation: DF.Currency
-        payment_date: DF.Date
+        payment_date: DF.Datetime
         payment_items: DF.Table[PaymentReceiptItem]
         premises: DF.Link | None
-        reconnection_charge: DF.Currency
         reference_no: DF.Data | None
         remarks: DF.SmallText | None
-        resulting_balance: DF.Data | None
         service_contract: DF.Link
-        subscriber: DF.Data | None
+        subscriber: DF.Link | None
         total_to_pay: DF.Currency
+        unallocated_amount: DF.Currency
     # end: auto-generated types
 
     def validate(self):
-        if self.amount_paid <= 0:
-            frappe.throw(_("Amount paid must be greater than zero."))
+        """
+        Este método se ejecuta SIEMPRE al guardar. 
+        Asegura que los totales sean correctos independientemente del JavaScript.
+        """
+        self.calculate_internals()
+
+    def calculate_internals(self):
+        total_general = 0
         
-        # 1. Validar que la suma de la tabla coincida con el total pagado (si hay items)
-        self.validate_totals()
-
-        # 2. Validaciones de Reconexión (Tu código original)
-        if self.is_reconnection_payment and self.reconnection_charge > 0:
-            # Verificamos si el pago total cubre al menos la reconexión
-            if self.amount_paid < self.reconnection_charge:
-                frappe.msgprint(_("Warning: Payment is less than the Reconnection Charge. Service might not be restored automatically."))
-
-    def validate_totals(self):
-        """Si hay items en la tabla, el total debe coincidir"""
-        if self.payment_items:
-            items_total = sum(flt(item.amount) for item in self.payment_items)
+        # 1. Sumar de la tabla de deudas pendientes
+        for item in self.get("payment_items"):
+            total_general += flt(item.amount)
             
-            # Si hay cargo de reconexión, se suma aparte porque no suele estar en la tabla de meses
-            if self.is_reconnection_payment:
-                items_total += flt(self.reconnection_charge)
+        # 2. Sumar de la tabla de adelantos
+        for item in self.get("advance_items"):
+            total_general += flt(item.amount)
             
-            # Permitimos una pequeña diferencia por redondeo, pero actualizamos el header si difiere
-            if abs(flt(self.amount_paid) - items_total) > 0.01:
-                # Opcional: Forzar el valor o lanzar error. 
-                # Aquí actualizamos el valor para ayudar al cajero.
-                self.amount_paid = items_total
+        # 3. Asignar valores a los campos del encabezado
+        self.total_to_pay = total_general
+        self.amount_paid = total_general
+        
+        # Como el pago es exacto a lo seleccionado, el sobrante es 0
+        self.unallocated_amount = 0
 
     def on_submit(self):
-        # --- A. LÓGICA DE RECONEXIÓN (Tu código original) ---
-        if self.is_reconnection_payment and self.reconnection_charge > 0:
-            # 1. Crear la Deuda del Cargo (Adjustment)
-            DebtLedgerEntry.create_entry(
-                contract=self.service_contract,
-                entry_type="Reconnection Fee", 
-                amount=self.reconnection_charge, 
-                ref_dt="Payment Receipt",
-                ref_dn=self.name,
-                posting_date=self.payment_date,
-                description=_("Automatic Reconnection Charge")
-            )
+        """
+        Applies funds to selected debt entries and calculates the advance balance.
+        """
+        remaining_funds = flt(self.amount_paid)
+        
+        # 1. Procesar deudas específicas de la tabla que tienen un vínculo al Ledger
+        for item in self.payment_items:
+            if remaining_funds <= 0.01:
+                break
             
-            # 2. Crear el PAGO específico de ese cargo
-            DebtLedgerEntry.create_entry(
-                contract=self.service_contract,
-                entry_type="Payment",
-                amount= -1 * self.reconnection_charge,
-                ref_dt="Payment Receipt",
-                ref_dn=self.name,
-                posting_date=self.payment_date,
-                description=_("Payment for Reconnection Fee")
-            )
-            
-            # 3. Reactivar Contrato
-            frappe.db.set_value("Service Contract", self.service_contract, {
-                "status": "Active",
-                "last_status_change": self.payment_date
-            })
-            frappe.msgprint(_("Service Contract reactivated successfully."), indicator='green')
+            # Si el item tiene un debt_id, es una deuda existente que debemos cerrar
+            if getattr(item, 'debt_id', None):
+                current_outstanding = frappe.db.get_value("Debt Ledger Entry", item.debt_id, "outstanding_amount")
+                amount_to_apply = min(remaining_funds, flt(current_outstanding))
+                
+                if amount_to_apply > 0:
+                    allocate_payment_to_debt(self.name, item.debt_id, amount_to_apply)
+                    remaining_funds -= amount_to_apply
+            else:
+                # Si no tiene debt_id es un adelanto, restamos del fondo pero no aplicamos a nada
+                remaining_funds -= flt(item.amount)
 
-        # --- B. LÓGICA DE PAGO MENSUAL (Nueva Lógica Detallada) ---
-        
-        if self.payment_items:
-            # Si el cajero seleccionó meses específicos, creamos una entrada por cada mes
-            for item in self.payment_items:
-                DebtLedgerEntry.create_entry(
-                    contract=self.service_contract,
-                    entry_type="Payment",
-                    amount= -1 * flt(item.amount), 
-                    ref_dt="Payment Receipt",
-                    ref_dn=self.name,
-                    posting_date=self.payment_date,
-                    # GUARDAMOS LA REFERENCIA DEL MES Y AÑO
-                    fiscal_year=item.year,
-                    fiscal_month=item.month,
-                    description=f"Payment for {item.month} {item.year}"
-                )
-        else:
-            # FALLBACK: Si no usaron la tabla (pago global), usamos la lógica antigua
-            # Restamos la reconexión si ya se pagó arriba para no duplicar
-            remaining_amount = self.amount_paid
-            if self.is_reconnection_payment:
-                remaining_amount -= self.reconnection_charge
-            
-            if remaining_amount > 0:
-                DebtLedgerEntry.create_entry(
-                    contract=self.service_contract,
-                    entry_type="Payment",
-                    amount= -1 * remaining_amount, 
-                    ref_dt="Payment Receipt",
-                    ref_dn=self.name,
-                    posting_date=self.payment_date,
-                    description="Lump Sum Payment"
-                )
-        
-        frappe.msgprint(_("Payment of {0} registered successfully.").format(self.amount_paid), indicator='green')
+        # 2. El excedente final (o el total de adelantos) se guarda como saldo a favor
+        self.db_set("unallocated_amount", remaining_funds if remaining_funds > 0 else 0)
 
     def on_cancel(self):
-        pass
-        # Reversión inteligente
-        #if self.payment_items:
-        #    for item in self.payment_items:
-        #        DebtLedgerEntry.create_entry(
-        #            contract=self.service_contract,
-        #            entry_type="Payment Reversal",
-        #            amount= flt(item.amount),
-        #            ref_dt="Payment Receipt",
-        #            ref_dn=self.name,
-        #            posting_date=today(),
-        #            fiscal_year=item.year,
-        #            fiscal_month=item.month,
-        #            description=f"Cancelled Payment {item.month} {item.year}"
-        #        )
-        #else:
-            # Reversión global antigua
-        #    reversal_amount = self.amount_paid
-        #    if self.is_reconnection_payment:
-        #        reversal_amount -= self.reconnection_charge # Ajustar si es necesario reversar reconexión aparte
-                
-        #    DebtLedgerEntry.create_entry(
-        #        contract=self.service_contract,
-        #        entry_type="Payment Reversal",
-        #        amount= reversal_amount, 
-        #        ref_dt="Payment Receipt",
-        #        ref_dn=self.name,
-        #        posting_date=today()
-        #    )
+        """
+        Reverses all ledger allocations and restores debt balances.
+        """
+        allocations = frappe.get_all("Payment Allocation", 
+            filters={"payment_receipt": self.name}, 
+            fields=["name", "debt_ledger_entry", "amount"])
+        
+        for alloc in allocations:
+            debt = frappe.get_doc("Debt Ledger Entry", alloc.debt_ledger_entry)
+            new_paid = flt(debt.paid_amount) - flt(alloc.amount)
+            
+            # Restaurar saldos en el Ledger Entry
+            debt.db_set("paid_amount", new_paid)
+            debt.db_set("outstanding_amount", flt(debt.amount) - new_paid)
+            debt.db_set("status", "Unpaid" if new_paid <= 0 else "Partially Paid")
+            
+            # Eliminar el rastro del vínculo
+            frappe.delete_doc("Payment Allocation", alloc.name)
 
-        #if self.is_reconnection_payment:
-        #    frappe.msgprint(_("Note: This payment was for a reconnection. Check if the Service Contract needs to be suspended again manually."), indicator='orange')
-
-# --- API METHODS (Para que funcionen los botones del JS) ---
+        self.db_set("unallocated_amount", 0)
 
 @frappe.whitelist()
-def get_payment_info(contract):
-    """ 
-    Devuelve Deuda Total Ledger, Estimado Mensual y Datos de Reconexión
+def get_pending_balances(contract):
     """
-    # 1. Deuda Ledger
-    balance = frappe.db.sql("""
-        SELECT SUM(amount) FROM `tabDebt Ledger Entry` 
-        WHERE service_contract = %s
-    """, (contract,))
-    current_debt = flt(balance[0][0]) if balance else 0.0
+    Fetches existing debts and determines mandatory status based on due dates.
+    """
+    debts = frappe.get_all("Debt Ledger Entry",
+        filters={
+            "service_contract": contract,
+            "outstanding_amount": [">", 0],
+            "docstatus": 0
+        },
+        fields=["name as debt_id", "entry_type as payment_concept", "outstanding_amount as amount", "due_date", "description"],
+        order_by="creation asc"
+    )
 
-    # 2. Datos del Contrato
-    contract_doc = frappe.db.get_value("Service Contract", contract, 
-        ["status", "service_category"], as_dict=True)
-
-    # 3. Estimado Mensual
-    monthly_est = 0.0
-    try:
-        from qota.billing.doctype.service_rate.service_rate import get_estimated_monthly_cost
-        monthly_est = get_estimated_monthly_cost(contract)
-    except Exception as e:
-        monthly_est = 0.0
-
-    # 4. Lógica de Reconexión
-    reconnection_charge = 0.0
-    is_reconnection = 0
-    
-    if contract_doc and contract_doc.status == "Suspended":
-        is_reconnection = 1
-        try:
-            fee_amount = frappe.db.get_value("Reconnection Fee", 
-                {"service_category": contract_doc.service_category, "active": 1}, 
-                "amount"
-            )
-            reconnection_charge = flt(fee_amount) if fee_amount else 0.0
-        except Exception:
-            reconnection_charge = 0.0
+    current_date = getdate(today())
+    for d in debts:
+        # Una deuda es obligatoria si ya pasó su fecha de vencimiento
+        is_overdue = True if not d['due_date'] else getdate(d['due_date']) <= current_date
+        d['is_mandatory'] = 1 if is_overdue else 0
+        d['days_diff'] = frappe.utils.date_diff(d['due_date'], current_date) if d['due_date'] else 0
 
     return {
-        "current_debt": current_debt,
-        "monthly_est": monthly_est,
-        "is_reconnection": is_reconnection,
-        "reconnection_charge": reconnection_charge
+        "debts": debts,
+        "current_debt": sum(flt(d['amount']) for d in debts)
     }
 
 @frappe.whitelist()
-def get_pending_debts(contract):
+def get_next_billing_advances(contract_name, qty):
     """
-    Busca TODA deuda pendiente en el Ledger (Mensualidades, Conexiones, Multas, etc.)
-    Agrupa por Tipo, Año y Mes.
+    Identifies the last billed period in the system and returns 
+    the next N months to be paid as advances.
     """
+    from qota.billing.utils import get_monthly_billing_breakdown
     
-    # 1. Consulta SQL: Agrupamos por Tipo de Entrada también
-    pending_ledger = frappe.db.sql("""
-        SELECT 
-            entry_type,
-            fiscal_month, 
-            fiscal_year, 
-            SUM(amount) as pending_balance
-        FROM `tabDebt Ledger Entry`
-        WHERE service_contract = %s
-          AND docstatus = 1
-        GROUP BY entry_type, fiscal_year, fiscal_month
-        HAVING pending_balance > 0.01
-    """, (contract,), as_dict=True)
+    contract = frappe.get_doc("Service Contract", contract_name)
+    month_names = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+    ]
 
-    if not pending_ledger:
-        return []
+    # --- PASO 1: Buscar el último punto en el historial (Ledger) ---
+    last_entry = frappe.get_all("Debt Ledger Entry",
+        filters={
+            "service_contract": contract_name,
+            "entry_type": "Monthly Fee",
+            "docstatus": ["!=", 2]
+        },
+        fields=["reference_name"],
+        order_by="creation desc",
+        limit=1
+    )
 
-    # 2. Mapeo de Orden para mostrar primero Cargos Varios y luego Meses Viejos
-    months_map = {
-        "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6,
-        "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12
-    }
-
-    # Ordenar: Primero por Año, luego Mes. 
-    # (Los cargos sin mes/año quedarán arriba o abajo según Python sort, 
-    # generalmente None es menor que números, así que saldrán primero).
-    pending_ledger.sort(key=lambda x: (x.fiscal_year or 0, months_map.get(x.fiscal_month, 0)))
-
-    result_list = []
-    
-    for row in pending_ledger:
-        # Definir Concepto y Descripción según el Ledger
-        concept = "Monthly Fee"
-        description = ""
+    if last_entry and last_entry[0].reference_name:
+        # Seguimos la pista: Ledger -> Billing Cycle -> Billing Year
+        cycle = frappe.get_doc("Billing Cycle", last_entry[0].reference_name)
+        year_val = frappe.db.get_value("Billing Year", cycle.fiscal_year, "year_name")
         
-        if row.entry_type == "Monthly Bill":
-            concept = "Monthly Fee"
-        elif row.entry_type == "Connection Fee":
-            concept = "Other" # O "Connection Fee" si agregas esa opción al Select del Item
-            description = "Pending Connection Fee"
-        elif row.entry_type == "Late Fee":
-            concept = "Other"
-            description = "Late Payment Penalty"
-        elif row.entry_type == "Adjustment":
-            concept = "Other"
-            description = "Adjustment / Reconnection"
-        else:
-            concept = "Other"
-            description = f"{row.entry_type} Balance"
+        try:
+            last_month = month_names.index(cycle.fiscal_month) + 1
+        except ValueError:
+            last_month = 1
+        last_year = int(year_val)
+    else:
+        # --- PASO 2: Si no hay historial, aplicar el filtro de seguridad ---
+        if not contract.start_date:
+            frappe.throw(_("The Service Contract {0} requires a Start Date.").format(contract_name))
+        
+        contract_start = getdate(contract.start_date)
+        
+        # Obtener el año abierto más antiguo
+        oldest_year_val = frappe.db.get_value("Billing Year", 
+            {"is_closed": 0}, "year_name", order_by="year_name asc")
+        
+        if not oldest_year_val:
+            frappe.throw(_("No open Billing Years found in the system."))
 
-        # Construir fila
-        result_list.append({
-            "payment_concept": concept,
-            "month": row.fiscal_month, # Puede venir vacío si es Connection Fee
-            "year": row.fiscal_year,
-            "amount": row.pending_balance,
-            "description": description
+        # Convertimos el límite del sistema a fecha
+        system_limit_date = getdate(f"{oldest_year_val}-01-01")
+
+        # Elegimos la fecha más reciente (no podemos cobrar antes de que exista el sistema o el contrato)
+        actual_start = contract_start if contract_start > system_limit_date else system_limit_date
+        
+        # Seteamos el puntero justo antes del inicio para que el loop tome el primer mes
+        last_month = actual_start.month - 1
+        last_year = actual_start.year
+
+    # --- PASO 3: Generar la secuencia de adelantos ---
+    advances = []
+    curr_m, curr_y = last_month, last_year
+
+    for _ in range(int(qty)):
+        curr_m += 1
+        if curr_m > 12:
+            curr_m, curr_y = 1, curr_y + 1
+        
+        # Llamamos al motor de cálculo (utils.py)
+        breakdown = get_monthly_billing_breakdown(contract_name, curr_m, curr_y)
+        
+        advances.append({
+            "month_num": curr_m,
+            "month_name": month_names[curr_m - 1],
+            "year": curr_y,
+            "rate": breakdown.get("total_to_bill", 0)
         })
 
-    return result_list
-
-@frappe.whitelist()
-def get_account_status(contract, year):
-    """
-    Botón 'View Account Status': Genera el reporte visual del Dialog.
-    Compara lo facturado (Ledger) vs lo pagado (Ledger) mes a mes.
-    """
-    months = ["January", "February", "March", "April", "May", "June", 
-              "July", "August", "September", "October", "November", "December"]
-    
-    status_report = []
-
-    # Obtener movimientos del Ledger para ese año
-    ledger_entries = frappe.db.sql("""
-        SELECT entry_type, fiscal_month, amount 
-        FROM `tabDebt Ledger Entry`
-        WHERE service_contract = %s AND fiscal_year = %s AND docstatus = 1
-    """, (contract, year), as_dict=True)
-
-    for m in months:
-        # Filtrar entradas de este mes
-        entries = [e for e in ledger_entries if e.fiscal_month == m]
-        
-        # Monthly Bill: Genera deuda positiva
-        bill_amount = sum(flt(e.amount) for e in entries if e.entry_type == "Monthly Bill")
-        
-        # Payment: Son valores negativos, los pasamos a absoluto para comparar
-        paid_amount = sum(abs(flt(e.amount)) for e in entries if e.entry_type == "Payment")
-        
-        status = "No Generated"
-        color = "gray"
-        
-        if bill_amount > 0:
-            if paid_amount >= bill_amount:
-                status = "Paid"
-                color = "green"
-            else:
-                status = "Due"
-                color = "red"
-        elif paid_amount > 0:
-            status = "Paid (Advance)"
-            color = "blue"
-            
-        status_report.append({
-            "month": m,
-            "bill": bill_amount,
-            "paid": paid_amount,
-            "status": status,
-            "color": color
-        })
-
-    return status_report
-
-@frappe.whitelist()
-def get_next_payable_month(contract):
-    """
-    Busca cuál fue el último mes pagado en el historial y devuelve 
-    la fecha de inicio para el SIGUIENTE mes a pagar.
-    """
-    import datetime
-    
-    # Buscamos el último pago de Mensualidad registrado
-    last_payment = frappe.db.sql("""
-        SELECT item.year, item.month
-        FROM `tabPayment Receipt Item` item
-        JOIN `tabPayment Receipt` head ON item.parent = head.name
-        WHERE head.service_contract = %s
-          AND head.docstatus = 1
-          AND item.payment_concept = 'Monthly Fee'
-        ORDER BY item.year DESC, 
-                 FIELD(item.month, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December') DESC
-        LIMIT 1
-    """, (contract,), as_dict=True)
-
-    today = datetime.date.today()
-    
-    if not last_payment:
-        # Si nunca ha pagado nada, empezamos desde el mes actual
-        return {"year": today.year, "month_idx": today.month - 1} # Python month es 1-12, JS usa 0-11
-
-    # Mapear nombre de mes a número
-    months_map = {
-        "January": 1, "February": 2, "March": 3, "April": 4, "May": 5, "June": 6,
-        "July": 7, "August": 8, "September": 9, "October": 10, "November": 11, "December": 12
-    }
-    
-    last_year = last_payment[0].year
-    last_month_name = last_payment[0].month
-    last_month_num = months_map.get(last_month_name, 1)
-
-    # Calcular el siguiente mes
-    next_month_num = last_month_num + 1
-    next_year = last_year
-    
-    if next_month_num > 12:
-        next_month_num = 1
-        next_year += 1
-        
-    return {"year": next_year, "month_idx": next_month_num - 1} # Restamos 1 para índice JS (0-11)
+    return advances

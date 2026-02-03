@@ -19,6 +19,7 @@ class BillingSettings(Document):
         apply_late_fee: DF.Check
         bill_footer_message: DF.TextEditor | None
         company_name: DF.Data
+        connection_debt_deadline_days: DF.Int
         cycle_start_day: DF.Int
         days_until_due: DF.Int
         default_currency: DF.Link
@@ -28,8 +29,12 @@ class BillingSettings(Document):
         late_fee_value: DF.Currency
         max_discounts_per_connection: DF.Int
         max_discounts_per_subscriber: DF.Int
+        min_debt_for_suspension: DF.Currency
         reading_window_days: DF.Int
+        reconnection_fee_item: DF.Int
+        separate_cistern_fee: DF.Check
         show_debt_details: DF.Check
+        suspension_months_limit: DF.Int
         water_service_label: DF.Data
     # end: auto-generated types
 

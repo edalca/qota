@@ -15,13 +15,8 @@ class Premises(Document):
         from frappe.types import DF
 
         address_reference: DF.SmallText | None
-        area_sqm: DF.Float
         block: DF.Data
         house_number: DF.Data
-        improvement_details: DF.SmallText | None
-        meter_id: DF.Data | None
-        nature: DF.Literal["Urban", "Rural"]
-        registration_id: DF.Data | None
         sector: DF.Data
         status: DF.Literal["Active", "Inactive"]
     # end: auto-generated types

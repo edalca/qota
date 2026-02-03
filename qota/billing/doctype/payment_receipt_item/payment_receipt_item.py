@@ -16,12 +16,11 @@ class PaymentReceiptItem(Document):
 
 		amount: DF.Currency
 		description: DF.Data | None
-		month: DF.Literal["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+		due_date: DF.Date | None
 		parent: DF.Data
 		parentfield: DF.Data
 		parenttype: DF.Data
-		payment_concept: DF.Literal["Monthly Fee", "Debt Payment", "Other"]
-		year: DF.Int
+		payment_concept: DF.Literal["Connection Fee", "Monthly Fee", "Late Fee", "Reconnection Fee"]
 	# end: auto-generated types
 
 	pass

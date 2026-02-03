@@ -5,7 +5,7 @@
 from frappe.model.document import Document
 
 
-class BillingCycleItem(Document):
+class PaymentAllocation(Document):
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
 
@@ -15,11 +15,9 @@ class BillingCycleItem(Document):
 		from frappe.types import DF
 
 		amount: DF.Currency
-		billing_entry: DF.Link | None
-		contract: DF.Link
-		parent: DF.Data
-		parentfield: DF.Data
-		parenttype: DF.Data
+		debt_ledger_entry: DF.Link
+		payment_receipt: DF.Link
+		transaction_date: DF.Date
 	# end: auto-generated types
 
 	pass

@@ -5,35 +5,30 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "posting_date",
-  "contract_section",
+  "general_sb",
   "service_contract",
-  "subscriber",
-  "full_name",
-  "premises",
-  "accounting_section",
   "entry_type",
+  "column_break_4",
+  "status",
+  "due_date",
+  "finance_sb",
   "amount",
-  "fiscal_year",
-  "fiscal_month",
-  "reference_section",
+  "paid_amount",
+  "column_break_10",
+  "outstanding_amount",
+  "reference_sb",
   "reference_doctype",
-  "reference_name"
+  "column_break_14",
+  "reference_name",
+  "section_break_16",
+  "description",
+  "amended_from"
  ],
  "fields": [
   {
-   "default": "Today",
-   "fieldname": "posting_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Posting Date",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "contract_section",
+   "fieldname": "general_sb",
    "fieldtype": "Section Break",
-   "label": "Context"
+   "label": "General Information"
   },
   {
    "fieldname": "service_contract",
@@ -41,51 +36,76 @@
    "in_list_view": 1,
    "label": "Service Contract",
    "options": "Service Contract",
-   "read_only": 1,
    "reqd": 1
-  },
-  {
-   "fetch_from": "service_contract.subscriber",
-   "fieldname": "subscriber",
-   "fieldtype": "Link",
-   "label": "Subscriber",
-   "options": "Subscriber",
-   "read_only": 1
-  },
-  {
-   "fieldname": "accounting_section",
-   "fieldtype": "Section Break",
-   "label": "Financial Detail"
   },
   {
    "fieldname": "entry_type",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Transaction Type",
-   "options": "Connection Fee\nMonthly Fee\nLate Fee\nPayment\nReconnection Fee",
+   "label": "Entry Type",
+   "options": "Monthly Fee\nConnection Fee\nLate Fee\nReconnection Fee\nOther Fee",
+   "reqd": 1
+  },
+  {
+   "default": "Unpaid",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Unpaid\nPartially Paid\nPaid",
    "read_only": 1,
    "reqd": 1
   },
   {
-   "description": "Positive values increase debt (Debit), negative values decrease debt (Credit/Payment).",
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "finance_sb",
+   "fieldtype": "Section Break",
+   "label": "Financial Balances"
+  },
+  {
    "fieldname": "amount",
    "fieldtype": "Currency",
    "in_list_view": 1,
-   "label": "Amount",
-   "read_only": 1,
+   "label": "Original Amount",
    "reqd": 1
   },
   {
-   "fieldname": "reference_section",
+   "default": "0",
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total Paid",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "outstanding_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Outstanding Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_sb",
    "fieldtype": "Section Break",
-   "label": "Source Document"
+   "label": "Source"
   },
   {
    "fieldname": "reference_doctype",
    "fieldtype": "Link",
-   "label": "Reference DocType",
+   "label": "Reference Doctype",
    "options": "DocType",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "reference_name",
@@ -95,38 +115,34 @@
    "read_only": 1
   },
   {
-   "fetch_from": "subscriber.full_name",
-   "fieldname": "full_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Full Name / Company Name",
-   "read_only": 1
+   "fieldname": "section_break_16",
+   "fieldtype": "Section Break"
   },
   {
-   "fetch_from": "service_contract.premises",
-   "fieldname": "premises",
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "amended_from",
    "fieldtype": "Link",
-   "label": "Premises",
-   "options": "Premises",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Debt Ledger Entry",
+   "print_hide": 1,
    "read_only": 1
   },
   {
-   "fieldname": "fiscal_year",
-   "fieldtype": "Int",
-   "label": "Fiscal Year"
-  },
-  {
-   "fieldname": "fiscal_month",
-   "fieldtype": "Select",
-   "label": "Fiscal Month",
-   "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember"
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date"
   }
  ],
  "grid_page_length": 50,
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-31 23:19:04.423549",
+ "modified": "2026-02-03 01:41:49.389261",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Debt Ledger Entry",
@@ -151,5 +167,18 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [
+  {
+   "color": "Red",
+   "title": "Unpaid"
+  },
+  {
+   "color": "Orange",
+   "title": "Partially Paid"
+  },
+  {
+   "color": "Green",
+   "title": "Paid"
+  }
+ ]
 }

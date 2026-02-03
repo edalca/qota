@@ -1,105 +1,99 @@
 <style>
-	.page-container {
-		font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-		color: #333;
-		width: 100%;
-		background-color: #fff;
-	}
+/* Esto fuerza al navegador y al motor de PDF a imprimir los colores exactos */
+* {
+    -webkit-print-color-adjust: exact !important;   /* Para Chrome/wkhtmltopdf */
+    print-color-adjust: exact !important;            /* Estándar moderno */
+    color-adjust: exact !important;                  /* Versiones antiguas */
+}
+    .page-container {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #333;
+        width: 100%;
+        background-color: #fff;
+    }
 
-	.month-row {
-		display: flex;
-		width: 100%;
-		border: 1.5px solid #000;
-		margin-bottom: 20px;
-		min-height: 290px;
-		page-break-inside: avoid;
-		background-color: #fff;
-		box-sizing: border-box;
-	}
+    /* SECCIÓN DE CORTE: Altura fija de 20mm para simetría total */
+    .cut-line-horizontal {
+        width: 100%;
+        height: 30px; /* Altura total del área de corte */
+        position: relative;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+    }
 
-	.coupon-copy {
-		width: 50%;
-		padding: 12px;
-		position: relative;
-		box-sizing: border-box;
-	}
+    /* Línea de puntos centrada matemáticamente (10mm arriba, 10mm abajo) */
+    .line-dashed-horizontal {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        border-top: 1.5pt dashed #000 !important;
+    }
 
-	.subscriber-side {
-		border-right: 2px dashed #000;
-	}
+    /* Tijera sobre la línea horizontal */
+    .scissor-icon {
+        position: absolute;
+        top: 50%;
+        left: 20mm;
+        transform: translateY(-50%);
+        background: #fff;
+        padding: 0 10px;
+        font-size: 14pt;
+        z-index: 10;
+    }
 
-	.cut-indicator {
-		position: absolute;
-		right: -10px;
-		top: 10px;
-		background: #fff;
-		z-index: 10;
-		font-size: 14pt;
-	}
+    /* CUADRO DEL CUPÓN */
+    .month-row {
+        display: flex;
+        width: 100%;
+        border: 1.5px solid #000;
+        min-height: 285px;
+        page-break-inside: avoid;
+        background-color: #fff;
+        box-sizing: border-box;
+        margin: 0 !important;
+    }
 
-	.header-area {
-		display: flex;
-		justify-content: space-between;
-		border-bottom: 2px solid #000;
-		margin-bottom: 8px;
-		padding-bottom: 5px;
-	}
+    .coupon-copy {
+        width: 50%;
+        padding: 15px;
+        position: relative;
+        box-sizing: border-box;
+    }
 
-	.company-title {
-		font-weight: bold;
-		text-transform: uppercase;
-		font-size: 9.5pt;
-	}
+    /* DIVISOR VERTICAL CENTRAL (TIJERA ORIGINAL) */
+    .subscriber-side {
+        border-right: 2px dashed #000;
+    }
 
-	.copy-label {
-		font-size: 7.5pt;
-		font-weight: bold;
-		text-transform: uppercase;
-		border: 1px solid #000;
-		padding: 2px 5px;
-	}
+    .cut-indicator-vertical {
+        position: absolute;
+        right: -10px;
+        top: 15px;
+        background: #fff;
+        z-index: 10;
+        font-size: 14pt;
+    }
 
-	.info-grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 3px;
-		margin-bottom: 8px;
-		font-size: 8.5pt;
-	}
+    /* ESTILOS DE TEXTO */
+    .header-area {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 2px solid #000;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+    }
 
-	.full-width {
-		grid-column: span 2;
-	}
-
-	.service-table {
-		width: 100%;
-		border-collapse: collapse;
-		font-size: 8.5pt;
-	}
-
-	.service-table td {
-		border: 1px solid #ccc;
-		padding: 4px;
-	}
-
-	.text-right {
-		text-align: right;
-	}
-
-	.total-box {
-		margin-top: 10px;
-		background: #f2f2f2;
-		padding: 8px;
-		border: 2px solid #000;
-		text-align: right;
-		font-weight: bold;
-		font-size: 11pt;
-	}
-
-	.page-break {
-		page-break-after: always;
-		clear: both;
-	}
+    .company-title { font-weight: bold; text-transform: uppercase; font-size: 9pt; }
+    .copy-label { font-size: 7pt; font-weight: bold; text-transform: uppercase; border: 1px solid #000; padding: 2px 4px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-bottom: 10px; font-size: 8.5pt; }
+    .full-width { grid-column: span 2; }
+    .service-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    .service-table td { border: 1px solid #ccc; padding: 4px; }
+    .text-right { text-align: right; }
+    .total-box { margin-top: 10px; background: #f2f2f2; padding: 8px; border: 1.5px solid #000; text-align: right; font-weight: bold; font-size: 11pt; }
+    .page-break { page-break-after: always; clear: both; }
 </style>
 
 {% set settings = frappe.get_doc("Billing Settings") %}
@@ -110,132 +104,136 @@
 {# --- LÓGICA DE DESCUENTOS --- #}
 {% set is_natural_person = sub_doc and sub_doc.subscriber_type == "Natural Person" %}
 {% set ns = namespace(best_rule=None, social_discount=0, grand_total=0) %}
-{% set benefit_list = frappe.get_all("Benefit Discount",
-filters={
-"service_contract": doc.name,
-"docstatus": 1,
-"status": "Active"
-},
-fields=["discount_rule"],
-order_by="discount_percentage desc",
-limit=1)
-%}
+
+{% set benefit_list = frappe.get_all("Benefit Discount", filters={"service_contract": doc.name, "docstatus": 1, "status": "Active"}, fields=["discount_rule"], order_by="creation desc", limit=1) %}
 {% set manual_rule_id = benefit_list[0].discount_rule if benefit_list else None %}
 
-{% set age_rules = frappe.get_all("Discount Rule",
-filters={
-"minimum_age": ["<=", sub_doc.age | int], "condition_type" : "Age" }, fields=["discount_percentage"],
-	order_by="discount_percentage desc" , limit=1 ) %} {% set manual_rules=frappe.get_all("Discount Rule",
-	filters={ "name" : manual_rule_id }, fields=["discount_percentage"], order_by="discount_percentage desc" , limit=1 )
-	%} {% set rules=age_rules + manual_rules %} {% for r in rules %} {% if not ns.best_rule %} {% set ns.best_rule=r %}
-	{% endif %} {% endfor %} {% if doc.service_category %} {% set st_doc=frappe.get_doc("Service Category",
-	doc.service_category) %} <div class="page-container">
-	{% for i in range(12) %}
-	{% set month_num = i + 1 %}
-	{% set month_date = selected_year ~ "-" ~ "{:02d}".format(month_num) ~ "-01" %}
-	{% set month_name = frappe.utils.get_datetime(month_date).strftime("%B") %}
+{% set age_val = (sub_doc.age | int) if (sub_doc and sub_doc.age) else 0 %}
+{% set age_rules = frappe.get_all("Discount Rule", filters={"minimum_age": ["<=", age_val], "condition_type": "Age"}, fields=["name", "discount_percentage"], order_by="discount_percentage desc", limit=1) %}
+{% set manual_rules = frappe.get_all("Discount Rule", filters={"name": manual_rule_id}, fields=["name", "discount_percentage"], limit=1) if manual_rule_id else [] %}
 
-	{% set tariff_list = frappe.get_all("Service Tariff",
-	filters={ "service_category": doc.service_category, "docstatus": 1, "effective_from": ["<=", month_date] },
-		fields=["name", "flat_rate_price" ], order_by="effective_from desc" , limit=1) %} {% if tariff_list %} {% set
-		tariff_doc=frappe.get_doc("Service Tariff", tariff_list[0].name) %} {% set
-		tariff_additional_fees=tariff_doc.additional_fees %} {% set base_price=tariff_doc.flat_rate_price | float %} {%
-		set extra_sum=tariff_additional_fees | map(attribute='amount' ) | sum if tariff_additional_fees else 0 %} {# ---
-		REINICIO DE CÁLCULOS MENSUALES --- #} {% set ns.social_discount=0 %} {% if st_doc.allow_discounts and
-		ns.best_rule %} {% set ns.social_discount=base_price * (ns.best_rule.discount_percentage / 100) %} {% endif %}
-		{% for fee in tariff_additional_fees %} {% if fee.allow_discounts and ns.best_rule %} {% set
-		ns.social_discount=ns.social_discount + (fee.amount * (ns.best_rule.discount_percentage / 100)) %} {% endif %}
-		{% endfor %} {% set ns.grand_total=base_price + extra_sum - ns.social_discount %} <div class="month-row">
-		<div class="coupon-copy subscriber-side">
-			<div class="cut-indicator">✂</div>
-			<div class="header-area">
-				<span class="company-title">{{ settings.company_name }}</span>
-				<span class="copy-label">{{ _("Subscriber") }}</span>
-			</div>
+{% set rules = age_rules + manual_rules %}
+{% for r in rules %}
+    {% if not ns.best_rule or r.discount_percentage > ns.best_rule.discount_percentage %}
+        {% set ns.best_rule = r %}
+    {% endif %}
+{% endfor %}
 
-			<div class="info-grid">
-				<div class="full-width"><strong>{{ _("Name") }}:</strong> {{ doc.full_name }}</div>
-				<div class="full-width">
-					<strong>{{ _("ID Number") }}:</strong> {{ sub_doc.id_number if sub_doc else "N/A" }}
-				</div>
-				<div><strong>{{ _("Contract") }}:</strong> {{ doc.name }}</div>
-				<div class="text-right">
-					<strong>{{ _("Month") }}:</strong> {{ _(month_name) }} {{ selected_year }}
-				</div>
+<div class="page-container">
+    {% if doc.service_category %}
+        {% set st_doc = frappe.get_doc("Service Category", doc.service_category) %}
 
-				{% if is_natural_person %}
-				<div><strong>{{ _("Age") }}:</strong> {{ sub_doc.age }}</div>
-				{% endif %}
+        {% for i in range(12) %}
+            {% set month_num = i + 1 %}
+            {% set month_date = selected_year ~ "-" ~ "{:02d}".format(month_num) ~ "-01" %}
+            {% set month_name = frappe.utils.get_datetime(month_date).strftime("%B") %}
 
-				<div class="text-right">
-					<strong>{{ _("Location") }}:</strong>
-					B:{{ premises_doc.block if premises_doc else "-" }} | C:{{ premises_doc.house_number if
-					premises_doc else "-" }}
-				</div>
-			</div>
+            {# --- LLAMADA SANEADA A SERVICE RATE PARA EVITAR ERROR DE IMPORTACIÓN --- #}
+            {% set rate_list = frappe.get_all("Service Rate", filters={"service_category": doc.service_category, "docstatus": 1, "status": "Active", "effective_from": ["<=", month_date]}, fields=["name", "flat_rate_price", "fixed_charge"], order_by="effective_from desc", limit=1) %}
 
-			<table class="service-table">
-				<tr>
-					<td>{{ settings.water_service_label or _("Water Service") }}</td>
-					<td class="text-right">{{ "{:,.2f}".format(base_price) }}</td>
-				</tr>
-				{% for extra in tariff_additional_fees %}
-				<tr>
-					<td>{{ extra.description or _("Fee") }}</td>
-					<td class="text-right">{{ "{:,.2f}".format(extra.amount) }}</td>
-				</tr>
-				{% endfor %}
+            {% if rate_list %}
+                {% set rate_doc = frappe.get_doc("Service Rate", rate_list[0].name) %}
+                {% set additional_fees = rate_doc.additional_fees or [] %}
+                {% set base_price = rate_doc.flat_rate_price if doc.billing_basis == "Flat Rate" else rate_doc.fixed_charge %}
+                {% set base_price = base_price | float %}
+                {% set extra_sum = additional_fees | map(attribute='amount') | sum if additional_fees else 0 %}
 
-				{% if ns.social_discount > 0 %}
-				<tr style="color: #d00">
-					<td>{{ _("Discount") }} ({{ ns.best_rule.discount_percentage | int }}%)</td>
-					<td class="text-right">-{{ "{:,.2f}".format(ns.social_discount) }}</td>
-				</tr>
-				{% endif %}
-			</table>
+                {# Descuentos #}
+                {% set ns.social_discount = 0 %}
+                {% if st_doc.allow_discounts and ns.best_rule %}
+                    {% set ns.social_discount = base_price * (ns.best_rule.discount_percentage / 100) %}
+                    {% for fee in additional_fees %}
+                        {% if fee.allow_discounts and ns.best_rule %}
+                            {% set ns.social_discount = ns.social_discount + (fee.amount * (ns.best_rule.discount_percentage / 100)) %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
 
-			<div class="total-box">
-				{{ _("Total") }}: {{ settings.default_currency or "L." }}
-				{{ "{:,.2f}".format(ns.grand_total) }}
-			</div>
-		</div>
+                {% set ns.grand_total = base_price + extra_sum - ns.social_discount %}
 
-		<div class="coupon-copy">
-			<div class="header-area">
-				<span class="company-title">{{ settings.company_name }}</span>
-				<span class="copy-label">{{ _("Board") }}</span>
-			</div>
+                <div class="cut-line-horizontal">
+                    <div class="line-dashed-horizontal"></div>
+                    <div class="scissor-icon">✂</div>
+                </div>
 
-			<div class="info-grid">
-				<div class="full-width"><strong>{{ _("Subscriber") }}:</strong> {{ doc.full_name }}</div>
-				<div class="full-width"><strong>{{ _("ID") }}:</strong> {{ sub_doc.id_number if sub_doc else "N/A"
-					}}</div>
-				<div><strong>{{ _("Ref") }}:</strong> {{ doc.name }}</div>
-				<div class="text-right"><strong>{{ _("Month") }}:</strong> {{ _(month_name) }}</div>
-				<div class="full-width">
-					<strong>{{ _("Location") }}:</strong> B:{{ premises_doc.block }} | C:{{
-					premises_doc.house_number }}
-				</div>
-			</div>
+                <div class="month-row">
+                    <div class="coupon-copy subscriber-side">
+                        <div class="cut-indicator-vertical">✂</div>
+                        <div class="header-area">
+                            <span class="company-title">{{ settings.company_name }}</span>
+                            <span class="copy-label">{{ _("Subscriber") }}</span>
+                        </div>
 
-			<div
-				style="margin-top: 15px; border: 2px solid #000; padding: 12px; text-align: center; background-color: #f9f9f9;">
-				<span style="font-size: 13pt; font-weight: bold">
-					{{ _("Total Paid") }}: {{ "{:,.2f}".format(ns.grand_total) }}
-				</span>
-			</div>
+                        <div class="info-grid">
+                            <div class="full-width"><strong>{{ _("Name") }}:</strong> {{ doc.full_name }}</div>
+                            <div class="full-width"><strong>{{ _("ID Number") }}:</strong> {{ sub_doc.id_number if sub_doc else "N/A" }}</div>
+                            <div><strong>{{ _("Contract") }}:</strong> {{ doc.name }}</div>
+                            <div class="text-right"><strong>{{ _("Month") }}:</strong> {{ _(month_name) }} {{ selected_year }}</div>
 
-			<div style="margin-top: 25px; font-size: 8.5pt">
-				<strong>{{ _("Date") }}:</strong> ________________<br /><br />
-				<strong>{{ _("Signature") }}:</strong> ________________
-			</div>
-		</div>
-		</div>
+                            {% if is_natural_person %}
+                            <div><strong>{{ _("Age") }}:</strong> {{ sub_doc.age }}</div>
+                            {% endif %}
 
-		{% if (i + 1) % 3 == 0 and not loop.last %}
-		<div class="page-break"></div>
-		{% endif %}
-		{% endif %}
-		{% endfor %}
-		</div>
-		{% endif %}
+                            <div class="text-right">
+                                <strong>{{ _("Location") }}:</strong> B:{{ premises_doc.block }} | C:{{ premises_doc.house_number }}
+                            </div>
+                        </div>
+
+                        <table class="service-table">
+                            <tr>
+                                <td>{{ settings.water_service_label or _("Water Service") }}</td>
+                                <td class="text-right">{{ "{:,.2f}".format(base_price) }}</td>
+                            </tr>
+                            {% for extra in additional_fees %}
+                            <tr>
+                                <td>{{ extra.description or _("Fee") }}</td>
+                                <td class="text-right">{{ "{:,.2f}".format(extra.amount) }}</td>
+                            </tr>
+                            {% endfor %}
+                         {% if ns.social_discount > 0 %}
+							<tr style="color: #d00 !important;"> <td>{{ _("Discount") }} ({{ ns.best_rule.discount_percentage | int }}%)</td>
+								<td class="text-right">-{{ "{:,.2f}".format(ns.social_discount) }}</td>
+							</tr>
+						{% endif %}
+                        </table>
+                        <div class="total-box">
+                            {{ _("Total") }}: {{ settings.default_currency or "L." }} {{ "{:,.2f}".format(ns.grand_total) }}
+                        </div>
+                    </div>
+
+                    <div class="coupon-copy">
+                        <div class="header-area">
+                            <span class="company-title">{{ settings.company_name }}</span>
+                            <span class="copy-label">{{ _("Board") }}</span>
+                        </div>
+                        <div class="info-grid">
+                            <div class="full-width"><strong>{{ _("Subscriber") }}:</strong> {{ doc.full_name }}</div>
+                            <div><strong>{{ _("Ref") }}:</strong> {{ doc.name }}</div>
+                            <div class="text-right"><strong>{{ _("Month") }}:</strong> {{ _(month_name) }}</div>
+                            <div class="full-width"><strong>{{ _("Location") }}:</strong> B:{{ premises_doc.block }} | C:{{ premises_doc.house_number }}</div>
+                        </div>
+                        <div style="margin-top: 15px; border: 2px solid #000; padding: 12px; text-align: center; background-color: #f9f9f9;">
+                            <span style="font-size: 13pt; font-weight: bold">{{ _("Amount Paid") }}: {{ "{:,.2f}".format(ns.grand_total) }}</span>
+                        </div>
+                        <div style="margin-top: 25px; font-size: 8.5pt">
+                            <strong>{{ _("Date") }}:</strong> ________________<br><br>
+                            <strong>{{ _("Signature") }}:</strong> ________________
+                        </div>
+                    </div>
+                </div>
+
+                {# LÍNEA DE CORTE INFERIOR SOLO AL FINAL DEL GRUPO DE 3 O DICIEMBRE #}
+                {% if (i + 1) % 3 == 0 or loop.last %}
+                    <div class="cut-line-horizontal">
+                        <div class="line-dashed-horizontal"></div>
+                        <div class="scissor-icon">✂</div>
+                    </div>
+                    {% if not loop.last %}
+                        <div class="page-break"></div>
+                    {% endif %}
+                {% endif %}
+
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</div>

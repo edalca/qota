@@ -6,6 +6,7 @@ app_icon = "fa fa-th"
 app_color = "#00a8b5"
 app_email = "edwinalonso162@hotmail.com"
 app_license = "mit"
+app_logo_url = "/assets/qota/logo.svg"
 
 # Apps
 # ------------------
@@ -16,9 +17,9 @@ app_license = "mit"
 add_to_apps_screen = [
 	{
  		"name": "qota",
- 		"logo": "/assets/qota/logo.png",
+ 		"logo": app_logo_url,
 		"title": "Qota",
-		"route": "/qota",
+		"route": "/desk",
   	}
  ]
 
@@ -72,6 +73,11 @@ app_include_icons = [
 
 # automatically create page for each record of this doctype
 # website_generators = ["Web Page"]
+
+website_context = {
+	"favicon": "/assets/qota/favicon.svg",
+	"splash_image": "/assets/qota/logo.svg",
+}
 
 # automatically load and sync documents of this doctype from downstream apps
 # importable_doctypes = [doctype_1]

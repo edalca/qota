@@ -3,19 +3,37 @@
 
 frappe.ui.form.on("Service Contract", {
 	setup: function (frm) {
-		// Filter: only active subscribers and premises
+		// Filter: only active subscribers
 		frm.set_query("subscriber", () => {
 			return { filters: { status: "Active" } };
 		});
+
+		// Filter: only active, non-contracted premises
 		frm.set_query("premises", () => {
 			return {
 				query: "qota.governance.doctype.premises.premises.premises_search",
 				filters: { status: "Active", docstatus: 0 },
 			};
 		});
+
+		// Filter: Connection Fee by Service Category
+		frm.set_query("connection_fee", () => {
+			return {
+				filters: [
+					["disabled", "=", 0],
+					["service_category", "=", frm.doc.service_category],
+				],
+			};
+		});
+	},
+
+	// Si cambia la categoría, limpiamos la tarifa
+	service_category: function (frm) {
+		frm.set_value("connection_fee", "");
 	},
 
 	refresh: function (frm) {
+		// Bloquear campos críticos si el documento ya fue enviado
 		const fields_to_lock = [
 			"status",
 			"billing_basis",
@@ -23,15 +41,21 @@ frappe.ui.form.on("Service Contract", {
 			"start_reading",
 			"has_cistern",
 			"cistern_capacity",
+			"connection_fee",
+			"connection_fee_posted",
+			"service_category",
 		];
+
 		if (frm.doc.docstatus !== 0) {
 			fields_to_lock.forEach((field) => {
 				frm.set_df_property(field, "read_only", 1);
 			});
 		}
+
 		if (window.qota && qota.utils && qota.utils.set_premises_description) {
 			qota.utils.set_premises_description(frm);
 		}
+
 		// 1. Buttons for new records
 		if (frm.is_new()) {
 			frm.add_custom_button(
@@ -47,6 +71,7 @@ frappe.ui.form.on("Service Contract", {
 		}
 
 		// 2. Actions for Active/Suspended contracts
+		// Solo permitimos acciones si NO está cerrado o cancelado
 		const terminal_statuses = ["Closed", "Cancelled"];
 
 		if (frm.doc.docstatus === 1 && !terminal_statuses.includes(frm.doc.status)) {
@@ -55,7 +80,6 @@ frappe.ui.form.on("Service Contract", {
 			frm.add_custom_button(
 				cistern_label,
 				() => {
-					// We define the fields array based on the current state
 					let fields = [
 						{
 							fieldname: "date",
@@ -72,7 +96,6 @@ frappe.ui.form.on("Service Contract", {
 						},
 					];
 
-					// If adding a cistern, we inject the capacity field at index 1
 					if (!frm.doc.has_cistern) {
 						fields.splice(1, 0, {
 							fieldname: "capacity",
@@ -112,7 +135,6 @@ frappe.ui.form.on("Service Contract", {
 						},
 					];
 
-					// If moving to Metered, we inject meter fields
 					if (frm.doc.billing_basis === "Flat Rate") {
 						fields.push({
 							fieldname: "meter_id",
@@ -148,40 +170,32 @@ frappe.ui.form.on("Service Contract", {
 				__("Actions"),
 			);
 
-			// ACTION: Status Management
+			// ACTION: Close Contract (Única acción de estado permitida manual)
 			frm.add_custom_button(
-				__("Update Status"),
+				__("Close Contract"),
 				() => {
-					let options = ["Suspended", "Closed"];
-					if (frm.doc.status === "Suspended") options = ["Active", "Closed"];
-
 					frappe.prompt(
 						[
 							{
-								fieldname: "new_status",
-								fieldtype: "Select",
-								label: __("New Status"),
-								options: options,
-								reqd: 1,
-							},
-							{
 								fieldname: "date",
 								fieldtype: "Date",
-								label: __("Effective Date"),
+								label: __("Closing Date"),
 								default: frappe.datetime.nowdate(),
 								reqd: 1,
 							},
 							{
 								fieldname: "description",
 								fieldtype: "Small Text",
-								label: __("Reason/Details"),
+								label: __("Reason for Closing"),
 								reqd: 1,
 							},
 						],
 						(data) => {
+							// Forzamos el estado a "Closed"
+							data.new_status = "Closed";
 							frm.events.call_update_method(frm, "Status", data);
 						},
-						__("Change Contract Status"),
+						__("Terminate Contract"), // Título del diálogo
 					);
 				},
 				__("Actions"),
@@ -198,7 +212,6 @@ frappe.ui.form.on("Service Contract", {
 	},
 
 	premises: function (frm) {
-		// Duplicity check logic
 		if (frm.doc.premises) {
 			frappe.call({
 				method: "frappe.client.get_value",

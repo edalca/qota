@@ -12,14 +12,7 @@
   "block",
   "house_number",
   "column_break_5",
-  "address_reference",
-  "property_details_tab",
-  "registration_id",
-  "nature",
-  "area_sqm",
-  "column_break_10",
-  "meter_id",
-  "improvement_details"
+  "address_reference"
  ],
  "fields": [
   {
@@ -61,46 +54,6 @@
    "label": "Address Reference"
   },
   {
-   "fieldname": "property_details_tab",
-   "fieldtype": "Tab Break",
-   "label": "Property Details"
-  },
-  {
-   "description": "Property Registry ID (Matr\u00edcula SINAP).",
-   "fieldname": "registration_id",
-   "fieldtype": "Data",
-   "label": "Registration ID",
-   "set_only_once": 1,
-   "unique": 1
-  },
-  {
-   "fieldname": "nature",
-   "fieldtype": "Select",
-   "label": "Nature",
-   "options": "Urban\nRural"
-  },
-  {
-   "fieldname": "area_sqm",
-   "fieldtype": "Float",
-   "label": "Area (sqm)"
-  },
-  {
-   "fieldname": "column_break_10",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "meter_id",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Meter ID",
-   "unique": 1
-  },
-  {
-   "fieldname": "improvement_details",
-   "fieldtype": "Small Text",
-   "label": "Improvement Details"
-  },
-  {
    "fieldname": "house_number",
    "fieldtype": "Data",
    "in_list_view": 1,
@@ -111,7 +64,7 @@
  ],
  "icon": "map-pin",
  "links": [],
- "modified": "2026-01-29 23:19:51.809547",
+ "modified": "2026-02-01 21:33:32.826741",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Premises",

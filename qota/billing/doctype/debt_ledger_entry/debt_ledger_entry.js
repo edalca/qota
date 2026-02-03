@@ -2,20 +2,35 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Debt Ledger Entry", {
-	refresh(frm) {
-		// Ocultar botón de guardar si el documento está enviado
-		if (!frm.is_new()) {
-			frm.disable_save();
-			frm.set_read_only();
-		}
-		if (window.qota && qota.utils && qota.utils.set_premises_description) {
-			qota.utils.set_premises_description(frm);
-		}
-	},
-	premises: function (frm) {
-		// 3. Ejecutar utilidad de descripción de predio si existe
-		if (window.qota && qota.utils && qota.utils.set_premises_description) {
-			qota.utils.set_premises_description(frm);
-		}
-	},
+    setup: function(frm) {
+        // Filter: Only allow linking to Open Billing Years
+        frm.set_query("fiscal_year", () => {
+            return {
+                filters: { is_closed: 0 }
+            };
+        });
+    },
+
+    refresh: function(frm) {
+        // Set visual indicators on the top header
+        frm.set_read_only();
+        frm.disable_save();
+        
+        if (frm.doc.status === "Paid") {
+            frm.page.set_indicator(__("Paid"), "green");
+        } else if (frm.doc.status === "Partially Paid") {
+            frm.page.set_indicator(__("Partially Paid"), "orange");
+        } else {
+            frm.page.set_indicator(__("Unpaid"), "red");
+        }
+
+        // Add an Audit button to see exactly which receipts paid this debt
+        if (frm.doc.docstatus === 1) {
+            frm.add_custom_button(__("View Allocations"), () => {
+                frappe.set_route("List", "Payment Allocation", {
+                    "debt_ledger_entry": frm.doc.name
+                });
+            }, __("Audit"));
+        }
+    }
 });

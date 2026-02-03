@@ -6,24 +6,29 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "service_contract_information_section",
   "service_contract",
-  "subscriber",
   "premises",
-  "payment_details_column",
+  "column_break_cpqw",
+  "subscriber",
+  "full_name",
+  "payment_details_sb",
   "payment_date",
-  "amount_paid",
   "mode_of_payment",
   "reference_no",
-  "section_break_balance",
-  "current_debt",
-  "monthly_rate_estimation",
-  "resulting_balance",
-  "is_reconnection_payment",
-  "reconnection_charge",
-  "total_to_pay",
-  "section_break_calculator",
+  "column_break_9",
+  "amount_paid",
+  "unallocated_amount",
+  "section_break_rioi",
   "payment_items",
-  "payment_details_section",
+  "section_break_fsww",
+  "advance_items",
+  "debt_info_sb",
+  "column_break_gerk",
+  "column_break_gvnv",
+  "current_debt",
+  "total_to_pay",
+  "section_break_footer",
   "remarks",
   "amended_from"
  ],
@@ -37,11 +42,11 @@
    "reqd": 1
   },
   {
-   "fetch_from": "service_contract.full_name",
+   "fetch_from": "service_contract.subscriber",
    "fieldname": "subscriber",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Subscriber",
+   "fieldtype": "Link",
+   "label": "Subscriber ID",
+   "options": "Subscriber",
    "read_only": 1
   },
   {
@@ -53,38 +58,62 @@
    "read_only": 1
   },
   {
-   "fieldname": "section_break_balance",
+   "default": "Now",
+   "fieldname": "payment_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Payment Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "payment_details_sb",
    "fieldtype": "Section Break",
-   "label": "Balance Info"
-  },
-  {
-   "description": "Positive = Debt. Negative = Credit (Paid in Advance).",
-   "fieldname": "current_debt",
-   "fieldtype": "Currency",
-   "label": "Current Debt",
-   "read_only": 1
-  },
-  {
-   "description": "Hidden field to help calculate months of coverage.",
-   "fieldname": "monthly_rate_estimation",
-   "fieldtype": "Currency",
-   "hidden": 1,
-   "label": "Est. Monthly Rate",
-   "read_only": 1
+   "label": "Payment Details"
   },
   {
    "default": "0",
-   "fieldname": "is_reconnection_payment",
-   "fieldtype": "Check",
+   "fieldname": "amount_paid",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount Received",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "unallocated_amount",
+   "fieldtype": "Currency",
    "hidden": 1,
-   "label": "Is Reconnection?",
+   "label": "Advance Balance",
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.is_reconnection_payment == 1",
-   "fieldname": "reconnection_charge",
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Cash",
+   "fieldname": "mode_of_payment",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Mode of Payment",
+   "options": "Cash\nBank Transfer\nCheck\nCredit Card",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.mode_of_payment != 'Cash'",
+   "fieldname": "reference_no",
+   "fieldtype": "Data",
+   "label": "Reference No."
+  },
+  {
+   "fieldname": "debt_info_sb",
+   "fieldtype": "Section Break",
+   "label": "Balance Summary"
+  },
+  {
+   "fieldname": "current_debt",
    "fieldtype": "Currency",
-   "label": "Reconnection Charge",
+   "label": "Current Debt",
    "read_only": 1
   },
   {
@@ -95,56 +124,8 @@
    "read_only": 1
   },
   {
-   "fieldname": "section_break_calculator",
-   "fieldtype": "Section Break",
-   "label": "Payment Calculator / Months Selection"
-  },
-  {
-   "description": "Select specific months to calculate the total automatically.",
-   "fieldname": "payment_items",
-   "fieldtype": "Table",
-   "label": "Items",
-   "options": "Payment Receipt Item"
-  },
-  {
-   "fieldname": "payment_details_section",
+   "fieldname": "section_break_footer",
    "fieldtype": "Section Break"
-  },
-  {
-   "default": "Today",
-   "fieldname": "payment_date",
-   "fieldtype": "Date",
-   "label": "Payment Date",
-   "reqd": 1
-  },
-  {
-   "description": "Calculated automatically if items are added.",
-   "fieldname": "amount_paid",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Amount Paid",
-   "reqd": 1
-  },
-  {
-   "default": "Cash",
-   "fieldname": "mode_of_payment",
-   "fieldtype": "Select",
-   "label": "Mode of Payment",
-   "options": "Cash\nBank Transfer\nCheck\nCredit Card",
-   "reqd": 1
-  },
-  {
-   "description": "Shows if the subscriber will have debt or credit after this payment.",
-   "fieldname": "resulting_balance",
-   "fieldtype": "Data",
-   "label": "Projected Status",
-   "read_only": 1
-  },
-  {
-   "depends_on": "eval:doc.mode_of_payment != 'Cash'",
-   "fieldname": "reference_no",
-   "fieldtype": "Data",
-   "label": "Reference / Check No."
   },
   {
    "fieldname": "remarks",
@@ -161,16 +142,54 @@
    "read_only": 1
   },
   {
-   "fieldname": "payment_details_column",
-   "fieldtype": "Column Break",
-   "label": "Payment Details"
+   "fetch_from": "subscriber.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name / Company Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "service_contract_information_section",
+   "fieldtype": "Section Break",
+   "label": "Service Contract Information"
+  },
+  {
+   "fieldname": "column_break_cpqw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_gvnv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_rioi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_gerk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "payment_items",
+   "fieldtype": "Table",
+   "options": "Payment Receipt Item"
+  },
+  {
+   "fieldname": "section_break_fsww",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "advance_items",
+   "fieldtype": "Table",
+   "options": "Payment Receipt Item",
+   "search_index": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-31 13:39:40.425114",
+ "modified": "2026-02-03 05:25:50.280836",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Payment Receipt",
@@ -195,5 +214,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "subscriber"
 }

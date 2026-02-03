@@ -17,7 +17,7 @@ class BillingYear(Document):
 		end_date: DF.Date
 		is_closed: DF.Check
 		start_date: DF.Date
-		year_name: DF.Data
+		year_name: DF.Int
 	# end: auto-generated types
 
 	pass
