@@ -57,6 +57,7 @@
    "fieldname": "premises",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Premises",
    "options": "Premises",
    "reqd": 1
@@ -211,7 +212,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-02 17:26:36.943137",
+ "modified": "2026-02-12 03:11:15.763782",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Service Contract",
@@ -235,7 +236,7 @@
  ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [
   {

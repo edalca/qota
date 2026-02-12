@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 from frappe.utils import today, flt
 
@@ -17,6 +18,7 @@ class DebtLedgerEntry(Document):
 
         amended_from: DF.Link | None
         amount: DF.Currency
+        billing_period: DF.Data | None
         description: DF.SmallText | None
         due_date: DF.Date | None
         entry_type: DF.Literal["Monthly Fee", "Connection Fee", "Late Fee", "Reconnection Fee", "Other Fee"]
@@ -50,6 +52,4 @@ class DebtLedgerEntry(Document):
         """
         Prevent cancellation if there are active payment allocations.
         """
-        allocations_exist = frappe.db.exists("Payment Allocation", {"debt_ledger_entry": self.name})
-        if allocations_exist:
-            frappe.throw(_("Cannot cancel this debt because it has allocated payments. Please cancel the associated payment receipts first."))
+        frappe.throw(_("Debt Ledger Entries cannot be cancelled manually. This creates accounting inconsistencies."))

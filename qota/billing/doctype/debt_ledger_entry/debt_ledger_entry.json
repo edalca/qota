@@ -1,6 +1,7 @@
 {
  "actions": [],
- "autoname": "hash",
+ "allow_import": 1,
+ "autoname": "DLE-.YY.-.#####",
  "creation": "2026-01-31 04:18:22.922138",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -8,6 +9,7 @@
   "general_sb",
   "service_contract",
   "entry_type",
+  "billing_period",
   "column_break_4",
   "status",
   "due_date",
@@ -34,6 +36,7 @@
    "fieldname": "service_contract",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Service Contract",
    "options": "Service Contract",
    "reqd": 1
@@ -42,6 +45,7 @@
    "fieldname": "entry_type",
    "fieldtype": "Select",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Entry Type",
    "options": "Monthly Fee\nConnection Fee\nLate Fee\nReconnection Fee\nOther Fee",
    "reqd": 1
@@ -51,6 +55,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Status",
    "options": "Unpaid\nPartially Paid\nPaid",
    "read_only": 1,
@@ -136,17 +141,22 @@
    "fieldname": "due_date",
    "fieldtype": "Date",
    "label": "Due Date"
+  },
+  {
+   "fieldname": "billing_period",
+   "fieldtype": "Data",
+   "label": "Billing Period",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
- "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-03 01:41:49.389261",
+ "modified": "2026-02-12 03:00:40.331911",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Debt Ledger Entry",
- "naming_rule": "Random",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

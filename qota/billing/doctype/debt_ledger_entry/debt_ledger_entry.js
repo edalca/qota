@@ -15,6 +15,7 @@ frappe.ui.form.on("Debt Ledger Entry", {
         // Set visual indicators on the top header
         frm.set_read_only();
         frm.disable_save();
+        frm.page.clear_secondary_action();
         
         if (frm.doc.status === "Paid") {
             frm.page.set_indicator(__("Paid"), "green");
@@ -22,15 +23,6 @@ frappe.ui.form.on("Debt Ledger Entry", {
             frm.page.set_indicator(__("Partially Paid"), "orange");
         } else {
             frm.page.set_indicator(__("Unpaid"), "red");
-        }
-
-        // Add an Audit button to see exactly which receipts paid this debt
-        if (frm.doc.docstatus === 1) {
-            frm.add_custom_button(__("View Allocations"), () => {
-                frappe.set_route("List", "Payment Allocation", {
-                    "debt_ledger_entry": frm.doc.name
-                });
-            }, __("Audit"));
         }
     }
 });

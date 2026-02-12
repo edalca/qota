@@ -13,9 +13,9 @@ IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
 
-class IntegrationTestPaymentAllocation(IntegrationTestCase):
+class IntegrationTestMonthlyBill(IntegrationTestCase):
 	"""
-	Integration tests for PaymentAllocation.
+	Integration tests for MonthlyBill.
 	Use this class for testing interactions between multiple components.
 	"""
 

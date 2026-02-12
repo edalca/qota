@@ -12,7 +12,7 @@
    "icon": "list",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Operaciones",
+   "label": "Billing",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Section Break"
@@ -23,8 +23,20 @@
    "icon": "hand-coins",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Payment Receipt",
+   "label": "Recibo de pago",
    "link_to": "Payment Receipt",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "calendar-clock",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Monthly Bill",
+   "link_to": "Monthly Bill",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -35,20 +47,8 @@
    "icon": "calendar-sync",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Billing Cycle",
+   "label": "Ciclo de Facturaci\u00f3n",
    "link_to": "Billing Cycle",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 1,
-   "icon": "circle-gauge",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Lectura de Medidor",
-   "link_to": "Meter Reading",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -59,7 +59,7 @@
    "icon": "list",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Catalogos",
+   "label": "Operations",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Section Break"
@@ -79,11 +79,45 @@
   {
    "child": 0,
    "collapsible": 1,
+   "icon": "circle-gauge",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Lectura de Medidor",
+   "link_to": "Meter Reading",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Masters",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Section Break"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
    "icon": "boxes",
    "indent": 0,
    "keep_closed": 0,
    "label": "Categoria de Servicio",
    "link_to": "Service Category",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
+   "icon": "calendar-clock",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "A\u00f1o de Facturaci\u00f3n",
+   "link_to": "Billing Year",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -100,7 +134,7 @@
    "type": "Section Break"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "icon": "receipt-text",
    "indent": 0,
@@ -112,7 +146,7 @@
    "type": "Link"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "icon": "qota-pipe",
    "indent": 0,
@@ -126,15 +160,16 @@
   {
    "child": 0,
    "collapsible": 1,
+   "icon": "list",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Benefit",
+   "label": "Beneficio",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Section Break"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "icon": "pencil-ruler",
    "indent": 0,
@@ -146,7 +181,7 @@
    "type": "Link"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "icon": "badge-percent",
    "indent": 0,
@@ -179,21 +214,9 @@
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
-  },
-  {
-   "child": 0,
-   "collapsible": 1,
-   "icon": "calendar-clock",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "A\u00f1o de Facturaci\u00f3n",
-   "link_to": "Billing Year",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
   }
  ],
- "modified": "2026-02-03 00:21:47.440022",
+ "modified": "2026-02-12 01:58:33.423247",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing",

@@ -5,7 +5,7 @@
 from frappe.model.document import Document
 
 
-class PaymentAllocation(Document):
+class MonthlyBillItem(Document):
 	# begin: auto-generated types
 	# This code is auto-generated. Do not modify anything in this block.
 
@@ -14,10 +14,9 @@ class PaymentAllocation(Document):
 	if TYPE_CHECKING:
 		from frappe.types import DF
 
-		amount: DF.Currency
-		debt_ledger_entry: DF.Link
-		payment_receipt: DF.Link
-		transaction_date: DF.Date
+		parent: DF.Data
+		parentfield: DF.Data
+		parenttype: DF.Data
 	# end: auto-generated types
 
 	pass

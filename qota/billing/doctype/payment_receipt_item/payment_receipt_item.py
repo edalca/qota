@@ -15,6 +15,9 @@ class PaymentReceiptItem(Document):
 		from frappe.types import DF
 
 		amount: DF.Currency
+		billing_details: DF.SmallText | None
+		billing_period: DF.Data | None
+		debt_ledger_entry: DF.Link | None
 		description: DF.Data | None
 		due_date: DF.Date | None
 		parent: DF.Data

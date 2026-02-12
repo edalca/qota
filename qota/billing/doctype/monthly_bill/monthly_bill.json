@@ -1,0 +1,209 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "MBILL-.YY.-.MM.-.####",
+ "creation": "2026-02-11 02:17:49.133356",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "general_section",
+  "posting_date",
+  "edit_posting_date",
+  "service_contract",
+  "full_name",
+  "premises",
+  "column_break_4",
+  "fiscal_year",
+  "fiscal_month",
+  "status",
+  "billing_cycle",
+  "service_period_sb",
+  "start_date",
+  "column_break_twdp",
+  "end_date",
+  "debt_info_section",
+  "billing_details_json",
+  "items_section",
+  "items",
+  "totals_section",
+  "column_break_12",
+  "grand_total",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "general_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nSubmitted\nCancelled\nPaid",
+   "read_only": 1
+  },
+  {
+   "fieldname": "billing_cycle",
+   "fieldtype": "Link",
+   "label": "Billing Cycle",
+   "options": "Billing Cycle",
+   "read_only": 1
+  },
+  {
+   "fieldname": "debt_info_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "billing_details_json",
+   "fieldtype": "Small Text",
+   "hidden": 1
+  },
+  {
+   "fieldname": "items_section",
+   "fieldtype": "Section Break",
+   "label": "Breakdown of Monthly Fee"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "options": "Monthly Bill Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "totals_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_12",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total to Pay",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Monthly Bill",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Subscriber Name",
+   "options": "Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "fiscal_year",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Billing Year",
+   "link_filters": "[[\"Billing Year\",\"is_closed\",\"=\",0]]",
+   "options": "Billing Year",
+   "reqd": 1
+  },
+  {
+   "fieldname": "fiscal_month",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Fiscal Month",
+   "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember"
+  },
+  {
+   "fetch_from": "service_contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "read_only_depends_on": "eval:!doc.edit_posting_date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "service_period_sb",
+   "fieldtype": "Section Break",
+   "label": "Coverage Period"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_twdp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "edit_posting_date",
+   "fieldtype": "Check",
+   "label": "Edit Posting Date"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-02-12 02:41:26.710220",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Monthly Bill",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "full_name"
+}

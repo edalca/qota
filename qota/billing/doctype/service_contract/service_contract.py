@@ -182,7 +182,7 @@ def contract_search(doctype, txt, searchfield, start, page_len, filters):
         SELECT 
             sc.name, 
             sc.full_name, 
-            CONCAT('S: ', p.sector, ' | B: ', p.block, ' | C: ', p.house_number) as location
+            CONCAT('B: ', p.block, ' | C: ', p.house_number) as location
         FROM 
             `tabService Contract` sc
         JOIN 
@@ -192,7 +192,6 @@ def contract_search(doctype, txt, searchfield, start, page_len, filters):
             AND (
                 sc.name LIKE {frappe.db.escape(search_txt)} OR 
                 sc.full_name LIKE {frappe.db.escape(search_txt)} OR
-                p.sector LIKE {frappe.db.escape(search_txt)} OR
                 p.block LIKE {frappe.db.escape(search_txt)} OR
                 p.house_number LIKE {frappe.db.escape(search_txt)}
             )
@@ -201,3 +200,25 @@ def contract_search(doctype, txt, searchfield, start, page_len, filters):
     """
 
     return frappe.db.sql(query)
+
+@frappe.whitelist()
+def service_contract_data(service_contract):
+    # Convertimos a json.loads si viene como string, o aseguramos que sea lista
+    if isinstance(service_contract, str):
+        import json
+        service_contract = json.loads(service_contract)
+    
+    if not service_contract:
+        return []
+
+    SQL = """
+    SELECT 
+        sc.name,
+        sc.full_name, 
+        p.block,
+        p.house_number as house
+    FROM `tabService Contract` sc 
+    LEFT JOIN `tabPremises` p ON sc.premises = p.name
+    WHERE sc.name IN %s
+    """     
+    return frappe.db.sql(SQL, (tuple(service_contract),), as_dict=True)

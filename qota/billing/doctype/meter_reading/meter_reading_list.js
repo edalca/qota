@@ -34,7 +34,6 @@ frappe.listview_settings["Meter Reading"] = {
 			const data = listview.premises_data ? listview.premises_data[val] : null;
 
 			if (data) {
-				const labelSec = __("Sector");
 				const labelBlk = __("Block");
 				const labelHse = __("House Number");
 
@@ -42,7 +41,7 @@ frappe.listview_settings["Meter Reading"] = {
                     <div style="line-height: 1.4;">
                         <span>${val}</span><br>
                         <small>
-                            ${labelSec} ${data.sector}, ${labelBlk} ${data.block}, ${labelHse} ${data.house_number}
+                         ${labelBlk} ${data.block}, ${labelHse} ${data.house_number}
                         </small>
                     </div>
                 `;

@@ -39,6 +39,7 @@
    "fieldname": "block",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Block",
    "reqd": 1,
    "set_only_once": 1
@@ -57,6 +58,7 @@
    "fieldname": "house_number",
    "fieldtype": "Data",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "House Number",
    "reqd": 1,
    "set_only_once": 1
@@ -64,7 +66,7 @@
  ],
  "icon": "map-pin",
  "links": [],
- "modified": "2026-02-01 21:33:32.826741",
+ "modified": "2026-02-12 03:10:13.951683",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Premises",

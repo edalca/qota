@@ -31,16 +31,15 @@ class Premises(Document):
 
     def validate_unique_location(self):
         exists = frappe.db.exists("Premises", {
-            "sector": self.sector,
             "block": self.block,
             "house_number": self.house_number,
             "name": ["!=", self.name]
         })
         if exists:
-            frappe.throw(_("Location (Sector, Block, House) is already registered under ID {0}").format(exists))
+            frappe.throw(_("Location ( Block, House) is already registered under ID {0}").format(exists))
 
     def check_immutable_fields(self):
-        immutable_fields = ["registration_id", "sector", "block", "house_number"]
+        immutable_fields = ["registration_id","block", "house_number"]
         db_doc = frappe.get_doc("Premises", self.name)
         
         for field in immutable_fields:

@@ -39,7 +39,6 @@ qota.utils = {
 			const description_html = `
                 <div style="margin-top: 5px; padding: 5px; background-color: #f8f9fa; border-left: 3px solid #3498db;">
                     <b style="color: #2980b9;">${__("Location")}:</b>
-                    ${__("Sector")} ${location.sector},
                     ${__("Block")} ${location.block},
                     ${__("House Number")} ${location.house_number}
                 </div>

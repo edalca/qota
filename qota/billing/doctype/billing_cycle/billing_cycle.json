@@ -12,11 +12,14 @@
   "billing_basis",
   "column_break_3",
   "posting_date",
+  "edit_posting_date",
   "status",
   "service_period_sb",
-  "service_start_date",
+  "start_date",
   "column_break_7",
-  "service_end_date",
+  "end_date",
+  "diagnostics_section",
+  "diagnostic_html",
   "summary_section",
   "total_generated",
   "column_break_11",
@@ -33,12 +36,14 @@
    "fieldname": "fiscal_year",
    "fieldtype": "Link",
    "label": "Billing Year",
+   "link_filters": "[[\"Billing Year\",\"is_closed\",\"=\",0]]",
    "options": "Billing Year",
    "reqd": 1
   },
   {
    "fieldname": "fiscal_month",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Fiscal Month",
    "options": "January\nFebruary\nMarch\nApril\nMay\nJune\nJuly\nAugust\nSeptember\nOctober\nNovember\nDecember",
    "reqd": 1
@@ -47,6 +52,7 @@
    "default": "Flat Rate",
    "fieldname": "billing_basis",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Billing Basis",
    "options": "Flat Rate\nMetered\nAll",
    "reqd": 1
@@ -59,7 +65,9 @@
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Posting Date",
+   "read_only_depends_on": "eval:!doc.edit_posting_date",
    "reqd": 1
   },
   {
@@ -67,7 +75,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nCompleted\nCancelled",
+   "options": "Draft\nQueue\nCompleted\nCancelled",
    "read_only": 1
   },
   {
@@ -76,20 +84,8 @@
    "label": "Coverage Period"
   },
   {
-   "fieldname": "service_start_date",
-   "fieldtype": "Date",
-   "label": "Start Date",
-   "read_only": 0
-  },
-  {
    "fieldname": "column_break_7",
    "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "service_end_date",
-   "fieldtype": "Date",
-   "label": "End Date",
-   "read_only": 0
   },
   {
    "fieldname": "summary_section",
@@ -99,6 +95,7 @@
   {
    "fieldname": "total_generated",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "Total Amount Generated",
    "read_only": 1
   },
@@ -109,15 +106,52 @@
   {
    "fieldname": "total_contracts",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "Total Contracts Processed",
    "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Billing Cycle",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "edit_posting_date",
+   "fieldtype": "Check",
+   "label": "Edit Posting Date"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "diagnostics_section",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Diagnostics"
+  },
+  {
+   "fieldname": "diagnostic_html",
+   "fieldtype": "HTML"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-02 07:43:18.097938",
+ "modified": "2026-02-11 23:35:33.277873",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing Cycle",
@@ -142,6 +176,23 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": [],
+ "states": [
+  {
+   "color": "Orange",
+   "title": "Draft"
+  },
+  {
+   "color": "Yellow",
+   "title": "Queue"
+  },
+  {
+   "color": "Blue",
+   "title": "Completed"
+  },
+  {
+   "color": "Red",
+   "title": "Cancelled"
+  }
+ ],
  "title_field": "fiscal_year"
 }

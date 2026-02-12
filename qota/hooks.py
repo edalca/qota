@@ -16,10 +16,10 @@ app_logo_url = "/assets/qota/logo.svg"
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
 	{
- 		"name": "qota",
- 		"logo": app_logo_url,
-		"title": "Qota",
-		"route": "/desk",
+		"name": "billing",
+		"logo": app_logo_url,
+		"title": "Billing",
+		"route": "/desk/payment-receipt",
   	}
  ]
 

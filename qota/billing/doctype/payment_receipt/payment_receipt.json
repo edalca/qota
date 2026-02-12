@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "RCP-.YY.-.#####",
  "creation": "2026-01-31 07:05:14.459122",
  "doctype": "DocType",
@@ -12,22 +11,21 @@
   "column_break_cpqw",
   "subscriber",
   "full_name",
+  "status",
   "payment_details_sb",
   "payment_date",
   "mode_of_payment",
   "reference_no",
   "column_break_9",
-  "amount_paid",
-  "unallocated_amount",
+  "total_to_pay",
   "section_break_rioi",
   "payment_items",
-  "section_break_fsww",
-  "advance_items",
   "debt_info_sb",
   "column_break_gerk",
   "column_break_gvnv",
+  "unallocated_amount",
   "current_debt",
-  "total_to_pay",
+  "total_pending",
   "section_break_footer",
   "remarks",
   "amended_from"
@@ -53,6 +51,7 @@
    "fetch_from": "service_contract.premises",
    "fieldname": "premises",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Premises",
    "options": "Premises",
    "read_only": 1
@@ -71,18 +70,8 @@
    "label": "Payment Details"
   },
   {
-   "default": "0",
-   "fieldname": "amount_paid",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Amount Received",
-   "read_only": 1,
-   "reqd": 1
-  },
-  {
    "fieldname": "unallocated_amount",
    "fieldtype": "Currency",
-   "hidden": 1,
    "label": "Advance Balance",
    "read_only": 1
   },
@@ -114,13 +103,6 @@
    "fieldname": "current_debt",
    "fieldtype": "Currency",
    "label": "Current Debt",
-   "read_only": 1
-  },
-  {
-   "bold": 1,
-   "fieldname": "total_to_pay",
-   "fieldtype": "Currency",
-   "label": "Total Pending",
    "read_only": 1
   },
   {
@@ -163,7 +145,8 @@
   },
   {
    "fieldname": "section_break_rioi",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Payments Items"
   },
   {
    "fieldname": "column_break_gerk",
@@ -172,48 +155,61 @@
   {
    "fieldname": "payment_items",
    "fieldtype": "Table",
-   "options": "Payment Receipt Item"
-  },
-  {
-   "fieldname": "section_break_fsww",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "advance_items",
-   "fieldtype": "Table",
    "options": "Payment Receipt Item",
-   "search_index": 1
+   "reqd": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "total_pending",
+   "fieldtype": "Currency",
+   "label": "Total Pending",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "total_to_pay",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Total to Pay",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nPaid\nCancelled",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-03 05:25:50.280836",
+ "modified": "2026-02-12 03:58:30.551057",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Payment Receipt",
  "naming_rule": "Expression",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "title_field": "subscriber"
+ "states": [
+  {
+   "color": "Green",
+   "title": "Paid"
+  },
+  {
+   "color": "Orange",
+   "title": "Draft"
+  },
+  {
+   "color": "Red",
+   "title": "Cancelled"
+  }
+ ],
+ "title_field": "full_name"
 }
