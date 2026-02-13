@@ -178,8 +178,7 @@ function open_advance_dialog(frm) {
                         row.amount = data.amount;
                         row.due_date = data.due_date;
 
-                        // --- NUEVO: Guardamos el JSON del detalle en el campo oculto ---
-                        row.billing_details = data.billing_details;
+                        row.billing_details = JSON.stringify(data.billing_details || []);
 
                         added_count++;
                     }
