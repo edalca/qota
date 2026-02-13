@@ -240,7 +240,7 @@ class MonthlyBill(Document):
         )
 
     def apply_advance_payments(self):
-        """Matches advance payments to the debt linked by reference"""
+        """Matches advance payments using the new balance field"""
         debt_name = frappe.db.get_value("Debt Ledger Entry", {
             "reference_doctype": "Monthly Bill", 
             "reference_name": self.name
@@ -248,33 +248,47 @@ class MonthlyBill(Document):
 
         if not debt_name: return
 
+        # ... (tu mapeo de meses y target_period igual) ...
         year_val = frappe.db.get_value("Billing Year", self.fiscal_year, "year_name")
-        month_map = {
-            "January":"01","February":"02","March":"03","April":"04","May":"05","June":"06",
-            "July":"07","August":"08","September":"09","October":"10","November":"11","December":"12"
-        }
+        month_map = {"January":"01","February":"02","March":"03","April":"04","May":"05","June":"06",
+                     "July":"07","August":"08","September":"09","October":"10","November":"11","December":"12"}
         target_period = f"{month_map[self.fiscal_month]}-{year_val}"
 
+        # CAMBIO: Buscamos ítems que tengan BALANCE > 0
         advance = frappe.db.sql("""
-            SELECT item.name, item.amount 
+            SELECT item.name, item.balance, item.amount 
             FROM `tabPayment Receipt Item` item
             INNER JOIN `tabPayment Receipt` parent ON parent.name = item.parent
             WHERE parent.service_contract = %s 
               AND item.billing_period = %s 
               AND parent.docstatus = 1 
-              AND (item.debt_ledger_entry IS NULL OR item.debt_ledger_entry = '')
+              AND item.balance > 0
             LIMIT 1
         """, (self.service_contract, target_period), as_dict=True)
 
         if advance:
-            adv = advance[0]
+            adv_item = advance[0]
             debt = frappe.get_doc("Debt Ledger Entry", debt_name)
-            debt.paid_amount = flt(adv.amount)
-            debt.outstanding_amount = flt(debt.amount) - flt(adv.amount)
-            debt.status = "Paid" if debt.outstanding_amount <= 0 else "Partially Paid"
+            
+            # Usamos el balance, no el amount total
+            available_money = flt(adv_item.balance)
+            needed_money = flt(debt.amount)
+
+            amount_to_apply = min(available_money, needed_money)
+
+            # 1. Actualizar la Deuda
+            debt.paid_amount = amount_to_apply
+            debt.outstanding_amount = needed_money - amount_to_apply
+            debt.status = "Paid" if debt.outstanding_amount <= 0.01 else "Partially Paid"
             debt.save(ignore_permissions=True)
             
-            frappe.db.set_value("Payment Receipt Item", adv.name, "debt_ledger_entry", debt_name)
+            # 2. Actualizar el SOBRANTE en el Recibo
+            new_balance = available_money - amount_to_apply
+            frappe.db.set_value("Payment Receipt Item", adv_item.name, {
+                "balance": new_balance,
+                "debt_ledger_entry": debt_name # Mantenemos el link por referencia
+            })
+
 
     def prepare_audit_json(self):
         details = [{"description": i.description, "amount": i.amount} for i in self.items]

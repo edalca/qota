@@ -43,6 +43,11 @@ class PaymentReceipt(Document):
         self.calculate_totals()
         self.status_update()
 
+    def before_submit(self):
+        for item in self.payment_items:
+            # Al inicio, el saldo disponible es el total del item
+            item.balance = item.amount
+
 
     def on_submit(self):
         """
@@ -67,46 +72,55 @@ class PaymentReceipt(Document):
 
     def process_ledger_updates(self, cancel=False):
         for item in self.payment_items:
+            # 1. Si estamos en Submit, nos aseguramos de que el balance inicial 
+            # sea igual al monto si es que viene vacío.
+            if not cancel and flt(item.balance) == 0:
+                item.balance = item.amount
+
             # Solo procesamos si el ítem está vinculado a una deuda existente
             if item.debt_ledger_entry:
                 debt = frappe.get_doc("Debt Ledger Entry", item.debt_ledger_entry)
-  
+                
+                # Monto que realmente se puede aplicar (el menor entre el balance y la deuda)
+                # Esto previene que la deuda quede en negativo
+                amount_to_apply = min(flt(item.balance), flt(debt.outstanding_amount))
+
                 if cancel:
-                    # CASO CANCELAR: Devolvemos el dinero a la deuda (Sumar)
-                    debt.outstanding_amount += flt(item.amount)
-
-                    debt.paid_amount -= flt(item.amount)
-                        
-                else:
-                    # CASO SUBMIT: Restamos el dinero a la deuda
-                    # Validación de seguridad
-                    if flt(item.amount) > flt(debt.outstanding_amount):
-                        frappe.throw(
-                            _("Payment amount ({0}) exceeds the outstanding balance ({1}) for debt {2}.").format(
-                                item.amount, debt.outstanding_amount, item.debt_ledger_entry
-                            )
-                        )
+                    # CASO CANCELAR: 
+                    # Lo que estaba 'pagado' en la deuda vuelve al balance del item
+                    # (Usamos el monto que se aplicó originalmente, que es item.amount - item.balance)
+                    applied_in_this_item = flt(item.amount) - flt(item.balance)
                     
-                    debt.outstanding_amount -= flt(item.amount)
-                    debt.paid_amount += flt(item.amount)
+                    debt.outstanding_amount += applied_in_this_item
+                    debt.paid_amount -= applied_in_this_item
+                    
+                    # Restauramos el balance total del ítem
+                    item.balance = item.amount
+                else:
+                    # CASO SUBMIT:
+                    if amount_to_apply <= 0:
+                        continue # Si la deuda ya estaba pagada por otro ítem, saltamos
+                    
+                    debt.outstanding_amount -= amount_to_apply
+                    debt.paid_amount += amount_to_apply
+                    
+                    # RESTAMOS del balance del ítem lo que usamos para la deuda
+                    item.balance = flt(item.balance) - amount_to_apply
 
-
-                if flt(debt.outstanding_amount) <= 0:
+                # --- Gestión de Estados de la Deuda ---
+                if flt(debt.outstanding_amount) <= 0.01:
                     debt.status = "Paid"
-                # Si ha pagado algo pero sigue debiendo -> Partially Paid
                 elif flt(debt.paid_amount) > 0:
                     debt.status = "Partially Paid"
-                # Si no ha pagado nada -> Unpaid
                 else:
                     debt.status = "Unpaid"
 
-                # Guardar cambios ignorando permisos (porque el Ledger suele ser Read Only)
+                # Guardar cambios en la Deuda
                 debt.flags.ignore_validate_update_after_submit = True
                 debt.save(ignore_permissions=True)
-
-                # Guardamos los cambios en el Debt Ledger Entry sin validar permisos de nuevo
-                debt.flags.ignore_validate_update_after_submit = True
-                debt.save(ignore_permissions=True)
+                
+                # Guardar el nuevo balance en el ítem del recibo
+                item.db_set("balance", item.balance)
 
     def calculate_totals(self):
         total_to_pay = 0.0

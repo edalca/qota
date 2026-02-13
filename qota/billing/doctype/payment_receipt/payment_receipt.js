@@ -59,6 +59,8 @@ frappe.ui.form.on('Payment Receipt', {
                         row.debt_id = d.debt_id;
                         row.due_date = d.due_date;
                         row.billing_period = d.billing_period;
+                        row.balance = d.amount;
+                        row.debt_ledger_entry = d.debt_id;
 
                         let time_label = d.days_diff < 0
                             ? ` (${__("OVERDUE: {0} days", [Math.abs(d.days_diff)])})`

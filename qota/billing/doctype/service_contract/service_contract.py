@@ -75,6 +75,10 @@ class ServiceContract(Document):
         log.field_changed = "Contract Status"
         log.description = _("Initial contract activation and validation.")
         log.insert(ignore_permissions=True)
+        
+    def on_cancel(self):
+        self.db_set("status", "Cancelled")
+        self.db_set("last_status_change", today())
 
     def post_connection_debt(self):
         """

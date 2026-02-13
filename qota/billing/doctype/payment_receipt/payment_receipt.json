@@ -35,7 +35,9 @@
    "fieldname": "service_contract",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Service Contract",
+   "link_filters": "[[\"Service Contract\",\"docstatus\",\"=\",\"1\"],[\"Service Contract\",\"status\",\"=\",\"Active\"]]",
    "options": "Service Contract",
    "reqd": 1
   },
@@ -52,6 +54,7 @@
    "fieldname": "premises",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Premises",
    "options": "Premises",
    "read_only": 1
@@ -186,7 +189,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-12 03:58:30.551057",
+ "modified": "2026-02-13 01:29:58.661958",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Payment Receipt",
