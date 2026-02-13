@@ -140,7 +140,131 @@ class PaymentReceipt(Document):
         self.unallocated_amount = unallocated_amount
         
         self.total_pending = flt(self.current_debt) - total_to_pay + unallocated_amount
+        
+    @frappe.whitelist()
+    @staticmethod
+    def get_next_billing_advances(self,contract_name, qty=12):
+        """
+        Calcula los próximos meses a pagar por adelantado.
+        Calcula dinámicamente start_date y end_date para cada mes futuro 
+        y los envía al motor de breakdown.
+        """
+        from qota.billing.utils import get_monthly_billing_breakdown
 
+        contract = frappe.get_doc("Service Contract", contract_name)
+        
+        # 1. Obtener configuración global de fechas
+        settings = frappe.get_single("Billing Settings")
+        start_day = int(settings.cycle_start_day or 1)
+        
+        # Mapeo de nombres de meses
+        month_names = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ]
+
+        # ------------------------------------------------------------------
+        # PASO 1 Y 2: DETERMINAR PUNTO DE PARTIDA (Historial de Deuda y Adelantos)
+        # ------------------------------------------------------------------
+        # (Mantenemos la lógica de búsqueda de last_debt_date y last_advance_date)
+        last_debt_date = None
+        last_entry = frappe.get_all("Debt Ledger Entry",
+            filters={"service_contract": contract_name, "entry_type": "Monthly Fee", "docstatus": ["!=", 2]},
+            fields=["reference_name"], order_by="creation desc", limit=1
+        )
+        if last_entry and last_entry[0].reference_name:
+            cycle_data = frappe.db.get_value("Billing Cycle", last_entry[0].reference_name, ["fiscal_month", "fiscal_year"], as_dict=True)
+            if cycle_data:
+                year_val = frappe.db.get_value("Billing Year", cycle_data.fiscal_year, "year_name")
+                last_debt_date = date(int(year_val), month_names.index(cycle_data.fiscal_month) + 1, 1)
+
+        last_advance_date = None
+        paid_periods = frappe.db.sql("""
+            SELECT billing_period FROM `tabPayment Receipt Item`
+            WHERE parent IN (SELECT name FROM `tabPayment Receipt` WHERE service_contract = %s AND docstatus = 1)
+            AND billing_period IS NOT NULL AND payment_concept = 'Monthly Fee'
+        """, (contract_name), as_dict=True)
+        
+        found_dates = []
+        for row in paid_periods:
+            parts = row.billing_period.split('-')
+            found_dates.append(date(int(parts[1]), int(parts[0]), 1))
+        if found_dates: last_advance_date = max(found_dates)
+
+        start_point = last_debt_date
+        if last_advance_date and (not last_debt_date or last_advance_date > last_debt_date):
+            start_point = last_advance_date
+
+        # ------------------------------------------------------------------
+        # PASO 3: MAPEO DE AÑOS Y VALIDACIÓN INICIAL
+        # ------------------------------------------------------------------
+        open_years_map = { 
+            int(y.year_name): y.name 
+            for y in frappe.get_all("Billing Year", filters={"is_closed": 0}, fields=["name", "year_name"]) 
+        }
+        
+        if not start_point:
+            contract_start = getdate(contract.start_date)
+            min_y = min(open_years_map.keys())
+            start_point = contract_start if contract_start.year >= min_y else date(min_y, 1, 1)
+            current_date = add_months(start_point, -1)
+        else:
+            current_date = start_point
+
+        # ------------------------------------------------------------------
+        # PASO 4: GENERAR ADELANTOS CON FECHAS CALCULADAS
+        # ------------------------------------------------------------------
+        advances = []
+        today_date = nowdate()
+
+        for i in range(int(qty)):
+            next_month_date = add_months(current_date, 1)
+            y_num = next_month_date.year
+            m_num = next_month_date.month
+
+            # A. Verificar si el año está abierto
+            fiscal_year_link = open_years_map.get(y_num)
+            if not fiscal_year_link: break
+
+            fiscal_month_str = month_names[m_num - 1]
+
+            # B. CALCULAR START_DATE Y END_DATE PARA EL PERIODO FUTURO
+            # Basado en la lógica del Billing Cycle
+            if start_day == 1:
+                period_start = date(y_num, m_num, 1)
+                # El último día del mes es el día 0 del mes siguiente
+                period_end = add_days(add_months(period_start, 1), -1)
+            else:
+                period_start = date(y_num, m_num, start_day)
+                period_end = add_days(add_months(period_start, 1), -1)
+
+            # C. LLAMADA AL MOTOR CON LOS 5 PARÁMETROS
+            breakdown = get_monthly_billing_breakdown(
+                contract_name = contract_name,
+                billing_month = fiscal_month_str, # "January"
+                billing_year  = fiscal_year_link,  # "BY-2026"
+                start_date    = period_start,     # Date object
+                end_date      = period_end        # Date object
+            )
+            
+            # D. Empaquetar resultados
+            advances.append({
+                "billing_period": next_month_date.strftime("%m-%Y"),
+                "month_num": m_num,
+                "month_label": "{0} {1}".format(_(month_names[m_num - 1]), y_num),
+                "year": y_num,
+                "due_date": today_date,
+                "amount": flt(breakdown.get("total_to_bill", 0)),
+                # PASAMOS ESTOS DOS CAMPOS NUEVOS:
+                "discount_amount": flt(breakdown.get("discount_amount", 0)),
+                "discount_percentage": flt(breakdown.get("discount_percentage", 0)),
+                "description": _("Monthly Fee: {0}").format(format_date(next_month_date, 'MMMM YYYY')),
+                "billing_details": breakdown.get("detailed_items", [])
+            })
+            
+            current_date = next_month_date
+
+        return advances
 
 
 @frappe.whitelist()
@@ -168,122 +292,4 @@ def get_pending_balances(contract):
         "current_debt": sum(flt(d['amount']) for d in debts)
     }
 
-@frappe.whitelist()
-def get_next_billing_advances(contract_name, qty=12):
-    """
-    Calcula los próximos meses a pagar por adelantado.
-    Calcula dinámicamente start_date y end_date para cada mes futuro 
-    y los envía al motor de breakdown.
-    """
-    from qota.billing.utils import get_monthly_billing_breakdown
-
-    contract = frappe.get_doc("Service Contract", contract_name)
     
-    # 1. Obtener configuración global de fechas
-    settings = frappe.get_single("Billing Settings")
-    start_day = int(settings.cycle_start_day or 1)
-    
-    # Mapeo de nombres de meses
-    month_names = [
-        "January", "February", "March", "April", "May", "June", 
-        "July", "August", "September", "October", "November", "December"
-    ]
-
-    # ------------------------------------------------------------------
-    # PASO 1 Y 2: DETERMINAR PUNTO DE PARTIDA (Historial de Deuda y Adelantos)
-    # ------------------------------------------------------------------
-    # (Mantenemos la lógica de búsqueda de last_debt_date y last_advance_date)
-    last_debt_date = None
-    last_entry = frappe.get_all("Debt Ledger Entry",
-        filters={"service_contract": contract_name, "entry_type": "Monthly Fee", "docstatus": ["!=", 2]},
-        fields=["reference_name"], order_by="creation desc", limit=1
-    )
-    if last_entry and last_entry[0].reference_name:
-        cycle_data = frappe.db.get_value("Billing Cycle", last_entry[0].reference_name, ["fiscal_month", "fiscal_year"], as_dict=True)
-        if cycle_data:
-            year_val = frappe.db.get_value("Billing Year", cycle_data.fiscal_year, "year_name")
-            last_debt_date = date(int(year_val), month_names.index(cycle_data.fiscal_month) + 1, 1)
-
-    last_advance_date = None
-    paid_periods = frappe.db.sql("""
-        SELECT billing_period FROM `tabPayment Receipt Item`
-        WHERE parent IN (SELECT name FROM `tabPayment Receipt` WHERE service_contract = %s AND docstatus = 1)
-        AND billing_period IS NOT NULL AND payment_concept = 'Monthly Fee'
-    """, (contract_name), as_dict=True)
-    
-    found_dates = []
-    for row in paid_periods:
-        parts = row.billing_period.split('-')
-        found_dates.append(date(int(parts[1]), int(parts[0]), 1))
-    if found_dates: last_advance_date = max(found_dates)
-
-    start_point = last_debt_date
-    if last_advance_date and (not last_debt_date or last_advance_date > last_debt_date):
-        start_point = last_advance_date
-
-    # ------------------------------------------------------------------
-    # PASO 3: MAPEO DE AÑOS Y VALIDACIÓN INICIAL
-    # ------------------------------------------------------------------
-    open_years_map = { 
-        int(y.year_name): y.name 
-        for y in frappe.get_all("Billing Year", filters={"is_closed": 0}, fields=["name", "year_name"]) 
-    }
-    
-    if not start_point:
-        contract_start = getdate(contract.start_date)
-        min_y = min(open_years_map.keys())
-        start_point = contract_start if contract_start.year >= min_y else date(min_y, 1, 1)
-        current_date = add_months(start_point, -1)
-    else:
-        current_date = start_point
-
-    # ------------------------------------------------------------------
-    # PASO 4: GENERAR ADELANTOS CON FECHAS CALCULADAS
-    # ------------------------------------------------------------------
-    advances = []
-    today_date = nowdate()
-
-    for i in range(int(qty)):
-        next_month_date = add_months(current_date, 1)
-        y_num = next_month_date.year
-        m_num = next_month_date.month
-
-        # A. Verificar si el año está abierto
-        fiscal_year_link = open_years_map.get(y_num)
-        if not fiscal_year_link: break
-
-        fiscal_month_str = month_names[m_num - 1]
-
-        # B. CALCULAR START_DATE Y END_DATE PARA EL PERIODO FUTURO
-        # Basado en la lógica del Billing Cycle
-        if start_day == 1:
-            period_start = date(y_num, m_num, 1)
-            # El último día del mes es el día 0 del mes siguiente
-            period_end = add_days(add_months(period_start, 1), -1)
-        else:
-            period_start = date(y_num, m_num, start_day)
-            period_end = add_days(add_months(period_start, 1), -1)
-
-        # C. LLAMADA AL MOTOR CON LOS 5 PARÁMETROS
-        breakdown = get_monthly_billing_breakdown(
-            contract_name = contract_name,
-            billing_month = fiscal_month_str, # "January"
-            billing_year  = fiscal_year_link,  # "BY-2026"
-            start_date    = period_start,     # Date object
-            end_date      = period_end        # Date object
-        )
-        
-        # D. Empaquetar resultados
-        advances.append({
-            "billing_period": next_month_date.strftime("%m-%Y"),
-            "month_num": m_num,
-            "year": y_num,
-            "due_date": today_date,
-            "amount": flt(breakdown.get("total_to_bill", 0)),
-            "description": _("Monthly Fee: {0}").format(format_date(next_month_date, 'MMMM YYYY')),
-            "billing_details": json.dumps(breakdown.get("detailed_items", []))
-        })
-        
-        current_date = next_month_date
-
-    return advances

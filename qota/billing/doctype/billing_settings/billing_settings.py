@@ -35,6 +35,7 @@ class BillingSettings(Document):
         separate_cistern_fee: DF.Check
         show_debt_details: DF.Check
         suspension_months_limit: DF.Int
+        truncate_discount_decimals: DF.Check
         water_service_label: DF.Data
     # end: auto-generated types
 

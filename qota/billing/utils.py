@@ -267,24 +267,40 @@ def apply_discount_logic(contract, settings, reference_date):
     applicable_rules.sort(key=lambda x: flt(x.discount_percentage), reverse=True)
     selected_rules = applicable_rules[:(settings.max_discounts_per_subscriber or 1)]
     total_pct = min(sum(flt(r.discount_percentage) for r in selected_rules), 100.0)
+    
 
     return {"total_pct": total_pct, "selected_rules": selected_rules if total_pct > 0 else []}
 
 def finalize_breakdown(base_results, discount_pct, rules):
+    settings = frappe.get_single("Billing Settings")
+    
     discountable = base_results["discountable_amount"]
     non_discountable = base_results["non_discountable_amount"]
+    
     discount_amount = flt(discountable * (discount_pct / 100))
+    
+    if settings.truncate_discount_decimals:
+        discount_amount = int(discount_amount)
+    
     total_to_bill = (discountable + non_discountable) - discount_amount
+    
+    if settings.truncate_discount_decimals:
+        total_to_bill = int(total_to_bill)
+        
     items = base_results.get("detailed_items", [])
+    
     if discount_amount > 0:
         rule_list = ", ".join([r.name for r in rules])
-        items.append({"description": _("Applied Discount ({0})").format(rule_list), "amount": -discount_amount})
+        items.append({
+            "description": _("Applied Discount ({0})").format(rule_list), 
+            "amount": -discount_amount
+        })
     
     return {
         "total_to_bill": flt(total_to_bill),
         "detailed_items": items,
         "discount_amount": discount_amount,
-        "discount_percentage": discount_pct,
+        "discount_percentage": discount_pct, # El % se queda igual, el monto es el que cambia
         "base_rate": base_results.get("base_rate", 0),
         "cistern_fee": base_results.get("cistern_fee", 0)
     }

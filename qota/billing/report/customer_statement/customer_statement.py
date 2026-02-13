@@ -16,7 +16,9 @@ def execute(filters=None):
 def get_columns():
     return [
         {"label": _("Date"), "fieldname": "posting_date", "fieldtype": "Date", "width": 110},
+        {"label": _("Doctype"), "fieldname": "reference_doctype", "fieldtype": "Data", "width": 150},
         {"label": _("Reference"), "fieldname": "reference", "fieldtype": "Dynamic Link", "options": "reference_doctype", "width": 140},
+        {"label": _("Billing Period"), "fieldname": "billing_period", "fieldtype": "Data", "width": 120},
         {"label": _("Description"), "fieldname": "description", "fieldtype": "Data", "width": 250},
         {"label": _("Debit (Charges)"), "fieldname": "debit", "fieldtype": "Currency", "width": 120},
         {"label": _("Credit (Payments)"), "fieldname": "credit", "fieldtype": "Currency", "width": 120},
@@ -34,6 +36,7 @@ def get_data(filters):
             name as reference,
             'Debt Ledger Entry' as reference_doctype,
             description,
+            billing_period,
             amount as debit,
             0 as credit
         FROM `tabDebt Ledger Entry`
@@ -46,6 +49,7 @@ def get_data(filters):
             parent.name as reference,            -- Cambiado: Ahora es el ID del Recibo (RCP-...)
             'Payment Receipt' as reference_doctype, -- Cambiado: El Doctype para el link
             item.description,
+            item.billing_period,
             0 as debit,
             item.amount as credit
         FROM `tabPayment Receipt Item` item
@@ -62,8 +66,7 @@ def get_data(filters):
     running_balance = 0
     
     for entry in raw_entries:
-        running_balance += flt(entry.debit) - flt(entry.credit)
-        
+        running_balance += flt(entry.debit) - flt(entry.credit)  
         entry["balance"] = running_balance
         data.append(entry)
         

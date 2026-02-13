@@ -29,6 +29,7 @@
   "max_discounts_per_subscriber",
   "column_break_disc",
   "max_discounts_per_connection",
+  "truncate_discount_decimals",
   "taxes_sb",
   "apply_isv",
   "isv_percent",
@@ -248,13 +249,20 @@
    "fieldtype": "Int",
    "label": "Default Reconnection Fee",
    "options": "0"
+  },
+  {
+   "default": "1",
+   "description": "If checked, decimals will be removed from discount amounts (e.g., 78.75 becomes 78).",
+   "fieldname": "truncate_discount_decimals",
+   "fieldtype": "Check",
+   "label": "Truncate Discount Decimals?"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-02-03 01:53:16.678655",
+ "modified": "2026-02-13 16:42:06.201321",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing Settings",

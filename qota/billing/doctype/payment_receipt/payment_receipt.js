@@ -199,23 +199,16 @@ function open_advance_dialog(frm) {
         }
     });
 
-    // Llamada al servidor para obtener los meses calculados
-    frappe.call({
-        method: "qota.billing.doctype.payment_receipt.payment_receipt.get_next_billing_advances",
-        args: {
-            contract_name: frm.doc.service_contract,
-            qty: 12
-        },
-        freeze: true,
-        freeze_message: __("Calculating rates..."),
-        callback: function (r) {
-            if (r.message && r.message.length > 0) {
-                d.months_data = r.message;
-                render_month_selection_table(d, r.message);
-                d.show();
-            } else {
-                frappe.msgprint(__("No available months found for advances."));
-            }
+    frm.call('get_next_billing_advances', {
+        contract_name: frm.doc.service_contract,
+        qty: 12
+    }).then(r => {
+        if (r.message && r.message.length > 0) {
+            d.months_data = r.message;
+            render_month_selection_table(d, r.message);
+            d.show();
+        } else {
+            frappe.msgprint(__("No available months found for advances."));
         }
     });
 }
@@ -303,7 +296,7 @@ function render_month_selection_table(d, months) {
         const m = months[idx];
 
         // Parseamos el JSON que viene del servidor
-        const details = JSON.parse(m.billing_details || "[]");
+        const details = m.billing_details || [];
         show_billing_breakdown_dialog(m.billing_period, details);
     });
 
