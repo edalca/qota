@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qota VERSION\n"
 "Report-Msgid-Bugs-To: edwinalonso162@hotmail.com\n"
-"POT-Creation-Date: 2026-02-13 08:05+0000\n"
-"PO-Revision-Date: 2026-02-13 08:05+0000\n"
+"POT-Creation-Date: 2026-02-16 20:57+0000\n"
+"PO-Revision-Date: 2026-02-16 20:57+0000\n"
 "Last-Translator: edwinalonso162@hotmail.com\n"
 "Language-Team: edwinalonso162@hotmail.com\n"
 "MIME-Version: 1.0\n"
@@ -79,7 +79,7 @@ msgstr ""
 msgid "Add to Receipt"
 msgstr ""
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:193
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:192
 msgid "Added {0} months to the receipt"
 msgstr ""
 
@@ -133,7 +133,7 @@ msgstr ""
 #. Option for the 'Condition Type' (Select) field in DocType 'Discount Rule'
 #. Label of the age (Int) field in DocType 'Subscriber'
 #: qota/billing/doctype/discount_rule/discount_rule.json
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:174
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:175
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:220
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Age"
@@ -192,16 +192,12 @@ msgstr ""
 #. Fee'
 #: qota/billing/doctype/amortization_schedule_item/amortization_schedule_item.json
 #: qota/billing/doctype/monthly_bill_item/monthly_bill_item.json
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:227
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:329
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:219
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:321
 #: qota/billing/doctype/payment_receipt_item/payment_receipt_item.json
 #: qota/billing/doctype/service_rate_additional_fee/service_rate_additional_fee.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:281
 msgid "Amount"
-msgstr ""
-
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:216
-msgid "Amount Paid"
 msgstr ""
 
 #: qota/billing/utils.py:18
@@ -220,11 +216,15 @@ msgstr ""
 msgid "Amount to Finance"
 msgstr ""
 
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:223
+msgid "Amount to Pay"
+msgstr ""
+
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:146
 msgid "Applied Benefits"
 msgstr ""
 
-#: qota/billing/utils.py:281
+#: qota/billing/utils.py:295
 msgid "Applied Discount ({0})"
 msgstr ""
 
@@ -268,7 +268,7 @@ msgstr ""
 
 #. Label of the balance (Currency) field in DocType 'Payment Receipt Item'
 #: qota/billing/doctype/payment_receipt_item/payment_receipt_item.json
-#: qota/billing/report/customer_statement/customer_statement.py:23
+#: qota/billing/report/customer_statement/customer_statement.py:25
 msgid "Balance"
 msgstr ""
 
@@ -360,6 +360,7 @@ msgstr ""
 #. Label of the billing_period (Data) field in DocType 'Payment Receipt Item'
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
 #: qota/billing/doctype/payment_receipt_item/payment_receipt_item.json
+#: qota/billing/report/customer_statement/customer_statement.py:21
 msgid "Billing Period"
 msgstr ""
 
@@ -403,11 +404,11 @@ msgstr ""
 msgid "Blocked"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:207
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:212
 msgid "Board"
 msgstr ""
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:342
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:334
 msgid "Breakdown for {0}"
 msgstr ""
 
@@ -418,10 +419,6 @@ msgstr ""
 
 #: qota/billing/doctype/monthly_bill/monthly_bill.js:13
 msgid "Calculate Breakdown"
-msgstr ""
-
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:210
-msgid "Calculating rates..."
 msgstr ""
 
 #. Label of the can_read_and_write (Check) field in DocType 'Subscriber'
@@ -575,7 +572,7 @@ msgstr ""
 msgid "Continuity Gaps Detected"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:170
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:171
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:119
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:226
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:17
@@ -619,7 +616,7 @@ msgstr ""
 msgid "Credit & Suspension Policy"
 msgstr ""
 
-#: qota/billing/report/customer_statement/customer_statement.py:22
+#: qota/billing/report/customer_statement/customer_statement.py:24
 msgid "Credit (Payments)"
 msgstr ""
 
@@ -692,7 +689,7 @@ msgstr ""
 msgid "Cycle Start Day"
 msgstr ""
 
-#: qota/billing/doctype/billing_settings/billing_settings.py:48
+#: qota/billing/doctype/billing_settings/billing_settings.py:49
 msgid "Cycle Start Day must be between 1 and 28 to ensure compatibility with all months."
 msgstr ""
 
@@ -710,7 +707,7 @@ msgstr ""
 msgid "Daily Collection"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:219
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:227
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:204
 #: qota/billing/report/customer_statement/customer_statement.py:18
 #: qota/billing/report/daily_collection/daily_collection.py:20
@@ -740,7 +737,7 @@ msgstr ""
 msgid "Days until Due Date"
 msgstr ""
 
-#: qota/billing/report/customer_statement/customer_statement.py:21
+#: qota/billing/report/customer_statement/customer_statement.py:23
 msgid "Debit (Charges)"
 msgstr ""
 
@@ -791,7 +788,7 @@ msgstr ""
 #: qota/billing/doctype/service_category/service_category.json
 #: qota/billing/doctype/service_rate_additional_fee/service_rate_additional_fee.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:279
-#: qota/billing/report/customer_statement/customer_statement.py:20
+#: qota/billing/report/customer_statement/customer_statement.py:22
 msgid "Description"
 msgstr ""
 
@@ -827,7 +824,7 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:194
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:197
 msgid "Discount"
 msgstr ""
 
@@ -865,6 +862,10 @@ msgstr ""
 #. 'Billing Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Do not suspend if total debt is less than this amount (avoids cutting service for pennies)."
+msgstr ""
+
+#: qota/billing/report/customer_statement/customer_statement.py:19
+msgid "Doctype"
 msgstr ""
 
 #. Label of the down_payment (Currency) field in DocType 'Debt Refinancing'
@@ -1005,10 +1006,6 @@ msgstr ""
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 msgid "February"
-msgstr ""
-
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:189
-msgid "Fee"
 msgstr ""
 
 #. Label of the fee_name (Data) field in DocType 'Connection Fee'
@@ -1188,6 +1185,12 @@ msgstr ""
 msgid "ID document has expired."
 msgstr ""
 
+#. Description of the 'Truncate Discount Decimals?' (Check) field in DocType
+#. 'Billing Settings'
+#: qota/billing/doctype/billing_settings/billing_settings.json
+msgid "If checked, decimals will be removed from discount amounts (e.g., 78.75 becomes 78)."
+msgstr ""
+
 #. Description of the 'Subject to Late Fee?' (Check) field in DocType 'Service
 #. Rate Additional Fee'
 #: qota/billing/doctype/service_rate_additional_fee/service_rate_additional_fee.json
@@ -1327,7 +1330,7 @@ msgstr ""
 msgid "Late Fee"
 msgstr ""
 
-#: qota/billing/doctype/billing_settings/billing_settings.py:57
+#: qota/billing/doctype/billing_settings/billing_settings.py:58
 msgid "Late Fee Percentage must be between 0 and 100."
 msgstr ""
 
@@ -1356,8 +1359,8 @@ msgstr ""
 msgid "Legal Representative"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:178
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:213
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:179
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:218
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:129
 #: qota/billing/report/aging_report/aging_report.py:17
 #: qota/public/js/utils.js:39
@@ -1472,8 +1475,8 @@ msgstr ""
 msgid "Mode of Payment"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:171
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:212
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:172
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:217
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:141
 msgid "Month"
 msgstr ""
@@ -1496,7 +1499,7 @@ msgstr ""
 msgid "Monthly Fee"
 msgstr ""
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.py:283
+#: qota/billing/doctype/payment_receipt/payment_receipt.py:261
 msgid "Monthly Fee: {0}"
 msgstr ""
 
@@ -1514,7 +1517,7 @@ msgstr ""
 msgid "Monthly Total"
 msgstr ""
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:270
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:262
 msgid "Months must be selected in sequential order."
 msgstr ""
 
@@ -1548,7 +1551,7 @@ msgstr ""
 msgid "No active Service Rate found for category '{0}' on {1}"
 msgstr ""
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:217
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:210
 msgid "No available months found for advances."
 msgstr ""
 
@@ -1662,7 +1665,7 @@ msgstr ""
 
 #. Label of the payment_concept (Select) field in DocType 'Payment Receipt
 #. Item'
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:329
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:321
 #: qota/billing/doctype/payment_receipt_item/payment_receipt_item.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:278
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:19
@@ -1713,7 +1716,7 @@ msgstr ""
 msgid "Percentage"
 msgstr ""
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.js:227
+#: qota/billing/doctype/payment_receipt/payment_receipt.js:219
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:280
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:20
 msgid "Period"
@@ -1870,7 +1873,7 @@ msgstr ""
 msgid "Reconnection Fee"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:211
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:216
 msgid "Ref"
 msgstr ""
 
@@ -1878,7 +1881,7 @@ msgstr ""
 msgid "Ref. No"
 msgstr ""
 
-#: qota/billing/report/customer_statement/customer_statement.py:19
+#: qota/billing/report/customer_statement/customer_statement.py:20
 msgid "Reference"
 msgstr ""
 
@@ -2058,7 +2061,7 @@ msgstr ""
 msgid "Show Cistern Fee as separate line item?"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:220
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:228
 msgid "Signature"
 msgstr ""
 
@@ -2146,7 +2149,7 @@ msgstr ""
 #: qota/billing/doctype/meter_reading/meter_reading.json
 #: qota/billing/doctype/service_contract/service_contract.json
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:164
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:210
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:215
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:116
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:18
 #: qota/billing/report/daily_collection/daily_collection.py:22
@@ -2218,7 +2221,7 @@ msgstr ""
 msgid "Tax Percentage"
 msgstr ""
 
-#: qota/billing/doctype/billing_settings/billing_settings.py:53
+#: qota/billing/doctype/billing_settings/billing_settings.py:54
 msgid "Tax Percentage must be between 0 and 100."
 msgstr ""
 
@@ -2307,7 +2310,7 @@ msgstr ""
 msgid "To Date"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:200
+#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:204
 msgid "Total"
 msgstr ""
 
@@ -2375,6 +2378,12 @@ msgstr ""
 msgid "Transaction Date"
 msgstr ""
 
+#. Label of the truncate_discount_decimals (Check) field in DocType 'Billing
+#. Settings'
+#: qota/billing/doctype/billing_settings/billing_settings.json
+msgid "Truncate Discount Decimals?"
+msgstr ""
+
 #. Option for the 'Status' (Select) field in DocType 'Debt Ledger Entry'
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.js:25
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
@@ -2398,7 +2407,6 @@ msgstr ""
 msgid "View Generated Bills"
 msgstr ""
 
-#: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:184
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:143
 msgid "Water Service"
 msgstr ""
