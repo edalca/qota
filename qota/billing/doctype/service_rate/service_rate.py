@@ -19,6 +19,7 @@ class ServiceRate(Document):
 
         additional_fees: DF.Table[ServiceRateAdditionalFee]
         amended_from: DF.Link | None
+        billing_basis: DF.Literal["Flat Rate", "Metered"]
         cistern_fee: DF.Currency
         effective_from: DF.Date
         fixed_charge: DF.Currency

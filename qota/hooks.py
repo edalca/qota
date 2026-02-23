@@ -15,12 +15,12 @@ app_logo_url = "/assets/qota/logo.svg"
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
-	{
-		"name": "billing",
-		"logo": app_logo_url,
-		"title": "Billing",
-		"route": "/desk/payment-receipt",
-  	}
+    {
+        "name": "billing",
+        "logo": app_logo_url,
+        "title": "Billing",
+        "route": "/desk/payment-receipt",
+      }
  ]
 
 # Includes in <head>
@@ -75,8 +75,8 @@ app_include_icons = [
 # website_generators = ["Web Page"]
 
 website_context = {
-	"favicon": "/assets/qota/favicon.svg",
-	"splash_image": "/assets/qota/logo.svg",
+    "favicon": "/assets/qota/favicon.svg",
+    "splash_image": "/assets/qota/logo.svg",
 }
 
 # automatically load and sync documents of this doctype from downstream apps
@@ -254,8 +254,10 @@ export_python_type_annotations = True
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+fixtures = [
+    "Custom HTML Block",
+]
 # Translation
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
-

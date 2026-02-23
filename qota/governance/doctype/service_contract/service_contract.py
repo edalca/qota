@@ -1,13 +1,14 @@
 # Copyright (c) 2026, Edwin Carrillo and contributors
 # For license information, please see license.txt
 
+import json
 import frappe
-import json  
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import today, getdate 
+from frappe.utils import today
 
 from qota.billing.utils import make_debt_ledger_entry
+
 
 class ServiceContract(Document):
     # begin: auto-generated types
@@ -38,7 +39,6 @@ class ServiceContract(Document):
     # end: auto-generated types
 
     def validate(self):
-        # Evitar duplicados activos para el mismo predio
         self.check_active_contract_on_save()
 
     def check_active_contract_on_save(self):
@@ -51,7 +51,9 @@ class ServiceContract(Document):
             })
             if existing:
                 frappe.throw(
-                    _("The Premises {0} is already associated with an Active contract: {1}.")
+                    _(
+                        "The Premises {0} is already associated with "
+                        "an Active contract: {1}.")
                     .format(self.premises, existing)
                 )
 
@@ -59,7 +61,7 @@ class ServiceContract(Document):
         """
         Activa el contrato, genera la deuda de conexión y registra en el log.
         """
-        # 1. Actualizar estado
+
         self.db_set("status", "Active")
         self.db_set("last_status_change", today())
 
@@ -67,7 +69,6 @@ class ServiceContract(Document):
         if self.connection_fee and not self.connection_fee_posted:
             self.post_connection_debt()
 
-        # 3. Crear registro de Log
         log = frappe.new_doc("Service Contract Log")
         log.service_contract = self.name
         log.operation_date = today()
@@ -75,7 +76,7 @@ class ServiceContract(Document):
         log.field_changed = "Contract Status"
         log.description = _("Initial contract activation and validation.")
         log.insert(ignore_permissions=True)
-        
+
     def on_cancel(self):
         self.db_set("status", "Cancelled")
         self.db_set("last_status_change", today())
@@ -84,10 +85,9 @@ class ServiceContract(Document):
         """
         Llama al motor de deudas sin preocuparse por años o meses.
         """
-        fee_amount = frappe.db.get_value("Connection Fee", self.connection_fee, "total_fee")
-        
+        fee_amount = frappe.db.get_value("Connection Fee", self.connection_fee,
+                                         "total_fee")
         if fee_amount and fee_amount > 0:
-            # LLAMADA SIMPLIFICADA: Sin Year ni Month
             make_debt_ledger_entry(
                 contract_name=self.name,
                 entry_type="Connection Fee",
@@ -96,16 +96,17 @@ class ServiceContract(Document):
                 ref_dn=self.name,
                 description=_("Connection Fee - Contract Activation")
             )
-            
-            # Marcar como posteado
             self.db_set("connection_fee_posted", 1)
-            
             frappe.msgprint(
-                _("Connection Fee of {0} has been registered as a pending debt.").format(
-                    frappe.format(fee_amount, "Currency")
+                _(
+                    "Connection Fee of {0} has been "
+                    "registered as a pending debt.")
+                .format(
+                        frappe.format(fee_amount, "Currency")
                 ),
                 indicator='blue'
             )
+
 
 @frappe.whitelist()
 def update_contract_property(contract_id, update_type, data):
@@ -114,19 +115,19 @@ def update_contract_property(contract_id, update_type, data):
     """
     if isinstance(data, str):
         data = json.loads(data)
-        
+
     doc = frappe.get_doc("Service Contract", contract_id)
     log = frappe.new_doc("Service Contract Log")
     log.service_contract = contract_id
     log.operation_date = data.get("date") or today()
     log.description = data.get("description")
-    
+
     if update_type == "Cistern":
         doc.has_cistern = data.get("has_cistern")
         doc.cistern_capacity = data.get("capacity") if doc.has_cistern else 0
         log.change_type = "Cistern Update"
         log.field_changed = "Cistern Status"
-        
+
     elif update_type == "Billing":
         doc.billing_basis = data.get("billing_basis")
         if doc.billing_basis == "Metered":
@@ -151,6 +152,7 @@ def update_contract_property(contract_id, update_type, data):
     doc.save()
     return _("Contract updated successfully")
 
+
 @frappe.whitelist()
 def contract_search(doctype, txt, searchfield, start, page_len, filters):
     """
@@ -158,43 +160,42 @@ def contract_search(doctype, txt, searchfield, start, page_len, filters):
     """
     search_txt = f"%{txt}%"
     conditions = []
-    
-    # Handle docstatus
     docstatus = filters.get('docstatus', 1)
     conditions.append(f"sc.docstatus = {docstatus}")
 
-    # Handle status filtering
     if filters and 'status' in filters:
         status_filter = filters.get('status')
         if isinstance(status_filter, (list, tuple)):
             if status_filter[0] == 'in':
                 values = status_filter[1]
-                formatted_values = ", ".join([frappe.db.escape(v) for v in values])
+                formatted_values = ", ".join(
+                    [frappe.db.escape(v) for v in values])
                 conditions.append(f"sc.status IN ({formatted_values})")
         else:
             conditions.append(f"sc.status = {frappe.db.escape(status_filter)}")
     else:
         conditions.append("sc.status = 'Active'")
 
-    # Handle billing basis filter
     if filters and 'billing_basis' in filters:
-        conditions.append(f"sc.billing_basis = {frappe.db.escape(filters.get('billing_basis'))}")
+        conditions.append(f"sc.billing_basis = {frappe.db.escape(
+            filters.get('billing_basis')
+            )}")
 
     where_clause = " AND ".join(conditions)
 
     query = f"""
-        SELECT 
-            sc.name, 
-            sc.full_name, 
+        SELECT
+            sc.name,
+            sc.full_name,
             CONCAT('B: ', p.block, ' | C: ', p.house_number) as location
-        FROM 
+        FROM
             `tabService Contract` sc
-        JOIN 
+        JOIN
             `tabPremises` p ON sc.premises = p.name
-        WHERE 
+        WHERE
             {where_clause}
             AND (
-                sc.name LIKE {frappe.db.escape(search_txt)} OR 
+                sc.name LIKE {frappe.db.escape(search_txt)} OR
                 sc.full_name LIKE {frappe.db.escape(search_txt)} OR
                 p.block LIKE {frappe.db.escape(search_txt)} OR
                 p.house_number LIKE {frappe.db.escape(search_txt)}
@@ -205,24 +206,27 @@ def contract_search(doctype, txt, searchfield, start, page_len, filters):
 
     return frappe.db.sql(query)
 
+
 @frappe.whitelist()
-def service_contract_data(service_contract):
+def service_contract_data(service_contract: str):
     # Convertimos a json.loads si viene como string, o aseguramos que sea lista
     if isinstance(service_contract, str):
         import json
         service_contract = json.loads(service_contract)
-    
+
     if not service_contract:
         return []
 
     SQL = """
-    SELECT 
+    SELECT
         sc.name,
-        sc.full_name, 
+        sc.full_name,
         p.block,
         p.house_number as house
-    FROM `tabService Contract` sc 
+    FROM `tabService Contract` sc
     LEFT JOIN `tabPremises` p ON sc.premises = p.name
     WHERE sc.name IN %s
-    """     
-    return frappe.db.sql(SQL, (tuple(service_contract),), as_dict=True)
+    """
+    return frappe.db.sql(SQL, (
+        tuple(service_contract),), as_dict=True)
+

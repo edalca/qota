@@ -40,6 +40,11 @@
    "fieldtype": "Section Break"
   },
   {
+   "fieldname": "subscriber_premises",
+   "fieldtype": "Column Break",
+   "label": "Subscriber & Premises"
+  },
+  {
    "fieldname": "subscriber",
    "fieldtype": "Link",
    "label": "Subscriber",
@@ -60,7 +65,8 @@
    "in_standard_filter": 1,
    "label": "Premises",
    "options": "Premises",
-   "reqd": 1
+   "reqd": 1,
+   "width": "400px"
   },
   {
    "fieldname": "column_break_4",
@@ -88,36 +94,26 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Active\nSuspended\nClosed\nCancelled",
-   "read_only": 1
+   "options": "Active\nSuspended\nClosed\nCancelled"
   },
   {
-   "allow_on_submit": 1,
-   "fieldname": "last_status_change",
-   "fieldtype": "Date",
-   "label": "Last Status Change",
-   "read_only": 1
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Contract",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   },
   {
    "fieldname": "connection_charges_section",
    "fieldtype": "Section Break"
   },
   {
-   "description": "Select the applicable tariff for the new service installation.",
-   "fieldname": "connection_fee",
-   "fieldtype": "Link",
-   "label": "Connection Fee",
-   "options": "Connection Fee",
-   "reqd": 1
-  },
-  {
-   "default": "0",
-   "description": "Automatically checked when the connection fee is posted to the Debt Ledger.",
-   "fieldname": "connection_fee_posted",
-   "fieldtype": "Check",
-   "label": "Connection Fee Posted",
-   "no_copy": 1,
-   "read_only": 1
+   "fieldname": "timeline_column",
+   "fieldtype": "Column Break",
+   "label": "Timeline"
   },
   {
    "default": "Today",
@@ -131,6 +127,42 @@
    "fieldname": "end_date",
    "fieldtype": "Date",
    "label": "End Date",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "last_status_change",
+   "fieldtype": "Date",
+   "label": "Last Status Change",
+   "read_only": 1
+  },
+  {
+   "fieldname": "connection_charges_column",
+   "fieldtype": "Column Break",
+   "label": "Connection Charges"
+  },
+  {
+   "description": "Select the applicable tariff for the new service installation.",
+   "fieldname": "connection_fee",
+   "fieldtype": "Link",
+   "label": "Connection Fee",
+   "options": "Connection Fee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "connection_fee.total_fee",
+   "fieldname": "total_connection_fee",
+   "fieldtype": "Data",
+   "label": "Total Connection Fee",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "description": "Automatically checked when the connection fee is posted to the Debt Ledger.",
+   "fieldname": "connection_fee_posted",
+   "fieldtype": "Check",
+   "label": "Connection Fee Posted",
+   "no_copy": 1,
    "read_only": 1
   },
   {
@@ -174,47 +206,15 @@
    "fieldname": "cistern_capacity",
    "fieldtype": "Float",
    "label": "Cistern Capacity (m\u00b3)"
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Service Contract",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
-   "fieldname": "timeline_column",
-   "fieldtype": "Column Break",
-   "label": "Timeline"
-  },
-  {
-   "fieldname": "connection_charges_column",
-   "fieldtype": "Column Break",
-   "label": "Connection Charges"
-  },
-  {
-   "fieldname": "subscriber_premises",
-   "fieldtype": "Column Break",
-   "label": "Subscriber & Premises"
-  },
-  {
-   "fetch_from": "connection_fee.total_fee",
-   "fieldname": "total_connection_fee",
-   "fieldtype": "Data",
-   "label": "Total Connection Fee",
-   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-12 03:11:15.763782",
+ "modified": "2026-02-23 10:16:34.190933",
  "modified_by": "Administrator",
- "module": "Billing",
+ "module": "Governance",
  "name": "Service Contract",
  "naming_rule": "Expression",
  "owner": "Administrator",

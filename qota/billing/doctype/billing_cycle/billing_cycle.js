@@ -2,8 +2,12 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Billing Cycle', {
-    onload: function(frm) {
-        // 1. Escuchar la señal del servidor cuando termine el proceso de fondo
+    onload: function (frm) {
+        /*
+        Listen to background process signals to refresh the UI 
+        when the mass billing batch is finished.
+        */
+        // Escuchar cuando el proceso en segundo plano termina para refrescar la pantalla
         frappe.realtime.on("billing_cycle_finished", (data) => {
             if (data.name === frm.doc.name) {
                 frm.reload_doc();
@@ -17,17 +21,39 @@ frappe.ui.form.on('Billing Cycle', {
     },
 
     refresh: function (frm) {
-        // 2. Indicador visual si el proceso está en cola
+        // Mostrar mensaje de advertencia si el proceso está en cola (background)
         if (frm.doc.status === "Queue") {
-            frm.set_intro(__('This cycle is currently being processed in the background. Please wait for the "Completed" status.'), 'orange');
+            frm.set_intro(__('This cycle is currently being processed in the background.'), 'orange');
+            // BOTÓN DE EMERGENCIA: Permite resetear el estado si el proceso se queda pegado
+            frm.add_custom_button(__('Reset to Draft'), function () {
+                frappe.confirm(__('Are you sure you want to reset the status? Only do this if the process is clearly stuck.'), () => {
+                    frm.call('reset_status').then(() => {
+                        frm.reload_doc();
+                        frappe.show_alert({ message: __('Status reset successfully'), indicator: 'green' });
+                    });
+                });
+            }, __('Actions'));
+        }
+        if (frm.doc.docstatus === 1 && frappe.user_roles.includes("Administrator")) {
+            frm.add_custom_button(__('Update All Rates'), function () {
+                frappe.confirm(
+                    __('This will cancel and regenerate all UNPAID bills for this cycle with current rates. Continue?'),
+                    () => {
+                        frm.call('reprocess_cycle_bills').then(() => {
+                            frm.reload_doc();
+                        });
+                    }
+                );
+            }, __('Actions'));
+        }
+        // Botón para ejecutar el diagnóstico (Simulación)
+        if (frm.doc.docstatus === 0) {
+            frm.add_custom_button(__('Get Diagnostics'), function () {
+                frm.events.run_diagnostics(frm);
+            }, __('Actions'));
         }
 
-        // 3. Ejecutar diagnóstico solo en Borrador
-        if (frm.doc.docstatus === 0 && frm.doc.start_date) {
-            run_diagnostics(frm);
-        }
-
-        // 4. Botón para ver facturas generadas (Solo si ya hay resultados)
+        // Botón para ver las facturas ya generadas
         if (frm.doc.status === "Completed") {
             frm.add_custom_button(__('View Generated Bills'), function () {
                 frappe.set_route('List', 'Monthly Bill', {
@@ -38,95 +64,59 @@ frappe.ui.form.on('Billing Cycle', {
     },
 
     after_save: function (frm) {
+        // Ejecutar diagnóstico automáticamente después de guardar en borrador
         if (frm.doc.docstatus === 0) {
-            run_diagnostics(frm);
+            frm.events.run_diagnostics(frm);
         }
     },
 
-    fiscal_month: function (frm) { 
-        clear_diagnostics(frm);
-        calculate_cycle_dates(frm); 
+    fiscal_month: function (frm) {
+        // Recalcular fechas del ciclo al cambiar el mes
+        calculate_cycle_dates(frm);
     },
 
-    fiscal_year: function (frm) { 
-        clear_diagnostics(frm);
-        calculate_cycle_dates(frm); 
+    fiscal_year: function (frm) {
+        // Recalcular fechas del ciclo al cambiar el año
+        calculate_cycle_dates(frm);
+    },
+
+    run_diagnostics: function (frm) {
+        /*
+        Triggers the server-side simulation and reloads the document
+        to show issues in the child table.
+        */
+        // Llama al servidor para ejecutar la simulación y recarga los datos en la tabla 'issues'
+        frappe.call({
+            method: "get_billing_diagnostics",
+            doc: frm.doc,
+            freeze: true,
+            freeze_message: __("Identifying billing gaps..."),
+            callback: function (r) {
+                // Recargamos el documento para que la tabla 'issues' se pinte con los resultados
+                frm.reload_doc();
+
+                if (frm.doc.issues && frm.doc.issues.length > 0) {
+                    frappe.msgprint({
+                        title: __('Diagnostics Finished'),
+                        indicator: 'orange',
+                        message: __('Found {0} contracts with issues. Check the Execution Issues section.', [frm.doc.issues.length])
+                    });
+                } else {
+                    frappe.show_alert({
+                        message: __('No issues detected. Ready for billing.'),
+                        indicator: 'green'
+                    });
+                }
+            }
+        });
     }
 });
 
 /**
- * Llama al diagnóstico masivo y renderiza la tabla agrupada.
- */
-function run_diagnostics(frm) {
-    frappe.call({
-        method: "get_billing_diagnostics",
-        doc: frm.doc,
-        callback: function (r) {
-            if (r.message && r.message.length > 0) {
-                let html = `
-                    <div class="alert alert-danger" style="margin-bottom: 15px; border-left: 5px solid #d9534f;">
-                        <i class="fa fa-exclamation-triangle" style="font-size: 1.2em;"></i> 
-                        <strong style="margin-left: 10px;">${__('Continuity Gaps Detected')}</strong>
-                        <p style="margin-top: 5px; margin-bottom: 0;">${__('The following contracts will be skipped during processing.')}</p>
-                    </div>
-                    <div style="max-height: 500px; overflow-y: auto; padding-right: 5px;">`;
-
-                r.message.forEach(group => {
-                    html += `
-                        <div style="margin-bottom: 15px; border: 1px solid #fbcfe8; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                            <div style="background-color: #fff1f2; padding: 10px; border-bottom: 1px solid #fecdd3; display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: #be123c; font-weight: bold;">
-                                    <i class="fa fa-folder-open"></i> ${group.reason}
-                                </span>
-                                <span class="badge badge-danger" style="font-size: 0.9em; padding: 5px 10px;">
-                                    ${group.contracts.length} ${__('Contracts')}
-                                </span>
-                            </div>
-                            <div style="padding: 12px; background-color: #fff;">
-                                ${group.contracts.map(c => `
-                                    <a href="/app/service-contract/${c}" target="_blank" 
-                                       class="btn btn-xs btn-default" 
-                                       style="margin: 3px; border: 1px solid #d1d8dd; font-weight: 500;">
-                                       ${c} <i class="fa fa-external-link" style="font-size: 8px; margin-left: 4px; color: #8d99a6;"></i>
-                                    </a>
-                                `).join('')}
-                            </div>
-                        </div>`;
-                });
-
-                html += `</div>
-                    <div class="text-muted small" style="margin-top: 10px;">
-                        <i class="fa fa-lightbulb-o text-warning"></i> 
-                        ${__('Action Required: Create the missing monthly bills for these contracts to clear the alerts.')}
-                    </div>`;
-
-                frm.set_df_property('diagnostic_html', 'options', html);
-                frm.set_df_property('diagnostics_section', 'hidden', 0);
-                frm.refresh_field('diagnostics_section');
-                frm.refresh_field('diagnostic_html');
-            } else {
-                clear_diagnostics(frm);
-            }
-        }
-    });
-}
-
-/**
- * Limpieza profunda del área de diagnóstico.
- */
-function clear_diagnostics(frm) {
-    if (frm.fields_dict.diagnostic_html) {
-        frm.fields_dict.diagnostic_html.wrapper.innerHTML = "";
-    }
-    frm.set_df_property('diagnostic_html', 'options', "");
-    frm.set_df_property('diagnostics_section', 'hidden', 1);
-    frm.refresh_field('diagnostics_section');
-}
-
-/**
- * Lógica automática de fechas.
+ * Automatic Date Logic based on ERSAPS settings.
  */
 function calculate_cycle_dates(frm) {
+    // Lógica para calcular automáticamente start_date y end_date según el mes/año fiscal
     if (frm.doc.fiscal_month && frm.doc.fiscal_year) {
         frappe.db.get_single_value('Billing Settings', 'cycle_start_day')
             .then(start_day => {

@@ -1,0 +1,193 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "SUS-.YY.-.#####",
+ "creation": "2026-02-18 14:06:38.390428",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "suspension_date",
+  "service_contract",
+  "subscriber",
+  "full_name",
+  "premises",
+  "column_break_5",
+  "suspension_type",
+  "billing_basis",
+  "reason",
+  "status",
+  "meter_reading_section",
+  "final_reading",
+  "column_break_11",
+  "reading_date",
+  "notes_section",
+  "remarks",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "suspension_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Suspension Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "service_contract.subscriber",
+   "fieldname": "subscriber",
+   "fieldtype": "Link",
+   "label": "Subscriber",
+   "options": "Subscriber",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name / Company Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "suspension_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Suspension Type",
+   "options": "Voluntary\nInvoluntary",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Reason",
+   "options": "Unpaid Debt\nMoving Out\nEmpty House\nTemporary Absence\nOther",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Draft\nScheduled\nExecuted\nReconnected",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.billing_basis==\"Metered\"",
+   "fieldname": "meter_reading_section",
+   "fieldtype": "Section Break",
+   "label": "Final Reading"
+  },
+  {
+   "fieldname": "final_reading",
+   "fieldtype": "Float",
+   "label": "Final Reading Value",
+   "mandatory_depends_on": "eval:doc.billing_basis==\"Metered\""
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "reading_date",
+   "fieldtype": "Date",
+   "label": "Reading Date",
+   "mandatory_depends_on": "eval:doc.billing_basis==\"Metered\""
+  },
+  {
+   "fieldname": "notes_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Suspension",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.billing_basis",
+   "fieldname": "billing_basis",
+   "fieldtype": "Select",
+   "label": "Billing Basis",
+   "options": "\nFlat Rate\nMetered",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-02-23 09:34:05.052602",
+ "modified_by": "Administrator",
+ "module": "Governance",
+ "name": "Service Suspension",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [
+  {
+   "color": "Orange",
+   "title": "Draft"
+  },
+  {
+   "color": "Yellow",
+   "title": "Scheduled"
+  },
+  {
+   "color": "Green",
+   "title": "Executed"
+  },
+  {
+   "color": "Blue",
+   "title": "Reconnected"
+  }
+ ]
+}

@@ -9,6 +9,7 @@
   "general_info_sb",
   "rate_name",
   "service_category",
+  "billing_basis",
   "column_break_3",
   "effective_from",
   "status",
@@ -50,6 +51,7 @@
    "options": "Active\nInactive"
   },
   {
+   "depends_on": "eval:doc.billing_basis ==\"Metered\"",
    "fieldname": "metered_config_sb",
    "fieldtype": "Section Break",
    "label": "Metered Configuration"
@@ -59,14 +61,16 @@
    "description": "Base amount if the connection has a meter.",
    "fieldname": "fixed_charge",
    "fieldtype": "Currency",
-   "label": "Fixed Charge (Base)"
+   "label": "Fixed Charge (Base)",
+   "mandatory_depends_on": "eval:doc.billing_basis ==\"Metered\""
   },
   {
    "default": "0",
    "description": "m3 already included in the fixed charge.",
    "fieldname": "min_consumption",
    "fieldtype": "Float",
-   "label": "Included m3"
+   "label": "Included m3",
+   "mandatory_depends_on": "eval:doc.billing_basis ==\"Metered\""
   },
   {
    "fieldname": "ranges",
@@ -75,6 +79,7 @@
    "options": "Service Rate Consumption Range"
   },
   {
+   "depends_on": "eval:doc.billing_basis ==\"Flat Rate\"",
    "fieldname": "flat_rate_config_sb",
    "fieldtype": "Section Break",
    "label": "Flat Rate Configuration"
@@ -84,14 +89,16 @@
    "description": "Total monthly amount if NO meter is present.",
    "fieldname": "flat_rate_price",
    "fieldtype": "Currency",
-   "label": "Flat Rate Price"
+   "label": "Flat Rate Price",
+   "mandatory_depends_on": "eval:doc.billing_basis ==\"Flat Rate\""
   },
   {
    "default": "0",
    "description": "Extra charge applied if the connection has a cistern and is Flat Rate.",
    "fieldname": "cistern_fee",
    "fieldtype": "Currency",
-   "label": "Additional Cistern Fee"
+   "label": "Additional Cistern Fee",
+   "mandatory_depends_on": "eval:doc.billing_basis ==\"Flat Rate\""
   },
   {
    "fieldname": "additional_fees_sb",
@@ -127,13 +134,21 @@
    "label": "Rate Name",
    "reqd": 1,
    "unique": 1
+  },
+  {
+   "default": "Flat Rate",
+   "fieldname": "billing_basis",
+   "fieldtype": "Select",
+   "label": "Billing Basis",
+   "options": "Flat Rate\nMetered",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-02 11:19:35.251767",
+ "modified": "2026-02-23 09:34:21.871199",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Service Rate",
@@ -158,7 +173,7 @@
  ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": [
   {

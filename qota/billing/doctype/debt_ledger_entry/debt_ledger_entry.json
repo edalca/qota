@@ -145,14 +145,16 @@
   {
    "fieldname": "billing_period",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Billing Period",
    "read_only": 1
   }
  ],
  "grid_page_length": 50,
+ "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-12 03:00:40.331911",
+ "modified": "2026-02-22 19:14:02.917156",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Debt Ledger Entry",

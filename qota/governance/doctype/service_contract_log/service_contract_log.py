@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 
@@ -14,7 +15,9 @@ class ServiceContractLog(Document):
     if TYPE_CHECKING:
         from frappe.types import DF
 
-        change_type: DF.Literal["Cistern Update", "Billing Basis Change", "Status Change"]
+        change_type: DF.Literal["Cistern Update",
+                                "Billing Basis Change",
+                                "Status Change"]
         description: DF.SmallText | None
         field_changed: DF.Data | None
         operation_date: DF.Date
@@ -23,11 +26,13 @@ class ServiceContractLog(Document):
 
     def validate(self):
         """
-        Prevents modification of log entries after they are created to ensure 
+        Prevents modification of log entries after they are created to ensure
         an immutable audit trail.
         """
         if not self.is_new():
-            frappe.throw(_("Audit logs cannot be modified once they are created."))
+            frappe.throw(_(
+                "Audit logs cannot be modified "
+                "once they are created."))
 
     def on_trash(self):
         """
@@ -39,6 +44,7 @@ class ServiceContractLog(Document):
 
     def before_insert(self):
         """
-        Ensures the user field is always populated with the current session user.
+        Ensures the user field is always populated with
+        the current session user.
         """
         self.user = frappe.session.user

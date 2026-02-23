@@ -1,11 +1,11 @@
 # Copyright (c) 2026, Edwin Carrillo and contributors
 # For license information, please see license.txt
 
+import json
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import getdate, add_days, flt, nowdate
-from qota.billing.utils import get_monthly_billing_breakdown,make_debt_ledger_entry
+from frappe.utils import getdate, add_days, flt
 
 
 class BillingCycle(Document):
@@ -16,6 +16,9 @@ class BillingCycle(Document):
 
     if TYPE_CHECKING:
         from frappe.types import DF
+        from qota.billing.doctype.billing_cycle_issue.billing_cycle_issue import (
+            BillingCycleIssue
+        )
 
         amended_from: DF.Link | None
         billing_basis: DF.Literal["Flat Rate", "Metered", "All"]
@@ -23,6 +26,7 @@ class BillingCycle(Document):
         end_date: DF.Date | None
         fiscal_month: DF.Literal["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
         fiscal_year: DF.Link
+        issues: DF.Table[BillingCycleIssue]
         posting_date: DF.Date
         start_date: DF.Date | None
         status: DF.Literal["Draft", "Queue", "Completed", "Cancelled"]
@@ -52,9 +56,8 @@ class BillingCycle(Document):
             "docstatus": ["!=", 2]
         })
         if exists:
-            frappe.throw(_("A Billing Cycle already exists for {0} {1}").format(
-                self.fiscal_month, self.fiscal_year
-            ))
+            frappe.throw(_("A Billing Cycle already exists for {0} {1}")
+                         .format(self.fiscal_month, self.fiscal_year))
 
     def validate_sequence(self):
         """Ensures there are no gaps between global billing cycles"""
@@ -74,6 +77,106 @@ class BillingCycle(Document):
                     frappe.format_date(expected_start)
                 ))
 
+    @frappe.whitelist()
+    def reprocess_cycle_bills(self):
+        """
+        Surgically updates submitted bills for this specific cycle.
+        """
+        from qota.billing.utils import get_monthly_billing_breakdown
+
+        # Usamos los valores del documento actual (self)
+        fiscal_month = self.fiscal_month
+        fiscal_year = self.fiscal_year
+
+        # 1. Get all submitted bills for the period
+        bills = frappe.get_all("Monthly Bill", filters={
+            "fiscal_month": fiscal_month,
+            "fiscal_year": fiscal_year,
+            "docstatus": 1
+        }, fields=["name", "service_contract", "start_date", "end_date"])
+
+        if not bills:
+            frappe.msgprint(_("No submitted bills found for {0}-{1}")
+                            .format(fiscal_month, fiscal_year))
+            return
+
+        count = 0
+        for b in bills:
+            # 2. Identify and Reset Payment Links
+            dle_name = frappe.db.get_value("Debt Ledger Entry",
+                                           {"reference_name": b.name}, "name")
+
+            if dle_name:
+                frappe.db.sql("""
+                    UPDATE `tabPayment Receipt Item`
+                    SET debt_ledger_entry = NULL, balance = amount
+                    WHERE debt_ledger_entry = %s
+                """, dle_name)
+
+            # 3. Recalculate
+            breakdown = get_monthly_billing_breakdown(
+                contract_name=b.service_contract,
+                billing_month=fiscal_month,
+                billing_year=fiscal_year,
+                start_date=b.start_date,
+                end_date=b.end_date
+            )
+            
+            new_total = flt(breakdown.get("total_to_bill"))
+
+            # 4. Update Items
+            frappe.db.delete("Monthly Bill Item", {"parent": b.name})
+            for item in breakdown.get("detailed_items", []):
+                frappe.get_doc({
+                    "doctype": "Monthly Bill Item",
+                    "parent": b.name,
+                    "parenttype": "Monthly Bill",
+                    "parentfield": "items",
+                    "description": item["description"],
+                    "amount": item["amount"]
+                }).db_insert()
+
+            # 5. Update Bill Header
+            frappe.db.set_value("Monthly Bill", b.name, {
+                "grand_total": new_total,
+                "billing_details_json": json.dumps(
+                    breakdown.get("detailed_items", []))
+            }, update_modified=True)
+
+            # 6. Update Debt Ledger
+            if dle_name:
+                frappe.db.set_value("Debt Ledger Entry", dle_name, {
+                    "amount": new_total,
+                    "paid_amount": 0,
+                    "outstanding_amount": new_total,
+                    "status": "Unpaid"
+                })
+
+            # 7. Re-apply payments
+            doc = frappe.get_doc("Monthly Bill", b.name)
+            doc.apply_advance_payments()
+
+            count += 1
+
+        frappe.db.commit()
+        return _(
+            "Successfully reprocessed {0} bills for {1}-{2}"
+            ).format(count, fiscal_month, fiscal_year)
+   
+
+    @frappe.whitelist()
+    def reset_status(self):
+        """
+        Manually resets the status to 'Draft' if the background process gets stuck.
+        This is necessary for error recovery when workers fail.
+        """
+        self.db_set("status", "Draft")
+        self.db_set("docstatus", 0)
+        self.db_set("total_generated", 0)
+        self.db_set("total_contracts", 0)
+
+        return True
+    
     def on_submit(self):
         """Triggers the background process for real execution"""
         self.db_set("status", "Queue")
@@ -95,8 +198,6 @@ class BillingCycle(Document):
         Finds and cancels all submitted Monthly Bills linked to this cycle.
         This effectively rolls back the entire execution.
         """
-        # Buscamos solo las facturas que están en estado 'Submitted' (docstatus 1)
-        # Usamos pluck="name" para obtener una lista simple de IDs y ahorrar memoria
         bills = frappe.get_all("Monthly Bill", 
             filters={
                 "billing_cycle": self.name, 
@@ -110,12 +211,9 @@ class BillingCycle(Document):
 
         for bill_name in bills:
             try:
-                # Cargamos cada documento y lo cancelamos
                 doc = frappe.get_doc("Monthly Bill", bill_name)
                 doc.cancel()
             except Exception:
-                # Si una falla (por ejemplo, porque ya está pagada), 
-                # dejamos registro pero seguimos con las demás.
                 frappe.log_error(
                     message=frappe.get_traceback(), 
                     title=_("Error cancelling bill {0} during cycle rollback").format(bill_name)
@@ -123,90 +221,100 @@ class BillingCycle(Document):
 
     @frappe.whitelist()
     def get_billing_diagnostics(self):
-        """Entry point for the UI to show issues without saving anything"""
+        """
+        Runs a simulation (Dry Run) to identify potential billing issues
+        without creating real invoices or saving the document.
+        """
         return self.run_billing_engine(is_dry_run=True)
     
     def run_billing_engine(self, is_dry_run=True):
         """
-        The core engine. 
-        If is_dry_run=True: Returns grouped issues.
-        If is_dry_run=False: Generates and submits bills, returns totals.
+        Core billing engine.
+        Populates 'issues' child table. Avoids self.save() on real runs to prevent docstatus errors.
         """
+        self.set("issues", [])
+
         filters = {"status": "Active", "docstatus": 1}
         if self.billing_basis != "All":
             filters["billing_basis"] = self.billing_basis
 
-        # Fetch all contracts (limit=0 for the 758+ cases)
-        contracts = frappe.get_all("Service Contract", filters=filters, fields=["name", "start_date"], limit=0)
-        
-        grouped_issues = {}
+        contracts = frappe.get_all("Service Contract", filters=filters, fields=["name", "start_date", "billing_basis"], limit=0)
         results = {"total_gen": 0, "count": 0}
 
         for c in contracts:
-            # 1. Basic Date Check
+            error_reason = None
+            details = ""
+
             if getdate(c.start_date) > getdate(self.end_date):
-                frappe.log_error(f"Contract {c.name} skipped: Start date {c.start_date} is after cycle end date {self.end_date}.", "Billing Date Mismatch")
+                error_reason = "Future Start Date"
+                details = f"Contract starts on {c.start_date}"
+            
+            elif frappe.db.exists("Monthly Bill", {
+                "service_contract": c.name, "fiscal_year": self.fiscal_year,
+                "fiscal_month": self.fiscal_month, "docstatus": ["!=", 2]
+            }):
+                error_reason = "Already Billed"
+                details = "Bill already exists for this period."
+
+            elif c.billing_basis == "Metered":
+                if not frappe.db.exists("Meter Reading", {"service_contract": c.name, "billing_cycle": self.name, "docstatus": 1}):
+                    error_reason = "Missing Reading"
+                    details = "Required for metered service."
+
+            if error_reason:
+                self.append("issues", {"service_contract": c.name, "reason": error_reason, "details": details})
                 continue
 
-            # 2. Duplicate Check (Only for real runs)
-            if not is_dry_run:
-                if frappe.db.exists("Monthly Bill", {
-                    "service_contract": c.name, "fiscal_year": self.fiscal_year,
-                    "fiscal_month": self.fiscal_month, "docstatus": ["!=", 2]
-                }):
-                    frappe.log_error(f"Contract {c.name} skipped: Bill already exists for this cycle.", "Billing Duplicate")
-                    continue
-
-            # 3. Object Initialization
-            mb = frappe.new_doc("Monthly Bill")
-            mb.service_contract = c.name
-            mb.fiscal_year = self.fiscal_year
-            mb.fiscal_month = self.fiscal_month
-            mb.start_date = self.start_date
-            mb.end_date = self.end_date
-            mb.billing_cycle = self.name
-            mb.posting_date = self.posting_date
-
-            # 4. Sequence Validation
-            reason = mb.validate_sequence(throw_error=False)
-
-            if reason:
-                if is_dry_run:
-                    if reason not in grouped_issues: grouped_issues[reason] = []
-                    grouped_issues[reason].append(c.name)
-                else:
-                    # Log continuity errors during real run
-                    frappe.log_error(f"Contract {c.name} skipped: {reason}", "Billing Continuity Gap")
-                continue
-
-            # 5. Real Execution
             if not is_dry_run:
                 try:
+                    mb = frappe.new_doc("Monthly Bill")
+                    mb.service_contract = c.name
+                    mb.fiscal_year = self.fiscal_year
+                    mb.fiscal_month = self.fiscal_month
+                    mb.start_date = self.start_date
+                    mb.end_date = self.end_date
+                    mb.billing_cycle = self.name
+                    mb.posting_date = self.posting_date
+                    
                     mb.insert(ignore_permissions=True)
                     mb.submit()
                     results["total_gen"] += flt(mb.grand_total)
                     results["count"] += 1
-                except Exception:
-                    frappe.log_error(frappe.get_traceback(), _("Error processing {0}").format(c.name))
+                except Exception as e:
+                    self.append("issues", {"service_contract": c.name, "reason": "Execution Error", "details": str(e)})
+
 
         if is_dry_run:
-            return [{"reason": k, "contracts": v} for k, v in grouped_issues.items()]
+            self.save(ignore_permissions=True)
         
         return results
 
-# Worker Wrapper
 def execute_billing_process(billing_cycle_name):
-    cycle = frappe.get_doc("Billing Cycle", billing_cycle_name)
-    
-    # Run the engine in 'Real Mode'
-    out = cycle.run_billing_engine(is_dry_run=False)
+    """Background task to process billing with proper state management."""
+    try:
+        cycle = frappe.get_doc("Billing Cycle", billing_cycle_name)
+        
+        out = cycle.run_billing_engine(is_dry_run=False)
 
-    # Sync and notify
-    cycle.db_set("total_generated", out["total_gen"])
-    cycle.db_set("total_contracts", out["count"])
-    cycle.db_set("status", "Completed")
-    
-    frappe.publish_realtime("billing_cycle_finished", {
-        "message": _("Finished: {0} bills created.").format(out["count"]), 
-        "name": cycle.name
-    }, user=cycle.owner)
+        cycle.db_set("total_generated", out["total_gen"])
+        cycle.db_set("total_contracts", out["count"])
+        cycle.db_set("status", "Completed")
+        
+        frappe.publish_realtime("billing_cycle_finished", {
+            "message": _("Finished: {0} bills created.").format(out["count"]), 
+            "name": cycle.name
+        }, user=cycle.owner)
+
+    except Exception:
+        frappe.log_error(frappe.get_traceback(), _("Billing Process Critical Failure"))
+        
+        frappe.db.set_value("Billing Cycle", billing_cycle_name, {
+            "status": "Draft",
+            "docstatus": 0
+        })
+        
+        frappe.publish_realtime("billing_cycle_finished", {
+            "message": _("A critical error occurred. The cycle has been reset to Draft. Please check Error Logs."), 
+            "name": billing_cycle_name
+        })
+

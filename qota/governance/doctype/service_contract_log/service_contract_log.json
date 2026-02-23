@@ -15,18 +15,18 @@
  ],
  "fields": [
   {
+   "fieldname": "operation_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Operation Date",
+   "reqd": 1
+  },
+  {
    "fieldname": "service_contract",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Service Contract",
    "options": "Service Contract",
-   "reqd": 1
-  },
-  {
-   "fieldname": "operation_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Operation Date",
    "reqd": 1
   },
   {
@@ -60,9 +60,9 @@
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-30 01:13:45.666080",
+ "modified": "2026-02-23 09:07:49.571971",
  "modified_by": "Administrator",
- "module": "Billing",
+ "module": "Governance",
  "name": "Service Contract Log",
  "naming_rule": "Random",
  "owner": "Administrator",

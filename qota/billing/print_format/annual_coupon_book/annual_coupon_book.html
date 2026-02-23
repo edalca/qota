@@ -194,7 +194,7 @@
                 {# 2. Si hay descuento, ponemos TU fila especial roja al final #}
                 {% if adv.discount_amount > 0 %}
                 <tr style="color: #d00 !important;">
-                    <td>{{ _("Discount") }} ({{ adv.discount_percentage | int }}%)</td>
+                    <td>{{ _("Discount") }}</td>
                     <td class="text-right">-{{ "{:,.2f}".format(adv.discount_amount) }}</td>
                 </tr>
                 {% endif %}

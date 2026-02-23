@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qota VERSION\n"
 "Report-Msgid-Bugs-To: edwinalonso162@hotmail.com\n"
-"POT-Creation-Date: 2026-02-16 20:57+0000\n"
-"PO-Revision-Date: 2026-02-16 20:57+0000\n"
+"POT-Creation-Date: 2026-02-23 08:49+0000\n"
+"PO-Revision-Date: 2026-02-23 08:49+0000\n"
 "Last-Translator: edwinalonso162@hotmail.com\n"
 "Language-Team: edwinalonso162@hotmail.com\n"
 "MIME-Version: 1.0\n"
@@ -28,22 +28,35 @@ msgstr ""
 msgid "91+ Days"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:55
+#. Header text in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "<span class=\"h4\">Billing Dashboard</span>"
+msgstr ""
+
+#. Header text in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "<span class=\"h4\">Shortcut</span>"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:59
 msgid "A Billing Cycle already exists for {0} {1}"
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:58
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:60
 msgid "A Monthly Bill already exists for this contract in {0} {1} (Reference: {2})"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:317
+msgid "A critical error occurred. The cycle has been reset to Draft. Please check Error Logs."
 msgstr ""
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:339
 msgid "Accepted"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:97
-msgid "Action Required: Create the missing monthly bills for these contracts to clear the alerts."
-msgstr ""
-
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:35
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:47
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:53
 #: qota/billing/doctype/monthly_bill/monthly_bill.js:15
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:29
 #: qota/billing/doctype/service_contract/service_contract.js:64
@@ -51,6 +64,7 @@ msgstr ""
 #: qota/billing/doctype/service_contract/service_contract.js:117
 #: qota/billing/doctype/service_contract/service_contract.js:170
 #: qota/billing/doctype/service_contract/service_contract.js:201
+#: qota/governance/doctype/service_suspension/service_suspension.js:21
 msgid "Actions"
 msgstr ""
 
@@ -92,7 +106,7 @@ msgstr ""
 msgid "Additional Cistern Fee"
 msgstr ""
 
-#: qota/billing/utils.py:176
+#: qota/billing/utils.py:355
 msgid "Additional Fee"
 msgstr ""
 
@@ -118,6 +132,11 @@ msgstr ""
 msgid "Address Reference"
 msgstr ""
 
+#: qota/billing/report/advance_payments_report/advance_payments_report.py:27
+#: qota/billing/report/advance_payments_report/advance_payments_report.py:105
+msgid "Advance Amount"
+msgstr ""
+
 #. Label of the unallocated_amount (Currency) field in DocType 'Payment
 #. Receipt'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
@@ -125,8 +144,25 @@ msgstr ""
 msgid "Advance Balance"
 msgstr ""
 
+#. Label of a Workspace Sidebar Item
+#: qota/workspace_sidebar/billing.json
+msgid "Advance Payments"
+msgstr ""
+
 #. Name of a report
+#: qota/billing/report/advance_payments_report/advance_payments_report.json
+msgid "Advance Payments Report"
+msgstr ""
+
+#. Label of a number card in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "Advance Payments Summary"
+msgstr ""
+
+#. Name of a report
+#. Label of a Workspace Sidebar Item
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.json
+#: qota/workspace_sidebar/billing.json
 msgid "Advances and Surplus"
 msgstr ""
 
@@ -140,13 +176,20 @@ msgid "Age"
 msgstr ""
 
 #. Name of a report
+#. Label of a Workspace Sidebar Item
 #: qota/billing/report/aging_report/aging_report.json
+#: qota/workspace_sidebar/billing.json
 msgid "Aging Report"
 msgstr ""
 
 #. Option for the 'Billing Basis' (Select) field in DocType 'Billing Cycle'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 msgid "All"
+msgstr ""
+
+#. Option for the 'Condition Type' (Select) field in DocType 'Discount Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "All Subscribers"
 msgstr ""
 
 #. Label of the allow_discounts (Check) field in DocType 'Service Category'
@@ -167,6 +210,8 @@ msgstr ""
 #. Label of the amended_from (Link) field in DocType 'Payment Receipt'
 #. Label of the amended_from (Link) field in DocType 'Service Contract'
 #. Label of the amended_from (Link) field in DocType 'Service Rate'
+#. Label of the amended_from (Link) field in DocType 'Service Reconnection'
+#. Label of the amended_from (Link) field in DocType 'Service Suspension'
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/connection_fee/connection_fee.json
@@ -177,6 +222,8 @@ msgstr ""
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/billing/doctype/service_contract/service_contract.json
 #: qota/billing/doctype/service_rate/service_rate.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Amended From"
 msgstr ""
 
@@ -200,7 +247,7 @@ msgstr ""
 msgid "Amount"
 msgstr ""
 
-#: qota/billing/utils.py:18
+#: qota/billing/utils.py:44
 msgid "Amount must be greater than zero to create a Debt Ledger Entry."
 msgstr ""
 
@@ -220,12 +267,16 @@ msgstr ""
 msgid "Amount to Pay"
 msgstr ""
 
+#: qota/billing/report/billing_and_collections/billing_and_collections.py:28
+msgid "Applied Advances"
+msgstr ""
+
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:146
 msgid "Applied Benefits"
 msgstr ""
 
-#: qota/billing/utils.py:295
-msgid "Applied Discount ({0})"
+#: qota/billing/utils.py:479
+msgid "Applied Discounts ({0})"
 msgstr ""
 
 #. Label of the apply_late_fee (Check) field in DocType 'Billing Settings'
@@ -243,6 +294,10 @@ msgstr ""
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 msgid "April"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:29
+msgid "Are you sure you want to reset the status? Only do this if the process is clearly stuck."
 msgstr ""
 
 #: qota/billing/doctype/service_contract_log/service_contract_log.py:30
@@ -293,12 +348,16 @@ msgstr ""
 msgid "Basic Information"
 msgstr ""
 
+#. Label of a Workspace Sidebar Item
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:193
+#: qota/workspace_sidebar/billing.json
 msgid "Benefit"
 msgstr ""
 
 #. Name of a DocType
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
+#: qota/workspace_sidebar/billing.json
 msgid "Benefit Discount"
 msgstr ""
 
@@ -320,16 +379,34 @@ msgstr ""
 msgid "Billed"
 msgstr ""
 
+#: qota/billing/report/billing_and_collections/billing_and_collections.py:20
+msgid "Billed Amount"
+msgstr ""
+
 #. Label of the billed_invoice (Link) field in DocType 'Amortization Schedule
 #. Item'
 #: qota/billing/doctype/amortization_schedule_item/amortization_schedule_item.json
 msgid "Billed In"
 msgstr ""
 
+#. Name of a Workspace
+#. Label of a Desktop Icon
+#. Title of a Workspace Sidebar
+#: qota/billing/workspace/billing/billing.json qota/desktop_icon/billing.json
+#: qota/workspace_sidebar/billing.json
+msgid "Billing"
+msgstr ""
+
 #. Label of the billing_basis (Select) field in DocType 'Billing Cycle'
 #. Label of the billing_basis (Select) field in DocType 'Service Contract'
+#. Label of the billing_basis (Select) field in DocType 'Service Rate'
+#. Label of the billing_basis (Data) field in DocType 'Service Reconnection'
+#. Label of the billing_basis (Select) field in DocType 'Service Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/service_contract/service_contract.json
+#: qota/billing/doctype/service_rate/service_rate.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Billing Basis"
 msgstr ""
 
@@ -339,21 +416,33 @@ msgstr ""
 msgid "Billing Basis Change"
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:158
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:191
 msgid "Billing Continuity Error: Missing bill for {0} {1}."
 msgstr ""
 
 #. Name of a DocType
 #. Label of the billing_cycle (Link) field in DocType 'Monthly Bill'
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
+#: qota/workspace_sidebar/billing.json
 msgid "Billing Cycle"
+msgstr ""
+
+#. Name of a DocType
+#: qota/billing/doctype/billing_cycle_issue/billing_cycle_issue.json
+msgid "Billing Cycle Issue"
 msgstr ""
 
 #. Label of the billing_details (Small Text) field in DocType 'Payment Receipt
 #. Item'
 #: qota/billing/doctype/payment_receipt_item/payment_receipt_item.json
 msgid "Billing Detail"
+msgstr ""
+
+#. Label of the issues (Table) field in DocType 'Billing Cycle'
+#: qota/billing/doctype/billing_cycle/billing_cycle.json
+msgid "Billing Issues"
 msgstr ""
 
 #. Label of the billing_period (Data) field in DocType 'Debt Ledger Entry'
@@ -364,7 +453,11 @@ msgstr ""
 msgid "Billing Period"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:73
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:309
+msgid "Billing Process Critical Failure"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:76
 msgid "Billing Sequence Error: New cycle must start on {0} to maintain continuity."
 msgstr ""
 
@@ -376,10 +469,21 @@ msgstr ""
 #. Label of the fiscal_year (Link) field in DocType 'Billing Cycle'
 #. Name of a DocType
 #. Label of the fiscal_year (Link) field in DocType 'Monthly Bill'
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/billing_year/billing_year.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
+#: qota/workspace_sidebar/billing.json
 msgid "Billing Year"
+msgstr ""
+
+#. Name of a report
+#. Label of a chart in the Billing Workspace
+#. Label of a Workspace Sidebar Item
+#: qota/billing/report/billing_and_collections/billing_and_collections.json
+#: qota/billing/workspace/billing/billing.json
+#: qota/workspace_sidebar/billing.json
+msgid "Billing and Collections"
 msgstr ""
 
 #. Label of the birth_date (Date) field in DocType 'Subscriber'
@@ -390,6 +494,8 @@ msgstr ""
 #. Label of the block (Data) field in DocType 'Premises'
 #: qota/billing/doctype/meter_reading/meter_reading_list.js:37
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:234
+#: qota/billing/report/advance_payments_report/advance_payments_report.js:14
+#: qota/billing/report/advance_payments_report/advance_payments_report.py:23
 #: qota/governance/doctype/premises/premises.json qota/public/js/utils.js:39
 msgid "Block"
 msgstr ""
@@ -437,8 +543,12 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:208
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:245
 msgid "Cannot cancel bill {0} because the associated debt has recorded payments ({1})."
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:74
+msgid "Cannot suspend a contract in '{0}' status."
 msgstr ""
 
 #. Option for the 'Mode of Payment' (Select) field in DocType 'Payment Receipt'
@@ -466,7 +576,7 @@ msgstr ""
 msgid "Cistern Capacity (m³)"
 msgstr ""
 
-#: qota/billing/utils.py:163
+#: qota/billing/utils.py:249
 msgid "Cistern Fee"
 msgstr ""
 
@@ -494,6 +604,10 @@ msgstr ""
 msgid "Closing Date"
 msgstr ""
 
+#: qota/governance/doctype/service_suspension/service_suspension.py:184
+msgid "Closure reading due to suspension {0}"
+msgstr ""
+
 #: qota/billing/report/daily_collection/daily_collection.py:25
 msgid "Collected Amount"
 msgstr ""
@@ -508,6 +622,10 @@ msgstr ""
 msgid "Condition Type"
 msgstr ""
 
+#: qota/governance/doctype/service_suspension/service_suspension.js:19
+msgid "Confirm Technical Cut"
+msgstr ""
+
 #. Label of the connection_charges_column (Column Break) field in DocType
 #. 'Service Contract'
 #: qota/billing/doctype/service_contract/service_contract.json
@@ -519,14 +637,16 @@ msgstr ""
 #. Option for the 'Payment Concept' (Select) field in DocType 'Payment Receipt
 #. Item'
 #. Label of the connection_fee (Link) field in DocType 'Service Contract'
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/connection_fee/connection_fee.json
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
 #: qota/billing/doctype/payment_receipt_item/payment_receipt_item.json
 #: qota/billing/doctype/service_contract/service_contract.json
+#: qota/workspace_sidebar/billing.json
 msgid "Connection Fee"
 msgstr ""
 
-#: qota/billing/doctype/service_contract/service_contract.py:97
+#: qota/billing/doctype/service_contract/service_contract.py:98
 msgid "Connection Fee - Contract Activation"
 msgstr ""
 
@@ -536,7 +656,7 @@ msgstr ""
 msgid "Connection Fee Posted"
 msgstr ""
 
-#: qota/billing/doctype/service_contract/service_contract.py:104
+#: qota/billing/doctype/service_contract/service_contract.py:102
 msgid "Connection Fee of {0} has been registered as a pending debt."
 msgstr ""
 
@@ -568,10 +688,6 @@ msgstr ""
 msgid "Contact Information"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:66
-msgid "Continuity Gaps Detected"
-msgstr ""
-
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:171
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:119
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:226
@@ -587,12 +703,18 @@ msgid "Contract Information"
 msgstr ""
 
 #: qota/billing/doctype/service_contract/service_contract.js:258
-#: qota/billing/doctype/service_contract/service_contract.py:152
+#: qota/billing/doctype/service_contract/service_contract.py:154
 msgid "Contract updated successfully"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:75
-msgid "Contracts"
+#: qota/governance/doctype/service_suspension/service_suspension.py:70
+msgid "Contract {0} is already suspended."
+msgstr ""
+
+#. Description of the 'Execution Issues' (Section Break) field in DocType
+#. 'Billing Cycle'
+#: qota/billing/doctype/billing_cycle/billing_cycle.json
+msgid "Contracts that could not be billed during this cycle."
 msgstr ""
 
 #. Description of the 'Price per m3' (Currency) field in DocType 'Service Rate
@@ -669,7 +791,9 @@ msgid "Customer Signature"
 msgstr ""
 
 #. Name of a report
+#. Label of a Workspace Sidebar Item
 #: qota/billing/report/customer_statement/customer_statement.json
+#: qota/workspace_sidebar/billing.json
 msgid "Customer Statement"
 msgstr ""
 
@@ -703,7 +827,9 @@ msgid "DNI must be exactly 13 digits."
 msgstr ""
 
 #. Name of a report
+#. Label of a Workspace Sidebar Item
 #: qota/billing/report/daily_collection/daily_collection.json
+#: qota/workspace_sidebar/billing.json
 msgid "Daily Collection"
 msgstr ""
 
@@ -813,10 +939,13 @@ msgstr ""
 msgid "Detailed Annual Payment Breakdown"
 msgstr ""
 
-#. Label of the diagnostics_section (Section Break) field in DocType 'Billing
-#. Cycle'
-#: qota/billing/doctype/billing_cycle/billing_cycle.json
-msgid "Diagnostics"
+#. Label of the details (Small Text) field in DocType 'Billing Cycle Issue'
+#: qota/billing/doctype/billing_cycle_issue/billing_cycle_issue.json
+msgid "Details"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:100
+msgid "Diagnostics Finished"
 msgstr ""
 
 #. Label of the disabled (Check) field in DocType 'Connection Fee'
@@ -826,6 +955,12 @@ msgstr ""
 
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:197
 msgid "Discount"
+msgstr ""
+
+#. Label of the section_calculation (Section Break) field in DocType 'Discount
+#. Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "Discount Calculation"
 msgstr ""
 
 #. Label of the discount_name (Data) field in DocType 'Discount Rule'
@@ -843,12 +978,19 @@ msgstr ""
 
 #. Label of the discount_rule (Link) field in DocType 'Benefit Discount'
 #. Name of a DocType
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
 #: qota/billing/doctype/discount_rule/discount_rule.json
+#: qota/workspace_sidebar/billing.json
 msgid "Discount Rule"
 msgstr ""
 
-#: qota/billing/doctype/discount_rule/discount_rule.py:32
+#. Label of the discount_type (Select) field in DocType 'Discount Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "Discount Type"
+msgstr ""
+
+#: qota/billing/doctype/discount_rule/discount_rule.py:45
 msgid "Discount percentage must be between 1 and 100"
 msgstr ""
 
@@ -884,9 +1026,13 @@ msgstr ""
 #. Option for the 'Status' (Select) field in DocType 'Billing Cycle'
 #. Option for the 'Status' (Select) field in DocType 'Monthly Bill'
 #. Option for the 'Status' (Select) field in DocType 'Payment Receipt'
+#. Option for the 'Status' (Select) field in DocType 'Service Reconnection'
+#. Option for the 'Status' (Select) field in DocType 'Service Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Draft"
 msgstr ""
 
@@ -928,6 +1074,16 @@ msgstr ""
 msgid "Effective From"
 msgstr ""
 
+#: qota/billing/report/billing_and_collections/billing_and_collections.py:40
+msgid "Efficiency %"
+msgstr ""
+
+#. Label of the section_conditions (Section Break) field in DocType 'Discount
+#. Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "Eligibility Conditions"
+msgstr ""
+
 #. Label of the eligible_for_board (Check) field in DocType 'Subscriber'
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Eligible for Board"
@@ -936,6 +1092,11 @@ msgstr ""
 #. Label of the email (Data) field in DocType 'Subscriber'
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Email"
+msgstr ""
+
+#. Option for the 'Reason' (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Empty House"
 msgstr ""
 
 #. Label of the end_date (Date) field in DocType 'Billing Cycle'
@@ -960,16 +1121,12 @@ msgstr ""
 msgid "Entry Type"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:121
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:219
 msgid "Error cancelling bill {0} during cycle rollback"
 msgstr ""
 
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:138
 msgid "Error loading technical details."
-msgstr ""
-
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:190
-msgid "Error processing {0}"
 msgstr ""
 
 #: qota/billing/doctype/meter_reading/meter_reading.py:59
@@ -980,8 +1137,28 @@ msgstr ""
 msgid "Error! Current reading is lower than previous reading."
 msgstr ""
 
-#: qota/billing/utils.py:223
+#: qota/billing/utils.py:321
 msgid "Excess: {0} m3 at {1}/m3"
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.js:54
+msgid "Execute Cut"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Service Reconnection'
+#. Option for the 'Status' (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Executed"
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.js:35
+msgid "Execution Date"
+msgstr ""
+
+#. Label of the issues_section (Section Break) field in DocType 'Billing Cycle'
+#: qota/billing/doctype/billing_cycle/billing_cycle.json
+msgid "Execution Issues"
 msgstr ""
 
 #. Label of the summary_section (Section Break) field in DocType 'Billing
@@ -1033,12 +1210,35 @@ msgstr ""
 msgid "Field Changed"
 msgstr ""
 
+#: qota/governance/doctype/service_suspension/service_suspension.js:44
+msgid "Final Meter Reading"
+msgstr ""
+
+#. Label of the meter_reading_section (Section Break) field in DocType 'Service
+#. Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Final Reading"
+msgstr ""
+
+#. Label of the final_reading (Float) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Final Reading Value"
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:114
+msgid "Final Reading is mandatory for metered services upon execution."
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:127
+msgid "Final reading ({0}) cannot be lower than the last recorded reading ({1})."
+msgstr ""
+
 #. Label of the finance_sb (Section Break) field in DocType 'Debt Ledger Entry'
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
 msgid "Financial Balances"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:210
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:304
 msgid "Finished: {0} bills created."
 msgstr ""
 
@@ -1054,9 +1254,20 @@ msgstr ""
 msgid "Fiscal Month"
 msgstr ""
 
+#: qota/billing/report/billing_and_collections/billing_and_collections.js:8
+msgid "Fiscal Year"
+msgstr ""
+
 #. Option for the 'Late Fee Type' (Select) field in DocType 'Billing Settings'
+#. Option for the 'Discount Type' (Select) field in DocType 'Discount Rule'
+#. Label of the fixed_amount (Currency) field in DocType 'Discount Rule'
 #: qota/billing/doctype/billing_settings/billing_settings.json
+#: qota/billing/doctype/discount_rule/discount_rule.json
 msgid "Fixed Amount"
+msgstr ""
+
+#: qota/billing/doctype/discount_rule/discount_rule.py:51
+msgid "Fixed Amount must be greater than 0"
 msgstr ""
 
 #. Label of the fixed_charge (Currency) field in DocType 'Service Rate'
@@ -1064,14 +1275,19 @@ msgstr ""
 msgid "Fixed Charge (Base)"
 msgstr ""
 
-#: qota/billing/utils.py:196
+#: qota/billing/utils.py:291
 msgid "Fixed Charge (Up to {0} m3)"
 msgstr ""
 
 #. Option for the 'Billing Basis' (Select) field in DocType 'Billing Cycle'
 #. Option for the 'Billing Basis' (Select) field in DocType 'Service Contract'
+#. Option for the 'Billing Basis' (Select) field in DocType 'Service Rate'
+#. Option for the 'Billing Basis' (Select) field in DocType 'Service
+#. Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/service_contract/service_contract.json
+#: qota/billing/doctype/service_rate/service_rate.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Flat Rate"
 msgstr ""
 
@@ -1084,6 +1300,10 @@ msgstr ""
 #. Label of the flat_rate_price (Currency) field in DocType 'Service Rate'
 #: qota/billing/doctype/service_rate/service_rate.json
 msgid "Flat Rate Price"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:102
+msgid "Found {0} contracts with issues. Check the Execution Issues section."
 msgstr ""
 
 #. Label of the from_unit (Float) field in DocType 'Service Rate Consumption
@@ -1099,11 +1319,15 @@ msgstr ""
 
 #. Label of the full_name (Data) field in DocType 'Benefit Discount'
 #. Label of the full_name (Data) field in DocType 'Meter Reading'
+#. Label of the full_name (Data) field in DocType 'Monthly Bill'
 #. Label of the full_name (Data) field in DocType 'Payment Receipt'
+#. Label of the full_name (Data) field in DocType 'Service Suspension'
 #. Label of the full_name (Data) field in DocType 'Subscriber'
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
 #: qota/billing/doctype/meter_reading/meter_reading.json
+#: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Full Name / Company Name"
 msgstr ""
@@ -1134,6 +1358,16 @@ msgstr ""
 msgid "Generated on"
 msgstr ""
 
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:51
+msgid "Get Diagnostics"
+msgstr ""
+
+#. Label of a Desktop Icon
+#. Title of a Workspace Sidebar
+#: qota/desktop_icon/governance.json qota/workspace_sidebar/governance.json
+msgid "Governance"
+msgstr ""
+
 #. Label of the grace_period (Int) field in DocType 'Billing Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Grace Period (Days)"
@@ -1144,12 +1378,19 @@ msgstr ""
 msgid "Has Cistern?"
 msgstr ""
 
+#. Label of a Workspace Sidebar Item
+#: qota/workspace_sidebar/billing.json
+msgid "Home"
+msgstr ""
+
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:234
 msgid "House"
 msgstr ""
 
 #. Label of the house_number (Data) field in DocType 'Premises'
 #: qota/billing/doctype/meter_reading/meter_reading_list.js:38
+#: qota/billing/report/advance_payments_report/advance_payments_report.js:19
+#: qota/billing/report/advance_payments_report/advance_payments_report.py:25
 #: qota/governance/doctype/premises/premises.json qota/public/js/utils.js:39
 msgid "House Number"
 msgstr ""
@@ -1183,6 +1424,16 @@ msgstr ""
 
 #: qota/governance/doctype/subscriber/subscriber.py:93
 msgid "ID document has expired."
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:93
+msgid "Identifying billing gaps..."
+msgstr ""
+
+#. Description of the 'Requires Cistern?' (Select) field in DocType 'Discount
+#. Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "If 'Yes', subscriber must have cistern service. If 'No', they must NOT have it."
 msgstr ""
 
 #. Description of the 'Truncate Discount Decimals?' (Check) field in DocType
@@ -1229,12 +1480,14 @@ msgid "Included m3"
 msgstr ""
 
 #. Label of the start_reading (Float) field in DocType 'Service Contract'
+#. Label of the initial_reading (Float) field in DocType 'Service Reconnection'
 #: qota/billing/doctype/service_contract/service_contract.js:148
 #: qota/billing/doctype/service_contract/service_contract.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
 msgid "Initial Reading"
 msgstr ""
 
-#: qota/billing/doctype/service_contract/service_contract.py:76
+#: qota/billing/doctype/service_contract/service_contract.py:78
 msgid "Initial contract activation and validation."
 msgstr ""
 
@@ -1250,7 +1503,7 @@ msgstr ""
 msgid "Installments must be at least 1."
 msgstr ""
 
-#: qota/billing/utils.py:121
+#: qota/billing/utils.py:166
 msgid "Invalid Billing Basis for contract {0}"
 msgstr ""
 
@@ -1258,8 +1511,24 @@ msgstr ""
 msgid "Invalid Input"
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:133
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:160
 msgid "Invalid Period: Contract starts on {0}. First billable period is {1} {2}."
+msgstr ""
+
+#. Option for the 'Suspension Type' (Select) field in DocType 'Service
+#. Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Involuntary"
+msgstr ""
+
+#. Option for the 'Requires Cistern?' (Select) field in DocType 'Discount Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "Irrelevant"
+msgstr ""
+
+#. Label of the is_active (Check) field in DocType 'Discount Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "Is Active"
 msgstr ""
 
 #. Label of the is_honduran (Check) field in DocType 'Subscriber'
@@ -1392,6 +1661,11 @@ msgstr ""
 msgid "March"
 msgstr ""
 
+#. Label of a Workspace Sidebar Item
+#: qota/workspace_sidebar/billing.json
+msgid "Masters"
+msgstr ""
+
 #. Label of the max_discounts_per_connection (Int) field in DocType 'Billing
 #. Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
@@ -1430,19 +1704,29 @@ msgstr ""
 
 #. Label of the meter_section (Section Break) field in DocType 'Service
 #. Contract'
+#. Label of the meter_section (Section Break) field in DocType 'Service
+#. Reconnection'
 #: qota/billing/doctype/service_contract/service_contract.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
 msgid "Meter Information"
 msgstr ""
 
 #. Name of a DocType
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/meter_reading/meter_reading.json
+#: qota/workspace_sidebar/billing.json
 msgid "Meter Reading"
 msgstr ""
 
 #. Option for the 'Billing Basis' (Select) field in DocType 'Billing Cycle'
 #. Option for the 'Billing Basis' (Select) field in DocType 'Service Contract'
+#. Option for the 'Billing Basis' (Select) field in DocType 'Service Rate'
+#. Option for the 'Billing Basis' (Select) field in DocType 'Service
+#. Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/service_contract/service_contract.json
+#: qota/billing/doctype/service_rate/service_rate.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Metered"
 msgstr ""
 
@@ -1457,7 +1741,11 @@ msgstr ""
 msgid "Minimum Age"
 msgstr ""
 
-#: qota/billing/doctype/discount_rule/discount_rule.py:37
+#: qota/billing/doctype/discount_rule/discount_rule.py:62
+msgid "Minimum Age cannot be negative"
+msgstr ""
+
+#: qota/billing/doctype/discount_rule/discount_rule.py:59
 msgid "Minimum Age must be less than Maximum Age"
 msgstr ""
 
@@ -1482,7 +1770,11 @@ msgid "Month"
 msgstr ""
 
 #. Name of a DocType
+#. Label of a shortcut in the Billing Workspace
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
+#: qota/billing/workspace/billing/billing.json
+#: qota/workspace_sidebar/billing.json
 msgid "Monthly Bill"
 msgstr ""
 
@@ -1499,11 +1791,11 @@ msgstr ""
 msgid "Monthly Fee"
 msgstr ""
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.py:261
+#: qota/billing/doctype/payment_receipt/payment_receipt.py:310
 msgid "Monthly Fee: {0}"
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:237
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:286
 msgid "Monthly Fee: {0} {1}"
 msgstr ""
 
@@ -1513,12 +1805,22 @@ msgstr ""
 msgid "Monthly Installment"
 msgstr ""
 
+#. Label of a number card in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "Monthly Payment Summary"
+msgstr ""
+
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:147
 msgid "Monthly Total"
 msgstr ""
 
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:262
 msgid "Months must be selected in sequential order."
+msgstr ""
+
+#. Option for the 'Reason' (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Moving Out"
 msgstr ""
 
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:168
@@ -1547,12 +1849,25 @@ msgstr ""
 msgid "New Payment Schedule"
 msgstr ""
 
-#: qota/billing/utils.py:145
+#. Option for the 'Requires Cistern?' (Select) field in DocType 'Discount Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "No"
+msgstr ""
+
+#: qota/billing/utils.py:214
 msgid "No active Service Rate found for category '{0}' on {1}"
 msgstr ""
 
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:210
 msgid "No available months found for advances."
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:106
+msgid "No issues detected. Ready for billing."
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:99
+msgid "No submitted bills found for {0}-{1}"
 msgstr ""
 
 #: qota/billing/doctype/billing_settings/billing_settings.js:25
@@ -1608,9 +1923,19 @@ msgstr ""
 msgid "Operation Date"
 msgstr ""
 
+#. Label of a Workspace Sidebar Item
+#: qota/workspace_sidebar/billing.json
+msgid "Operations"
+msgstr ""
+
 #. Label of the company_name (Data) field in DocType 'Billing Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Organization Name"
+msgstr ""
+
+#. Label of the suspension_id (Link) field in DocType 'Service Reconnection'
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+msgid "Origin Suspension"
 msgstr ""
 
 #. Label of the amount (Currency) field in DocType 'Debt Ledger Entry'
@@ -1619,7 +1944,9 @@ msgstr ""
 msgid "Original Amount"
 msgstr ""
 
+#. Option for the 'Reason' (Select) field in DocType 'Service Suspension'
 #. Option for the 'Gender' (Select) field in DocType 'Subscriber'
+#: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Other"
 msgstr ""
@@ -1685,7 +2012,11 @@ msgid "Payment Details"
 msgstr ""
 
 #. Name of a DocType
+#. Label of a shortcut in the Billing Workspace
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/billing/workspace/billing/billing.json
+#: qota/workspace_sidebar/billing.json
 msgid "Payment Receipt"
 msgstr ""
 
@@ -1711,14 +2042,21 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
+#: qota/billing/report/billing_and_collections/billing_and_collections.py:36
+msgid "Pending Balance"
+msgstr ""
+
 #. Option for the 'Late Fee Type' (Select) field in DocType 'Billing Settings'
+#. Option for the 'Discount Type' (Select) field in DocType 'Discount Rule'
 #: qota/billing/doctype/billing_settings/billing_settings.json
+#: qota/billing/doctype/discount_rule/discount_rule.json
 msgid "Percentage"
 msgstr ""
 
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:219
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:280
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:20
+#: qota/billing/report/billing_and_collections/billing_and_collections.py:16
 msgid "Period"
 msgstr ""
 
@@ -1747,7 +2085,7 @@ msgstr ""
 msgid "Please select a Service Contract first."
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:42
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:46
 msgid "Please set the Start and End dates for the coverage period."
 msgstr ""
 
@@ -1765,6 +2103,8 @@ msgstr ""
 #. Label of the premises (Link) field in DocType 'Payment Receipt'
 #. Label of the premises (Link) field in DocType 'Service Contract'
 #. Name of a DocType
+#. Label of the premises (Link) field in DocType 'Service Suspension'
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.json
 #: qota/billing/doctype/meter_reading/meter_reading.json
@@ -1773,6 +2113,8 @@ msgstr ""
 #: qota/billing/doctype/service_contract/service_contract.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:239
 #: qota/governance/doctype/premises/premises.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
+#: qota/workspace_sidebar/governance.json
 msgid "Premises"
 msgstr ""
 
@@ -1787,15 +2129,15 @@ msgstr ""
 msgid "Price per m3"
 msgstr ""
 
-#: qota/billing/doctype/service_rate/service_rate.py:40
+#: qota/billing/doctype/service_rate/service_rate.py:41
 msgid "Price values cannot be negative."
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:11
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:15
 msgid "Process Completed"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:86
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:189
 msgid "Process queued for background execution."
 msgstr ""
 
@@ -1832,14 +2174,30 @@ msgstr ""
 msgid "Rate Name"
 msgstr ""
 
+#. Label of a Workspace Sidebar Item
+#: qota/workspace_sidebar/billing.json
+msgid "Rates"
+msgstr ""
+
 #. Label of the reading_date (Date) field in DocType 'Meter Reading'
+#. Label of the reading_date (Date) field in DocType 'Service Reconnection'
+#. Label of the reading_date (Date) field in DocType 'Service Suspension'
 #: qota/billing/doctype/meter_reading/meter_reading.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Reading Date"
 msgstr ""
 
 #. Label of the reading_window_days (Int) field in DocType 'Billing Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Reading Window (Days)"
+msgstr ""
+
+#. Label of the reason (Data) field in DocType 'Billing Cycle Issue'
+#. Label of the reason (Select) field in DocType 'Service Suspension'
+#: qota/billing/doctype/billing_cycle_issue/billing_cycle_issue.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Reason"
 msgstr ""
 
 #: qota/billing/doctype/service_contract/service_contract.js:189
@@ -1857,6 +2215,17 @@ msgstr ""
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:334
 msgid "Received By"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Reconnected"
+msgstr ""
+
+#. Label of the reconnection_date (Date) field in DocType 'Service
+#. Reconnection'
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+msgid "Reconnection Date"
 msgstr ""
 
 #. Label of the section_break_reconn (Section Break) field in DocType 'Billing
@@ -1908,13 +2277,21 @@ msgstr ""
 msgid "Refinancing Terms"
 msgstr ""
 
+#: qota/billing/report/billing_and_collections/billing_and_collections.py:24
+msgid "Regular Payments"
+msgstr ""
+
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:316
 msgid "Remaining Debt"
 msgstr ""
 
 #. Label of the remarks (Small Text) field in DocType 'Payment Receipt'
+#. Label of the remarks (Small Text) field in DocType 'Service Reconnection'
+#. Label of the remarks (Small Text) field in DocType 'Service Suspension'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:300
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Remarks"
 msgstr ""
 
@@ -1922,20 +2299,34 @@ msgstr ""
 msgid "Remove Cistern"
 msgstr ""
 
+#. Label of a Workspace Sidebar Item
+#: qota/workspace_sidebar/billing.json
+msgid "Reports"
+msgstr ""
+
+#. Label of the requires_cistern (Select) field in DocType 'Discount Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "Requires Cistern?"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:28
+msgid "Reset to Draft"
+msgstr ""
+
 #. Option for the 'ID Type' (Select) field in DocType 'Subscriber'
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Residence Card"
 msgstr ""
 
-#: qota/billing/doctype/service_rate/service_rate.py:62
+#: qota/billing/doctype/service_rate/service_rate.py:63
 msgid "Row {0}: 'From' unit cannot be less than the previous limit ({1})."
 msgstr ""
 
-#: qota/billing/doctype/service_rate/service_rate.py:58
+#: qota/billing/doctype/service_rate/service_rate.py:59
 msgid "Row {0}: 'To' unit must be greater than 'From' unit."
 msgstr ""
 
-#: qota/billing/doctype/service_rate/service_rate.py:53
+#: qota/billing/doctype/service_rate/service_rate.py:54
 msgid "Row {0}: Price per unit cannot be negative."
 msgstr ""
 
@@ -1943,6 +2334,11 @@ msgstr ""
 #. Refinancing'
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.json
 msgid "Schedule"
+msgstr ""
+
+#. Option for the 'Status' (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Scheduled"
 msgstr ""
 
 #. Label of the sector (Data) field in DocType 'Premises'
@@ -1967,6 +2363,10 @@ msgstr ""
 msgid "September"
 msgstr ""
 
+#: qota/billing/doctype/payment_receipt/payment_receipt.py:104
+msgid "Sequence error: There is a gap between {0} and {1}. Payments must be sequential."
+msgstr ""
+
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:126
 msgid "Service"
 msgstr ""
@@ -1975,14 +2375,17 @@ msgstr ""
 #. Name of a DocType
 #. Label of the service_category (Link) field in DocType 'Service Contract'
 #. Label of the service_category (Link) field in DocType 'Service Rate'
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/connection_fee/connection_fee.json
 #: qota/billing/doctype/service_category/service_category.json
 #: qota/billing/doctype/service_contract/service_contract.json
 #: qota/billing/doctype/service_rate/service_rate.json
+#: qota/workspace_sidebar/billing.json
 msgid "Service Category"
 msgstr ""
 
 #. Label of the service_contract (Link) field in DocType 'Benefit Discount'
+#. Label of the service_contract (Link) field in DocType 'Billing Cycle Issue'
 #. Label of the service_contract (Link) field in DocType 'Debt Ledger Entry'
 #. Label of the service_contract (Link) field in DocType 'Debt Refinancing'
 #. Label of the service_contract (Link) field in DocType 'Meter Reading'
@@ -1990,7 +2393,12 @@ msgstr ""
 #. Label of the service_contract (Link) field in DocType 'Payment Receipt'
 #. Name of a DocType
 #. Label of the service_contract (Link) field in DocType 'Service Contract Log'
+#. Label of a shortcut in the Billing Workspace
+#. Label of the service_contract (Link) field in DocType 'Service Reconnection'
+#. Label of the service_contract (Link) field in DocType 'Service Suspension'
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
+#: qota/billing/doctype/billing_cycle_issue/billing_cycle_issue.json
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.json
 #: qota/billing/doctype/meter_reading/meter_reading.json
@@ -1998,8 +2406,14 @@ msgstr ""
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/billing/doctype/service_contract/service_contract.json
 #: qota/billing/doctype/service_contract_log/service_contract_log.json
+#: qota/billing/report/advance_payments_report/advance_payments_report.js:8
+#: qota/billing/report/advance_payments_report/advance_payments_report.py:21
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.js:8
 #: qota/billing/report/customer_statement/customer_statement.js:8
+#: qota/billing/workspace/billing/billing.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
+#: qota/workspace_sidebar/billing.json
 msgid "Service Contract"
 msgstr ""
 
@@ -2014,11 +2428,11 @@ msgstr ""
 msgid "Service Contract Log"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:44
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:48
 msgid "Service End Date cannot be earlier than Service Start Date"
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:68
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:71
 msgid "Service End Date must be after Service Start Date."
 msgstr ""
 
@@ -2028,7 +2442,9 @@ msgid "Service Name"
 msgstr ""
 
 #. Name of a DocType
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/service_rate/service_rate.json
+#: qota/workspace_sidebar/billing.json
 msgid "Service Rate"
 msgstr ""
 
@@ -2042,12 +2458,31 @@ msgstr ""
 msgid "Service Rate Consumption Range"
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:65
+#. Name of a DocType
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+msgid "Service Reconnection"
+msgstr ""
+
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:68
 msgid "Service Start Date and End Date are required."
+msgstr ""
+
+#. Name of a DocType
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Service Suspension"
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:166
+msgid "Service suspended by order {0}"
 msgstr ""
 
 #: qota/billing/doctype/service_contract/service_contract.js:124
 msgid "Set to Flat Rate"
+msgstr ""
+
+#. Label of a Workspace Sidebar Item
+#: qota/workspace_sidebar/billing.json
+msgid "Settings"
 msgstr ""
 
 #. Label of the show_debt_details (Check) field in DocType 'Billing Settings'
@@ -2109,6 +2544,8 @@ msgstr ""
 #. Label of the status (Select) field in DocType 'Service Contract'
 #. Label of the status (Select) field in DocType 'Service Rate'
 #. Label of the status (Select) field in DocType 'Premises'
+#. Label of the status (Select) field in DocType 'Service Reconnection'
+#. Label of the status (Select) field in DocType 'Service Suspension'
 #. Label of the status (Select) field in DocType 'Subscriber'
 #: qota/billing/doctype/amortization_schedule_item/amortization_schedule_item.json
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
@@ -2120,6 +2557,8 @@ msgstr ""
 #: qota/billing/doctype/service_rate/service_rate.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:260
 #: qota/governance/doctype/premises/premises.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Status"
 msgstr ""
@@ -2130,30 +2569,36 @@ msgstr ""
 msgid "Status Change"
 msgstr ""
 
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:32
+msgid "Status reset successfully"
+msgstr ""
+
 #. Label of the is_late_fee_applicable (Check) field in DocType 'Service Rate
 #. Additional Fee'
 #: qota/billing/doctype/service_rate_additional_fee/service_rate_additional_fee.json
 msgid "Subject to Late Fee?"
 msgstr ""
 
-#. Option for the 'Status' (Select) field in DocType 'Monthly Bill'
-#: qota/billing/doctype/monthly_bill/monthly_bill.json
-msgid "Submitted"
-msgstr ""
-
 #. Label of the subscriber (Data) field in DocType 'Debt Refinancing'
 #. Label of the subscriber (Link) field in DocType 'Meter Reading'
 #. Label of the subscriber (Link) field in DocType 'Service Contract'
+#. Label of the subscriber (Link) field in DocType 'Service Reconnection'
+#. Label of the subscriber (Link) field in DocType 'Service Suspension'
 #. Name of a DocType
+#. Label of a Workspace Sidebar Item
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.json
 #: qota/billing/doctype/meter_reading/meter_reading.json
 #: qota/billing/doctype/service_contract/service_contract.json
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:164
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:215
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:116
+#: qota/billing/report/advance_payments_report/advance_payments_report.py:19
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:18
 #: qota/billing/report/daily_collection/daily_collection.py:22
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/doctype/subscriber/subscriber.json
+#: qota/workspace_sidebar/governance.json
 msgid "Subscriber"
 msgstr ""
 
@@ -2163,14 +2608,14 @@ msgstr ""
 msgid "Subscriber & Premises"
 msgstr ""
 
+#. Label of the subscriber (Link) field in DocType 'Monthly Bill'
 #. Label of the subscriber (Link) field in DocType 'Payment Receipt'
+#: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 msgid "Subscriber ID"
 msgstr ""
 
-#. Label of the full_name (Data) field in DocType 'Monthly Bill'
 #. Label of the full_name (Data) field in DocType 'Service Contract'
-#: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/service_contract/service_contract.json
 #: qota/billing/report/aging_report/aging_report.py:16
 msgid "Subscriber Name"
@@ -2181,15 +2626,37 @@ msgstr ""
 msgid "Subscriber Type"
 msgstr ""
 
+#: qota/billing/utils.py:612
+msgid "Successfully generated {0} bills."
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:162
+msgid "Successfully reprocessed {0} bills for {1}-{2}"
+msgstr ""
+
 #. Option for the 'Status' (Select) field in DocType 'Service Contract'
 #: qota/billing/doctype/service_contract/service_contract.json
 msgid "Suspended"
+msgstr ""
+
+#. Label of the suspension_date (Date) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Suspension Date"
 msgstr ""
 
 #. Label of the suspension_months_limit (Int) field in DocType 'Billing
 #. Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Suspension Threshold (Months)"
+msgstr ""
+
+#. Label of the suspension_type (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Suspension Type"
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:102
+msgid "Suspension date ({0}) cannot be earlier than contract start date ({1})."
 msgstr ""
 
 #. Name of a role
@@ -2208,6 +2675,8 @@ msgstr ""
 #: qota/billing/doctype/service_contract_log/service_contract_log.json
 #: qota/billing/doctype/service_rate/service_rate.json
 #: qota/governance/doctype/premises/premises.json
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "System Manager"
 msgstr ""
@@ -2230,6 +2699,15 @@ msgstr ""
 msgid "Taxes"
 msgstr ""
 
+#: qota/governance/doctype/service_suspension/service_suspension.js:52
+msgid "Technical Confirmation"
+msgstr ""
+
+#. Option for the 'Reason' (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Temporary Absence"
+msgstr ""
+
 #: qota/billing/doctype/service_contract/service_contract.js:198
 msgid "Terminate Contract"
 msgstr ""
@@ -2242,8 +2720,12 @@ msgstr ""
 msgid "The 'To' limit ({0}) must be greater than the 'From' limit ({1})."
 msgstr ""
 
-#: qota/billing/doctype/service_contract/service_contract.py:54
+#: qota/billing/doctype/service_contract/service_contract.py:55
 msgid "The Premises {0} is already associated with an Active contract: {1}."
+msgstr ""
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:64
+msgid "The Service Contract must be submitted before suspension."
 msgstr ""
 
 #. Description of the 'Amount to Finance' (Currency) field in DocType 'Debt
@@ -2252,15 +2734,15 @@ msgstr ""
 msgid "The amount that will be split into installments (Total - Down Payment)."
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:66
-msgid "The following contracts will be skipped during processing."
-msgstr ""
-
 #: qota/billing/doctype/service_contract/service_contract.js:230
 msgid "The premises {0} is already linked to active contract {1}."
 msgstr ""
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:88
+#: qota/governance/doctype/service_suspension/service_suspension.py:61
+msgid "The selected Service Contract does not exist."
+msgstr ""
+
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:97
 msgid "The selected date range overlaps with an existing Monthly Bill: {0}"
 msgstr ""
 
@@ -2268,11 +2750,15 @@ msgstr ""
 msgid "The total connection fee must be greater than zero."
 msgstr ""
 
+#: qota/governance/doctype/service_suspension/service_suspension.py:87
+msgid "There is already a pending suspension order ({0}) for this contract."
+msgstr ""
+
 #: qota/billing/doctype/connection_fee/connection_fee.py:48
 msgid "There is already an active Connection Fee ({0}) for Service Category '{1}'. Please disable the existing one first."
 msgstr ""
 
-#: qota/billing/doctype/service_rate/service_rate.py:81
+#: qota/billing/doctype/service_rate/service_rate.py:82
 msgid "There is already an active Rate ({0}) for Category '{1}'. Please deactivate it first."
 msgstr ""
 
@@ -2284,12 +2770,16 @@ msgstr ""
 msgid "This contract is {0}. No further actions can be performed."
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:22
-msgid "This cycle is currently being processed in the background. Please wait for the \"Completed\" status."
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:26
+msgid "This cycle is currently being processed in the background."
 msgstr ""
 
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:126
 msgid "This item has no detailed breakdown."
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:40
+msgid "This will cancel and regenerate all UNPAID bills for this cycle with current rates. Continue?"
 msgstr ""
 
 #. Label of the timeline_column (Column Break) field in DocType 'Service
@@ -2323,6 +2813,7 @@ msgstr ""
 msgid "Total Annual Projection"
 msgstr ""
 
+#: qota/billing/report/billing_and_collections/billing_and_collections.py:32
 #: qota/billing/report/daily_collection/daily_collection.py:80
 msgid "Total Collected"
 msgstr ""
@@ -2384,10 +2875,30 @@ msgstr ""
 msgid "Truncate Discount Decimals?"
 msgstr ""
 
+#: qota/billing/report/advance_payments_report/advance_payments_report.py:91
+msgid "Unknown"
+msgstr ""
+
 #. Option for the 'Status' (Select) field in DocType 'Debt Ledger Entry'
+#. Option for the 'Status' (Select) field in DocType 'Monthly Bill'
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.js:25
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
+#: qota/billing/doctype/monthly_bill/monthly_bill.json
 msgid "Unpaid"
+msgstr ""
+
+#. Option for the 'Reason' (Select) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Unpaid Debt"
+msgstr ""
+
+#. Label of a number card in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "Unpaid Monthly Bills Total"
+msgstr ""
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:38
+msgid "Update All Rates"
 msgstr ""
 
 #: qota/billing/doctype/service_rate/service_rate.js:44
@@ -2399,12 +2910,18 @@ msgstr ""
 msgid "Validity Period"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:36
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:62
 msgid "View"
 msgstr ""
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.js:32
+#: qota/billing/doctype/billing_cycle/billing_cycle.js:58
 msgid "View Generated Bills"
+msgstr ""
+
+#. Option for the 'Suspension Type' (Select) field in DocType 'Service
+#. Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Voluntary"
 msgstr ""
 
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:143
@@ -2421,6 +2938,15 @@ msgstr ""
 msgid "Year"
 msgstr ""
 
+#. Option for the 'Requires Cistern?' (Select) field in DocType 'Discount Rule'
+#: qota/billing/doctype/discount_rule/discount_rule.json
+msgid "Yes"
+msgstr ""
+
+#: qota/billing/doctype/payment_receipt/payment_receipt.py:92
+msgid "You cannot skip pending debts. Please include {0} before adding future months."
+msgstr ""
+
 #. Description of the 'Included m3' (Float) field in DocType 'Service Rate'
 #: qota/billing/doctype/service_rate/service_rate.json
 msgid "m3 already included in the fixed charge."
@@ -2430,11 +2956,26 @@ msgstr ""
 msgid "years"
 msgstr ""
 
-#: qota/billing/utils.py:159
+#: qota/billing/utils.py:243
 msgid "{0} (Flat Rate - {1})"
 msgstr ""
 
-#: qota/billing/utils.py:166
+#: qota/billing/utils.py:253
 msgid "{0} (Flat Rate)"
+msgstr ""
+
+#. Count format of shortcut in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "{} Actives"
+msgstr ""
+
+#. Count format of shortcut in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "{} This Month"
+msgstr ""
+
+#. Count format of shortcut in the Billing Workspace
+#: qota/billing/workspace/billing/billing.json
+msgid "{} Unpaid"
 msgstr ""
 

@@ -1,0 +1,40 @@
+{
+ "chart_name": "Billing and Collections",
+ "chart_type": "Report",
+ "creation": "2026-02-22 00:32:12.305248",
+ "currency": "HNL",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "dynamic_filters_json": "{}",
+ "filters_json": "{\"fiscal_year\":\"2026\"}",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 0,
+ "is_standard": 1,
+ "modified": "2026-02-22 00:33:27.985896",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Billing and Collections",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "report_name": "Billing and Collections",
+ "roles": [],
+ "show_values_over_chart": 1,
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "x_field": "period",
+ "y_axis": [
+  {
+   "y_field": "billed"
+  },
+  {
+   "y_field": "regular_paid"
+  },
+  {
+   "y_field": "advances_paid"
+  }
+ ]
+}

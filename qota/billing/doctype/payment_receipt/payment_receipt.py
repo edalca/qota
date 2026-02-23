@@ -4,9 +4,17 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, today, getdate, add_months, format_date,nowdate,add_days
+from frappe.utils import (
+    flt,
+    today,
+    getdate,
+    add_months,
+    format_date,
+    nowdate,
+    add_days
+)
 from datetime import date
-import json
+
 
 class PaymentReceipt(Document):
     # begin: auto-generated types
@@ -16,12 +24,16 @@ class PaymentReceipt(Document):
 
     if TYPE_CHECKING:
         from frappe.types import DF
-        from qota.billing.doctype.payment_receipt_item.payment_receipt_item import PaymentReceiptItem
-
+        from qota.billing.doctype.payment_receipt_item.payment_receipt_item import (
+            PaymentReceiptItem
+        )
         amended_from: DF.Link | None
         current_debt: DF.Currency
         full_name: DF.Data | None
-        mode_of_payment: DF.Literal["Cash", "Bank Transfer", "Check", "Credit Card"]
+        mode_of_payment: DF.Literal["Cash",
+                                    "Bank Transfer",
+                                    "Check",
+                                    "Credit Card"]
         payment_date: DF.Datetime
         payment_items: DF.Table[PaymentReceiptItem]
         premises: DF.Link | None
@@ -36,18 +48,70 @@ class PaymentReceipt(Document):
     # end: auto-generated types
 
     def validate(self):
-        """
-        Este método se ejecuta SIEMPRE al guardar. 
-        Asegura que los totales sean correctos independientemente del JavaScript.
-        """
         self.calculate_totals()
         self.status_update()
+        self.validate_payment_sequence()
+
+    def validate_payment_sequence(self):
+        """
+        Ensures that no billing periods are skipped.
+        All unpaid debts must be included if an advance is present,
+        and selected months must be sequential.
+        """
+        from frappe.utils import add_months
+
+        selected_items = [
+            d for d in self.payment_items if (
+                d.payment_concept == "Monthly Fee"
+            )
+        ]
+
+        if not selected_items:
+            return
+
+        def parse_period(p_str):
+            parts = p_str.split('-')
+            return date(int(parts[1]), int(parts[0]), 1)
+
+        selected_items.sort(key=lambda x: parse_period(x.billing_period))
+
+        oldest_pending_debt = frappe.db.get_value("Debt Ledger Entry", {
+            "service_contract": self.service_contract,
+            "entry_type": "Monthly Fee",
+            "outstanding_amount": [">", 0],
+            "docstatus": ["!=", 2]
+        }, "billing_period", order_by="due_date asc")
+
+        if oldest_pending_debt:
+            first_selected = selected_items[0].billing_period
+            if (
+                parse_period(first_selected) >
+                parse_period(oldest_pending_debt)
+            ):
+                frappe.throw(
+                    _(
+                        "You cannot skip pending debts. Please include {0} "
+                        "before adding future months.")
+                    .format(frappe.bold(oldest_pending_debt))
+                )
+
+        for i in range(len(selected_items) - 1):
+            curr_date = parse_period(selected_items[i].billing_period)
+            next_date = parse_period(selected_items[i+1].billing_period)
+
+            if next_date != add_months(curr_date, 1):
+                frappe.throw(
+                    _(
+                        "Sequence error: There is a gap between {0} and {1}. "
+                        "Payments must be sequential.")
+                    .format(frappe.bold(selected_items[i].billing_period),
+                            frappe.bold(selected_items[i+1].billing_period))
+                )
 
     def before_submit(self):
         for item in self.payment_items:
             # Al inicio, el saldo disponible es el total del item
             item.balance = item.amount
-
 
     def on_submit(self):
         """
@@ -68,7 +132,6 @@ class PaymentReceipt(Document):
             self.status = "Paid"
         elif self.docstatus == 2:
             self.status = "Cancelled"
-
 
     def process_ledger_updates(self, cancel=False):
         for item in self.payment_items:
@@ -138,131 +201,121 @@ class PaymentReceipt(Document):
 
         self.total_to_pay = total_to_pay
         self.unallocated_amount = unallocated_amount
-        
+
         self.total_pending = flt(self.current_debt) - total_to_pay + unallocated_amount
-        
+
     @frappe.whitelist()
     @staticmethod
     def get_next_billing_advances(self,contract_name, qty=12):
         """
-        Calcula los próximos meses a pagar por adelantado.
-        Calcula dinámicamente start_date y end_date para cada mes futuro 
-        y los envía al motor de breakdown.
+        Calculate next available billing periods for advances.
+        Blocks periods already in the Debt Ledger OR already paid as
+        a Monthly Fee.
         """
         from qota.billing.utils import get_monthly_billing_breakdown
 
+        # 1. Configuración inicial
         contract = frappe.get_doc("Service Contract", contract_name)
-        
-        # 1. Obtener configuración global de fechas
         settings = frappe.get_single("Billing Settings")
         start_day = int(settings.cycle_start_day or 1)
-        
-        # Mapeo de nombres de meses
         month_names = [
             "January", "February", "March", "April", "May", "June", 
             "July", "August", "September", "October", "November", "December"
         ]
 
-        # ------------------------------------------------------------------
-        # PASO 1 Y 2: DETERMINAR PUNTO DE PARTIDA (Historial de Deuda y Adelantos)
-        # ------------------------------------------------------------------
-        # (Mantenemos la lógica de búsqueda de last_debt_date y last_advance_date)
-        last_debt_date = None
-        last_entry = frappe.get_all("Debt Ledger Entry",
-            filters={"service_contract": contract_name, "entry_type": "Monthly Fee", "docstatus": ["!=", 2]},
-            fields=["reference_name"], order_by="creation desc", limit=1
-        )
-        if last_entry and last_entry[0].reference_name:
-            cycle_data = frappe.db.get_value("Billing Cycle", last_entry[0].reference_name, ["fiscal_month", "fiscal_year"], as_dict=True)
-            if cycle_data:
-                year_val = frappe.db.get_value("Billing Year", cycle_data.fiscal_year, "year_name")
-                last_debt_date = date(int(year_val), month_names.index(cycle_data.fiscal_month) + 1, 1)
+        # 2. Períodos con DEUDA generada (Facturados)
+        existing_periods = set(frappe.get_all(
+            "Debt Ledger Entry",
+            filters={
+                "service_contract": contract_name,
+                "entry_type": "Monthly Fee",
+                "docstatus": ["!=", 2]
+            },
+            pluck="billing_period"
+        ))
 
-        last_advance_date = None
-        paid_periods = frappe.db.sql("""
-            SELECT billing_period FROM `tabPayment Receipt Item`
-            WHERE parent IN (SELECT name FROM `tabPayment Receipt` WHERE service_contract = %s AND docstatus = 1)
-            AND billing_period IS NOT NULL AND payment_concept = 'Monthly Fee'
-        """, (contract_name), as_dict=True)
-        
-        found_dates = []
-        for row in paid_periods:
-            parts = row.billing_period.split('-')
-            found_dates.append(date(int(parts[1]), int(parts[0]), 1))
-        if found_dates: last_advance_date = max(found_dates)
+        # 3. Períodos con ANTICIPOS ya pagados (Sin factura aún)
+        # Agregamos el filtro por 'Monthly Fee' para no bloquear meses por otros cobros
+        paid_advances = frappe.db.sql("""
+            SELECT pri.billing_period 
+            FROM `tabPayment Receipt Item` pri
+            JOIN `tabPayment Receipt` pr ON pri.parent = pr.name
+            WHERE pr.service_contract = %s 
+            AND pri.payment_concept = 'Monthly Fee'
+            AND pr.docstatus = 1 
+            AND pri.billing_period IS NOT NULL
+        """, (contract_name,), as_dict=True)
 
-        start_point = last_debt_date
-        if last_advance_date and (not last_debt_date or last_advance_date > last_debt_date):
-            start_point = last_advance_date
+        for pa in paid_advances:
+            existing_periods.add(pa.billing_period)
 
-        # ------------------------------------------------------------------
-        # PASO 3: MAPEO DE AÑOS Y VALIDACIÓN INICIAL
-        # ------------------------------------------------------------------
-        open_years_map = { 
+        # 4. Mapa de Años Fiscales Abiertos
+        open_years_map = {
             int(y.year_name): y.name 
-            for y in frappe.get_all("Billing Year", filters={"is_closed": 0}, fields=["name", "year_name"]) 
+            for y in frappe.get_all(
+                "Billing Year",
+                filters={"is_closed": 0},
+                fields=["name", "year_name"])
         }
-        
-        if not start_point:
-            contract_start = getdate(contract.start_date)
-            min_y = min(open_years_map.keys())
-            start_point = contract_start if contract_start.year >= min_y else date(min_y, 1, 1)
-            current_date = add_months(start_point, -1)
-        else:
-            current_date = start_point
 
-        # ------------------------------------------------------------------
-        # PASO 4: GENERAR ADELANTOS CON FECHAS CALCULADAS
-        # ------------------------------------------------------------------
+        if not open_years_map:
+            return []
+
+        # 5. Lógica de inicio de escaneo
+        min_active_year = min(open_years_map.keys())
+        contract_start = getdate(contract.start_date)
+        
+        if contract_start.year < min_active_year:
+            current_date = date(min_active_year, 1, 1)
+        else:
+            current_date = date(contract_start.year, contract_start.month, 1)
+
+        # 6. Escaneo cronológico
         advances = []
         today_date = nowdate()
+        iterations = 0
+        max_limit = int(qty)
 
-        for i in range(int(qty)):
-            next_month_date = add_months(current_date, 1)
-            y_num = next_month_date.year
-            m_num = next_month_date.month
+        while len(advances) < max_limit and iterations < (max_limit * 3):
+            iterations += 1
+            y_num = current_date.year
+            m_num = current_date.month
+            period_id = current_date.strftime("%m-%Y")
 
-            # A. Verificar si el año está abierto
             fiscal_year_link = open_years_map.get(y_num)
-            if not fiscal_year_link: break
+            if not fiscal_year_link:
+                break
 
-            fiscal_month_str = month_names[m_num - 1]
+            # Si el periodo no está facturado ni pagado por anticipado, es elegible
+            if period_id not in existing_periods:
+                fiscal_month_str = month_names[m_num - 1]
 
-            # B. CALCULAR START_DATE Y END_DATE PARA EL PERIODO FUTURO
-            # Basado en la lógica del Billing Cycle
-            if start_day == 1:
-                period_start = date(y_num, m_num, 1)
-                # El último día del mes es el día 0 del mes siguiente
-                period_end = add_days(add_months(period_start, 1), -1)
-            else:
-                period_start = date(y_num, m_num, start_day)
-                period_end = add_days(add_months(period_start, 1), -1)
+                # Fechas de cobertura para el motor de cálculo
+                p_start = date(y_num, m_num, start_day)
+                p_end = add_days(add_months(p_start, 1), -1)
 
-            # C. LLAMADA AL MOTOR CON LOS 5 PARÁMETROS
-            breakdown = get_monthly_billing_breakdown(
-                contract_name = contract_name,
-                billing_month = fiscal_month_str, # "January"
-                billing_year  = fiscal_year_link,  # "BY-2026"
-                start_date    = period_start,     # Date object
-                end_date      = period_end        # Date object
-            )
-            
-            # D. Empaquetar resultados
-            advances.append({
-                "billing_period": next_month_date.strftime("%m-%Y"),
-                "month_num": m_num,
-                "month_label": "{0} {1}".format(_(month_names[m_num - 1]), y_num),
-                "year": y_num,
-                "due_date": today_date,
-                "amount": flt(breakdown.get("total_to_bill", 0)),
-                # PASAMOS ESTOS DOS CAMPOS NUEVOS:
-                "discount_amount": flt(breakdown.get("discount_amount", 0)),
-                "discount_percentage": flt(breakdown.get("discount_percentage", 0)),
-                "description": _("Monthly Fee: {0}").format(format_date(next_month_date, 'MMMM YYYY')),
-                "billing_details": breakdown.get("detailed_items", [])
-            })
-            
-            current_date = next_month_date
+                breakdown = get_monthly_billing_breakdown(
+                    contract_name=contract_name,
+                    billing_month=fiscal_month_str,
+                    billing_year=fiscal_year_link,
+                    start_date=p_start,
+                    end_date=p_end
+                )
+
+                advances.append({
+                    "billing_period": period_id,
+                    "month_num": m_num,
+                    "month_label": f"{_(fiscal_month_str)} {y_num}",
+                    "year": y_num,
+                    "due_date": today_date,
+                    "amount": flt(breakdown.get("total_to_bill", 0)),
+                    "discount_amount": flt(breakdown.get("discount_amount", 0)),
+                    "description": _("Advance Payment: {0}").format(
+                        format_date(current_date, 'MMMM YYYY')),
+                    "billing_details": breakdown.get("detailed_items", [])
+                })
+
+            current_date = add_months(current_date, 1)
 
         return advances
 

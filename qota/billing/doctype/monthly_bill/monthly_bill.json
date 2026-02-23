@@ -1,6 +1,5 @@
 {
  "actions": [],
- "allow_rename": 1,
  "autoname": "MBILL-.YY.-.MM.-.####",
  "creation": "2026-02-11 02:17:49.133356",
  "doctype": "DocType",
@@ -10,6 +9,7 @@
   "posting_date",
   "edit_posting_date",
   "service_contract",
+  "subscriber",
   "full_name",
   "premises",
   "column_break_4",
@@ -39,6 +39,7 @@
    "fieldname": "service_contract",
    "fieldtype": "Link",
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Service Contract",
    "options": "Service Contract",
    "reqd": 1
@@ -52,7 +53,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nSubmitted\nCancelled\nPaid",
+   "options": "Draft\nUnpaid\nCancelled\nPaid",
    "read_only": 1
   },
   {
@@ -110,8 +111,7 @@
    "fetch_from": "service_contract.full_name",
    "fieldname": "full_name",
    "fieldtype": "Data",
-   "label": "Subscriber Name",
-   "options": "Name",
+   "label": "Full Name / Company Name",
    "read_only": 1
   },
   {
@@ -172,13 +172,21 @@
    "fieldname": "edit_posting_date",
    "fieldtype": "Check",
    "label": "Edit Posting Date"
+  },
+  {
+   "fetch_from": "service_contract.subscriber",
+   "fieldname": "subscriber",
+   "fieldtype": "Link",
+   "label": "Subscriber ID",
+   "options": "Subscriber",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-12 02:41:26.710220",
+ "modified": "2026-02-22 20:12:24.537339",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Monthly Bill",
@@ -204,6 +212,23 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": [],
+ "states": [
+  {
+   "color": "Orange",
+   "title": "Draft"
+  },
+  {
+   "color": "Yellow",
+   "title": "Unpaid"
+  },
+  {
+   "color": "Red",
+   "title": "Cancelled"
+  },
+  {
+   "color": "Green",
+   "title": "Paid"
+  }
+ ],
  "title_field": "full_name"
 }

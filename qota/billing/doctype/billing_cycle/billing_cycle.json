@@ -14,17 +14,17 @@
   "posting_date",
   "edit_posting_date",
   "status",
+  "amended_from",
   "service_period_sb",
   "start_date",
   "column_break_7",
   "end_date",
-  "diagnostics_section",
-  "diagnostic_html",
   "summary_section",
   "total_generated",
   "column_break_11",
   "total_contracts",
-  "amended_from"
+  "issues_section",
+  "issues"
  ],
  "fields": [
   {
@@ -35,6 +35,7 @@
   {
    "fieldname": "fiscal_year",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Billing Year",
    "link_filters": "[[\"Billing Year\",\"is_closed\",\"=\",0]]",
    "options": "Billing Year",
@@ -84,8 +85,18 @@
    "label": "Coverage Period"
   },
   {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
    "fieldname": "column_break_7",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
   },
   {
    "fieldname": "summary_section",
@@ -95,7 +106,6 @@
   {
    "fieldname": "total_generated",
    "fieldtype": "Currency",
-   "in_list_view": 1,
    "label": "Total Amount Generated",
    "read_only": 1
   },
@@ -106,8 +116,20 @@
   {
    "fieldname": "total_contracts",
    "fieldtype": "Int",
-   "in_list_view": 1,
    "label": "Total Contracts Processed",
+   "read_only": 1
+  },
+  {
+   "description": "Contracts that could not be billed during this cycle.",
+   "fieldname": "issues_section",
+   "fieldtype": "Section Break",
+   "label": "Execution Issues"
+  },
+  {
+   "fieldname": "issues",
+   "fieldtype": "Table",
+   "label": "Billing Issues",
+   "options": "Billing Cycle Issue",
    "read_only": 1
   },
   {
@@ -117,41 +139,20 @@
    "no_copy": 1,
    "options": "Billing Cycle",
    "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "edit_posting_date",
    "fieldtype": "Check",
    "label": "Edit Posting Date"
-  },
-  {
-   "fieldname": "start_date",
-   "fieldtype": "Date",
-   "label": "Start Date"
-  },
-  {
-   "fieldname": "end_date",
-   "fieldtype": "Date",
-   "label": "End Date"
-  },
-  {
-   "fieldname": "diagnostics_section",
-   "fieldtype": "Section Break",
-   "hidden": 1,
-   "label": "Diagnostics"
-  },
-  {
-   "fieldname": "diagnostic_html",
-   "fieldtype": "HTML"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-11 23:35:33.277873",
+ "modified": "2026-02-18 00:50:46.969901",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing Cycle",
