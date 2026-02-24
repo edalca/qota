@@ -6,7 +6,7 @@ frappe.ui.form.on("Meter Reading", {
 		// 1. Filtro personalizado para buscar solo contratos medidos y activos
 		frm.set_query("service_contract", function () {
 			return {
-				query: "qota.billing.doctype.service_contract.service_contract.contract_search",
+				query: "qota.governance.doctype.service_contract.service_contract.service_contract_query",
 				filters: {
 					billing_basis: "Metered",
 					docstatus: 1,

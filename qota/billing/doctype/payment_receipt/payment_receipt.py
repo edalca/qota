@@ -24,16 +24,12 @@ class PaymentReceipt(Document):
 
     if TYPE_CHECKING:
         from frappe.types import DF
-        from qota.billing.doctype.payment_receipt_item.payment_receipt_item import (
-            PaymentReceiptItem
-        )
+        from qota.billing.doctype.payment_receipt_item.payment_receipt_item import PaymentReceiptItem
+
         amended_from: DF.Link | None
         current_debt: DF.Currency
         full_name: DF.Data | None
-        mode_of_payment: DF.Literal["Cash",
-                                    "Bank Transfer",
-                                    "Check",
-                                    "Credit Card"]
+        mode_of_payment: DF.Literal["Cash", "Bank Transfer", "Check", "Credit Card"]
         payment_date: DF.Datetime
         payment_items: DF.Table[PaymentReceiptItem]
         premises: DF.Link | None
@@ -135,39 +131,30 @@ class PaymentReceipt(Document):
 
     def process_ledger_updates(self, cancel=False):
         for item in self.payment_items:
-            # 1. Si estamos en Submit, nos aseguramos de que el balance inicial 
-            # sea igual al monto si es que viene vacío.
             if not cancel and flt(item.balance) == 0:
                 item.balance = item.amount
 
-            # Solo procesamos si el ítem está vinculado a una deuda existente
             if item.debt_ledger_entry:
-                debt = frappe.get_doc("Debt Ledger Entry", item.debt_ledger_entry)
-                
-                # Monto que realmente se puede aplicar (el menor entre el balance y la deuda)
-                # Esto previene que la deuda quede en negativo
-                amount_to_apply = min(flt(item.balance), flt(debt.outstanding_amount))
+                debt = frappe.get_doc("Debt Ledger Entry",
+                                      item.debt_ledger_entry)
+
+                amount_to_apply = (
+                    min(flt(item.balance),
+                        flt(debt.outstanding_amount))
+                )
 
                 if cancel:
-                    # CASO CANCELAR: 
-                    # Lo que estaba 'pagado' en la deuda vuelve al balance del item
-                    # (Usamos el monto que se aplicó originalmente, que es item.amount - item.balance)
                     applied_in_this_item = flt(item.amount) - flt(item.balance)
-                    
                     debt.outstanding_amount += applied_in_this_item
                     debt.paid_amount -= applied_in_this_item
-                    
-                    # Restauramos el balance total del ítem
                     item.balance = item.amount
                 else:
-                    # CASO SUBMIT:
                     if amount_to_apply <= 0:
-                        continue # Si la deuda ya estaba pagada por otro ítem, saltamos
-                    
+                        continue
+
                     debt.outstanding_amount -= amount_to_apply
                     debt.paid_amount += amount_to_apply
-                    
-                    # RESTAMOS del balance del ítem lo que usamos para la deuda
+
                     item.balance = flt(item.balance) - amount_to_apply
 
                 # --- Gestión de Estados de la Deuda ---
@@ -181,7 +168,7 @@ class PaymentReceipt(Document):
                 # Guardar cambios en la Deuda
                 debt.flags.ignore_validate_update_after_submit = True
                 debt.save(ignore_permissions=True)
-                
+
                 # Guardar el nuevo balance en el ítem del recibo
                 item.db_set("balance", item.balance)
 
@@ -202,81 +189,77 @@ class PaymentReceipt(Document):
         self.total_to_pay = total_to_pay
         self.unallocated_amount = unallocated_amount
 
-        self.total_pending = flt(self.current_debt) - total_to_pay + unallocated_amount
+        self.total_pending = (
+            flt(self.current_debt) - total_to_pay
+            + unallocated_amount
+        )
 
     @frappe.whitelist()
     @staticmethod
-    def get_next_billing_advances(self,contract_name, qty=12):
+    def get_next_billing_advances(
+        self,
+        contract_name,
+        qty=12,
+        ignore_existing=False
+    ):
         """
-        Calculate next available billing periods for advances.
-        Blocks periods already in the Debt Ledger OR already paid as
-        a Monthly Fee.
+        Calculate billing periods for advances or full cycle (Talonario).
         """
         from qota.billing.utils import get_monthly_billing_breakdown
 
-        # 1. Configuración inicial
         contract = frappe.get_doc("Service Contract", contract_name)
         settings = frappe.get_single("Billing Settings")
         start_day = int(settings.cycle_start_day or 1)
+
         month_names = [
-            "January", "February", "March", "April", "May", "June", 
+            "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ]
 
-        # 2. Períodos con DEUDA generada (Facturados)
-        existing_periods = set(frappe.get_all(
-            "Debt Ledger Entry",
-            filters={
+        existing_periods = set()
+        if not ignore_existing:
+            debts = frappe.get_all("Debt Ledger Entry", filters={
                 "service_contract": contract_name,
                 "entry_type": "Monthly Fee",
                 "docstatus": ["!=", 2]
-            },
-            pluck="billing_period"
-        ))
+            }, pluck="billing_period")
+            existing_periods.update(debts)
 
-        # 3. Períodos con ANTICIPOS ya pagados (Sin factura aún)
-        # Agregamos el filtro por 'Monthly Fee' para no bloquear meses por otros cobros
-        paid_advances = frappe.db.sql("""
-            SELECT pri.billing_period 
-            FROM `tabPayment Receipt Item` pri
-            JOIN `tabPayment Receipt` pr ON pri.parent = pr.name
-            WHERE pr.service_contract = %s 
-            AND pri.payment_concept = 'Monthly Fee'
-            AND pr.docstatus = 1 
-            AND pri.billing_period IS NOT NULL
-        """, (contract_name,), as_dict=True)
+            paid = frappe.db.sql("""
+                SELECT pri.billing_period
+                FROM `tabPayment Receipt Item` pri
+                JOIN `tabPayment Receipt` pr ON pri.parent = pr.name
+                WHERE pr.service_contract = %s
+                AND pri.payment_concept = 'Monthly Fee'
+                AND pr.docstatus = 1 AND pri.billing_period IS NOT NULL
+            """, (contract_name,), as_dict=True)
+            for pa in paid:
+                existing_periods.add(pa.billing_period)
 
-        for pa in paid_advances:
-            existing_periods.add(pa.billing_period)
-
-        # 4. Mapa de Años Fiscales Abiertos
-        open_years_map = {
-            int(y.year_name): y.name 
-            for y in frappe.get_all(
-                "Billing Year",
-                filters={"is_closed": 0},
-                fields=["name", "year_name"])
-        }
+        # 3. Mapa de Años Fiscales Abiertos
+        open_years = frappe.get_all(
+            "Billing Year",
+            filters={"is_closed": 0},
+            fields=["name", "year_name"]
+        )
+        open_years_map = {int(y.year_name): y.name for y in open_years}
 
         if not open_years_map:
             return []
 
-        # 5. Lógica de inicio de escaneo
-        min_active_year = min(open_years_map.keys())
-        contract_start = getdate(contract.start_date)
-        
-        if contract_start.year < min_active_year:
-            current_date = date(min_active_year, 1, 1)
+        min_year = min(open_years_map.keys())
+        if ignore_existing:
+            current_date = date(min_year, 1, 1)
         else:
-            current_date = date(contract_start.year, contract_start.month, 1)
+            contract_start = getdate(contract.start_date)
+            start_year = max(contract_start.year, min_year)
+            current_date = date(start_year, contract_start.month, 1)
 
-        # 6. Escaneo cronológico
         advances = []
         today_date = nowdate()
         iterations = 0
-        max_limit = int(qty)
 
-        while len(advances) < max_limit and iterations < (max_limit * 3):
+        while len(advances) < int(qty) and iterations < (int(qty) * 2):
             iterations += 1
             y_num = current_date.year
             m_num = current_date.month
@@ -286,17 +269,14 @@ class PaymentReceipt(Document):
             if not fiscal_year_link:
                 break
 
-            # Si el periodo no está facturado ni pagado por anticipado, es elegible
-            if period_id not in existing_periods:
-                fiscal_month_str = month_names[m_num - 1]
-
-                # Fechas de cobertura para el motor de cálculo
+            if ignore_existing or (period_id not in existing_periods):
+                month_str = month_names[m_num - 1]
                 p_start = date(y_num, m_num, start_day)
                 p_end = add_days(add_months(p_start, 1), -1)
 
                 breakdown = get_monthly_billing_breakdown(
                     contract_name=contract_name,
-                    billing_month=fiscal_month_str,
+                    billing_month=month_str,
                     billing_year=fiscal_year_link,
                     start_date=p_start,
                     end_date=p_end
@@ -305,7 +285,7 @@ class PaymentReceipt(Document):
                 advances.append({
                     "billing_period": period_id,
                     "month_num": m_num,
-                    "month_label": f"{_(fiscal_month_str)} {y_num}",
+                    "month_label": f"{_(month_str)} {y_num}",
                     "year": y_num,
                     "due_date": today_date,
                     "amount": flt(breakdown.get("total_to_bill", 0)),

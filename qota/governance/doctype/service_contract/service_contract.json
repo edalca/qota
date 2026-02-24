@@ -12,20 +12,14 @@
   "subscriber",
   "full_name",
   "premises",
-  "column_break_4",
-  "service_category",
-  "billing_basis",
-  "status",
-  "amended_from",
-  "connection_charges_section",
   "timeline_column",
   "start_date",
+  "billing_basis",
+  "service_category",
+  "status",
   "end_date",
   "last_status_change",
-  "connection_charges_column",
-  "connection_fee",
-  "total_connection_fee",
-  "connection_fee_posted",
+  "amended_from",
   "meter_section",
   "meter_id",
   "column_break_lffv",
@@ -69,10 +63,6 @@
    "width": "400px"
   },
   {
-   "fieldname": "column_break_4",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "service_category",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -107,13 +97,8 @@
    "search_index": 1
   },
   {
-   "fieldname": "connection_charges_section",
-   "fieldtype": "Section Break"
-  },
-  {
    "fieldname": "timeline_column",
-   "fieldtype": "Column Break",
-   "label": "Timeline"
+   "fieldtype": "Column Break"
   },
   {
    "default": "Today",
@@ -134,35 +119,6 @@
    "fieldname": "last_status_change",
    "fieldtype": "Date",
    "label": "Last Status Change",
-   "read_only": 1
-  },
-  {
-   "fieldname": "connection_charges_column",
-   "fieldtype": "Column Break",
-   "label": "Connection Charges"
-  },
-  {
-   "description": "Select the applicable tariff for the new service installation.",
-   "fieldname": "connection_fee",
-   "fieldtype": "Link",
-   "label": "Connection Fee",
-   "options": "Connection Fee",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "connection_fee.total_fee",
-   "fieldname": "total_connection_fee",
-   "fieldtype": "Data",
-   "label": "Total Connection Fee",
-   "read_only": 1
-  },
-  {
-   "default": "0",
-   "description": "Automatically checked when the connection fee is posted to the Debt Ledger.",
-   "fieldname": "connection_fee_posted",
-   "fieldtype": "Check",
-   "label": "Connection Fee Posted",
-   "no_copy": 1,
    "read_only": 1
   },
   {
@@ -212,7 +168,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-23 10:16:34.190933",
+ "modified": "2026-02-23 22:04:58.892430",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Service Contract",

@@ -5,7 +5,7 @@ frappe.ui.form.on('Payment Receipt', {
     setup: function (frm) {
         frm.set_query("service_contract", function () {
             return {
-                query: "qota.billing.doctype.service_contract.service_contract.contract_search",
+                query: "qota.governance.doctype.service_contract.service_contract.service_contract_query",
                 filters: { docstatus: 1, status: "Active" },
             };
         });

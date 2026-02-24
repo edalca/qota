@@ -142,7 +142,7 @@
 {% set sub_doc = frappe.get_doc("Subscriber", doc.subscriber) if doc.subscriber else None %}
 
 {# LLAMADA DINÁMICA A LOS MESES PENDIENTES #}
-{% set advances = frappe.get_doc({"doctype": "Payment Receipt"}).get_next_billing_advances(doc.name, 12) %}
+{% set advances = frappe.get_doc({"doctype": "Payment Receipt"}).get_next_billing_advances(doc.name, 12,true) %}
 
 <div class="page-container">
     {% for adv in advances %}
