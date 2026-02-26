@@ -1,7 +1,6 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "SUS-.YY.-.#####",
+ "autoname": "SUS-.YY.-.####",
  "creation": "2026-02-18 14:06:38.390428",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -65,7 +64,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Suspension Type",
-   "options": "Voluntary\nInvoluntary",
+   "options": "Administrative\nBy Request",
    "reqd": 1
   },
   {
@@ -73,7 +72,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Reason",
-   "options": "Unpaid Debt\nMoving Out\nEmpty House\nTemporary Absence\nOther",
+   "options": "Arrears\nSubscriber Request\nFraud / Bypass\nSanction\nMaintenance\nOther",
    "reqd": 1
   },
   {
@@ -82,7 +81,7 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Draft\nScheduled\nExecuted\nReconnected",
+   "options": "Draft\nScheduled\nExecuted",
    "read_only": 1
   },
   {
@@ -130,6 +129,8 @@
    "fetch_from": "service_contract.premises",
    "fieldname": "premises",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Premises",
    "options": "Premises",
    "read_only": 1
@@ -147,7 +148,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-23 09:34:05.052602",
+ "modified": "2026-02-25 21:13:53.630553",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Service Suspension",
@@ -178,16 +179,13 @@
    "title": "Draft"
   },
   {
-   "color": "Yellow",
+   "color": "Gray",
    "title": "Scheduled"
   },
   {
-   "color": "Green",
-   "title": "Executed"
-  },
-  {
    "color": "Blue",
-   "title": "Reconnected"
+   "title": "Executed"
   }
- ]
+ ],
+ "title_field": "full_name"
 }

@@ -9,6 +9,18 @@
   {
    "child": 0,
    "collapsible": 1,
+   "icon": "home",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Governance",
+   "link_type": "Workspace",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
    "icon": "droplets",
    "indent": 0,
    "keep_closed": 0,
@@ -26,6 +38,18 @@
    "keep_closed": 0,
    "label": "Service Suspension",
    "link_to": "Service Suspension",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "droplet",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Service Reconnection",
+   "link_to": "Service Reconnection",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -55,7 +79,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-02-23 09:13:11.921955",
+ "modified": "2026-02-26 00:40:48.451585",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Governance",

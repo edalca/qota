@@ -31,6 +31,7 @@ class ServiceContract(Document):
         start_reading: DF.Float
         status: DF.Literal["Active", "Suspended", "Closed", "Cancelled"]
         subscriber: DF.Link
+        suspension_reason: DF.Data | None
     # end: auto-generated types
 
     def validate(self):
@@ -95,9 +96,17 @@ class ServiceContract(Document):
 
 
 @frappe.whitelist()
-def update_contract_property(service_contract, update_type, data):
+def update_contract_property(
+    service_contract: str,
+    update_type: str,
+    data
+) -> str:
     """
     Whitelisted function for quick UI updates via Modals.
+
+    Now supports tracking specific reasons for suspension to
+    provide better visibility in the Service Contract list.
+
     Args:
         service_contract (str): The name of the Service Contract.
         update_type (str): Type of update (Cistern, Billing, Status).
@@ -126,14 +135,27 @@ def update_contract_property(service_contract, update_type, data):
         doc.add_log_entry("Billing Basis Change", "Billing Basis", description)
 
     elif update_type == "Status":
-        doc.status = data.get("new_status")
+        new_status = data.get("new_status")
+        doc.status = new_status
         doc.last_status_change = op_date
-        if doc.status == "Closed":
+
+        # New parameter handling:
+        # Stores the specific reason (Maintenance, Arrears, etc.)
+        # Clears it if the status returns to 'Active'
+        if new_status == "Suspended":
+            doc.suspension_reason = data.get("suspension_reason")
+        else:
+            doc.suspension_reason = ""
+
+        if new_status == "Closed":
             doc.end_date = op_date
-        doc.add_log_entry("Status Change", "Contract Status", description)
+
+        doc.add_log_entry("Status Change", f"Status: {new_status}",
+                          description)
 
     doc.flags.ignore_permissions = True
     doc.save()
+
     return _("Contract updated successfully")
 
 

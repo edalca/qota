@@ -31,7 +31,7 @@ class BillingSettings(Document):
         max_discounts_per_subscriber: DF.Int
         min_debt_for_suspension: DF.Currency
         reading_window_days: DF.Int
-        reconnection_fee_item: DF.Int
+        reconnection_fee_item: DF.Currency
         separate_cistern_fee: DF.Check
         show_debt_details: DF.Check
         suspension_months_limit: DF.Int

@@ -69,7 +69,15 @@ frappe.ui.form.on("Service Contract", {
 				__("Actions"),
 			);
 		}
+		if (frm.doc.docstatus === 1) {
 
+			// ACTION: View History Log (NUEVO)
+			frm.add_custom_button(
+				__("View History Log"),
+				() => frm.events.show_history_log(frm),
+				__("Actions")
+			);
+		}
 		// 2. Actions for Active/Suspended contracts
 		// Solo permitimos acciones si NO está cerrado o cancelado
 		const terminal_statuses = ["Closed", "Cancelled"];
@@ -245,6 +253,79 @@ frappe.ui.form.on("Service Contract", {
 			qota.utils.set_premises_description(frm);
 		}
 	},
+
+    show_history_log: function(frm) {
+        frappe.db.get_list("Service Contract Log", {
+            filters: {
+                "service_contract": frm.doc.name
+            },
+            // Using your exact JSON fields:
+            fields: ["operation_date", "change_type", "field_changed", "description", "owner"],
+            order_by: "operation_date desc",
+            limit: 50
+        }).then(logs => {
+            if (!logs || logs.length === 0) {
+                frappe.msgprint({
+                    title: __("Contract History"),
+                    indicator: "blue",
+                    message: __("No audit records found for this contract.")
+                });
+                return;
+            }
+
+            let html = `
+                <table class="table table-bordered table-condensed" style="font-size: 13px;">
+                    <thead>
+                        <tr class="active">
+                            <th style="width: 15%">${__("Op. Date")}</th>
+                            <th style="width: 20%">${__("Change Type")}</th>
+                            <th style="width: 20%">${__("Field")}</th>
+                            <th style="width: 30%">${__("Description")}</th>
+                            <th style="width: 15%">${__("User")}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            logs.forEach(log => {
+                // Color mapping based on your Select options
+                let label_class = "label-default";
+                if (log.change_type === "Status Change") label_class = "label-warning";
+                if (log.change_type === "Cistern Update") label_class = "label-info";
+                if (log.change_type === "Billing Basis Change") label_class = "label-primary";
+
+                html += `
+                    <tr>
+                        <td>${frappe.datetime.str_to_user(log.operation_date)}</td>
+                        <td><span class="label ${label_class}">${__(log.change_type)}</span></td>
+                        <td><code style="font-size: 11px;">${log.field_changed || "-"}</code></td>
+                        <td>${log.description || ""}</td>
+                        <td><small class="text-muted">${log.owner}</small></td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+
+            let d = new frappe.ui.Dialog({
+                title: __("Operation Log - {0}", [frm.doc.name]),
+                size: "large",
+                fields: [
+                    {
+                        fieldname: "history_html",
+                        fieldtype: "HTML",
+                        options: html
+                    }
+                ],
+                primary_action_label: __("Close"),
+                primary_action() {
+                    d.hide();
+                }
+            });
+
+            d.show();
+        });
+    },
 
 	call_update_method: function (frm, type, data) {
 		frappe.call({

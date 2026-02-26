@@ -4,12 +4,12 @@
 frappe.ui.form.on("Service Suspension", {
     onload(frm) {
         frm.set_query("service_contract", function() {
-            return {
-                filters: {
-                    status: "Active"
-                }
+           return {
+                query: "qota.governance.doctype.service_contract.service_contract.service_contract_query",
+                filters: { docstatus: 1, status: "Active" },
             };
         });
+         frm.events.filter_reasons(frm);
     },
     refresh(frm) {
         if (window.qota && qota.utils && qota.utils.set_premises_description) {
@@ -20,6 +20,27 @@ frappe.ui.form.on("Service Suspension", {
                 frm.events.open_execution_dialog(frm);
             }, __('Actions'));
         }
+    },
+    suspension_type: function(frm) {
+        if (frm.doc.suspension_type === "By Request") {
+            // Seteo automático y limpieza de filtros
+            frm.set_value("reason", "Subscriber Request");
+            frm.set_df_property("reason", "read_only", 1);
+        } else {
+            frm.set_df_property("reason", "read_only", 0);
+            frm.set_value("reason", ""); // Limpiar para que elija una razón admin
+        }
+        frm.events.filter_reasons(frm);
+    },
+    filter_reasons: function(frm) {
+        // Limitamos las opciones del Select dinámicamente
+        let options = [];
+        if (frm.doc.suspension_type === "Administrative") {
+            options = ["Arrears", "Fraud / Bypass", "Sanction", "Maintenance", "Other"];
+        } else if (frm.doc.suspension_type === "By Request") {
+            options = ["Subscriber Request"];
+        }
+        frm.set_df_property("reason", "options", options);
     },
     premises(frm) {
         if (window.qota && qota.utils && qota.utils.set_premises_description) {

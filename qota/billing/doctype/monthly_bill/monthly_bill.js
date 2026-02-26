@@ -2,6 +2,14 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Monthly Bill", {
+    onload(frm) {  
+        frm.set_query("service_contract", function () {
+            return {
+                query: "qota.governance.doctype.service_contract.service_contract.service_contract_query",
+                filters: { docstatus: 1, status: "Active" },
+            };
+        });
+    },
     refresh(frm) {
         // UI Helper for premises description
         if (window.qota && qota.utils && qota.utils.set_premises_description) {

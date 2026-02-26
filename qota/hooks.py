@@ -16,10 +16,9 @@ app_logo_url = "/assets/qota/logo.svg"
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
     {
-        "name": "billing",
+        "name": "Qota",
         "logo": app_logo_url,
-        "title": "Billing",
-        "route": "/desk/payment-receipt",
+        "title": "Qota",
       }
  ]
 
@@ -260,4 +259,4 @@ fixtures = [
 # Translation
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
-ignore_translatable_strings_from = ["frappe"]
+# ignore_translatable_strings_from = []

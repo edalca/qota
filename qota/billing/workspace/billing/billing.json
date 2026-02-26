@@ -1,7 +1,7 @@
 {
  "app": "qota",
  "charts": [],
- "content": "[{\"id\":\"h1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Panel de Facturaci\u00f3n</span>\",\"col\":12}},{\"id\":\"-6yLd95S0z\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Monthly Payment Summary\",\"col\":4}},{\"id\":\"XOfRT1XT8q\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Unpaid Monthly Bills Total\",\"col\":4}},{\"id\":\"pJeOBGANXs\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Advance Payments Summary\",\"col\":4}},{\"id\":\"4ikPlDIt38\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Acceso Directo</span>\",\"col\":12}},{\"id\":\"8gYgmjTvvp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payment Receipt\",\"col\":4}},{\"id\":\"6CyQJkGHYz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Monthly Bill\",\"col\":4}},{\"id\":\"vmgd8KbXUM\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Contract\",\"col\":4}},{\"id\":\"zr5F9BEUsH\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Billing Continuity Monitor\",\"col\":12}}]",
+ "content": "[{\"id\":\"h1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Billing Dashboard</span>\",\"col\":12}},{\"id\":\"-6yLd95S0z\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Monthly Payment Summary\",\"col\":4}},{\"id\":\"XOfRT1XT8q\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Unpaid Monthly Bills Total\",\"col\":4}},{\"id\":\"pJeOBGANXs\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Advance Payments Summary\",\"col\":4}},{\"id\":\"4ikPlDIt38\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Shortcut</span>\",\"col\":12}},{\"id\":\"8gYgmjTvvp\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Payment Receipt\",\"col\":4}},{\"id\":\"6CyQJkGHYz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Monthly Bill\",\"col\":4}},{\"id\":\"vmgd8KbXUM\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Contract\",\"col\":4}},{\"id\":\"zr5F9BEUsH\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Billing Continuity Monitor\",\"col\":12}}]",
  "creation": "2026-02-20 01:37:50.819766",
  "custom_blocks": [
   {
@@ -17,7 +17,7 @@
  "is_hidden": 0,
  "label": "Billing",
  "links": [],
- "modified": "2026-02-23 08:41:38.023484",
+ "modified": "2026-02-26 01:30:11.183903",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing",
