@@ -16,13 +16,14 @@ from frappe.utils import (
 )
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from qota.billing.doctype.service_contract.service_contract import (
+    from qota.governance.doctype.service_contract.service_contract import (
         ServiceContract
     )
     from qota.billing.doctype.service_rate.service_rate import ServiceRate
     from qota.billing.doctype.billing_settings.billing_settings import (
         BillingSettings
     )
+
 
 @frappe.whitelist()
 def get_monthly_billing_breakdown(
@@ -167,8 +168,9 @@ def calculate_flat_rate(
 
     if settings.separate_cistern_fee:
         detailed_items.append({
-            "description": _("{0} (Flat Rate - {1})")
+            "description": ("{0} ({1} - {2})")
             .format(settings.water_service_label,
+                    _("Flat Rate"),
                     service_rate.rate_name) + suffix,
             "amount": base_price
         })
@@ -177,8 +179,8 @@ def calculate_flat_rate(
                                    "amount": cistern_fee})
     else:
         detailed_items.append({
-            "description": _("{0} (Flat Rate)")
-            .format(settings.water_service_label) + suffix,
+            "description": ("{0} ({1})")
+            .format(settings.water_service_label, _("Flat Rate")) + suffix,
             "amount": base_price + cistern_fee
         })
 
@@ -422,64 +424,79 @@ def finalize_breakdown(base_results, discount_pct, total_fixed, rules):
 def get_billing_gaps():
     """
     Identifies contracts missed during completed Billing Cycles.
-    Logic:
-    1. Look for 'Completed' Billing Cycles in open years.
-    2. For each cycle, find contracts that were active during its period.
-    3. If the contract has no 'Monthly Bill' for that cycle's month/year,
-    it's a gap.
+    Respects activity gaps (reactivation_date) and
+    suspension periods (suspended_since).
     """
-    # 1. Get open years
+    from frappe.utils import getdate
+
+    # 1. Traer Años Abiertos
     open_years = frappe.get_all("Billing Year",
                                 filters={"is_closed": 0},
                                 pluck="name")
     if not open_years:
         return []
 
-    completed_cycles = frappe.get_all("Billing Cycle",
-                                      filters={
-                                          "status": "Completed",
-                                          "fiscal_year": ["in", open_years],
-                                          "docstatus": 1},
-                                      fields=[
-                                                "fiscal_year",
-                                                "fiscal_month",
-                                                "start_date",
-                                                "end_date"])
-
+    completed_cycles = frappe.get_all(
+        "Billing Cycle",
+        filters={
+            "status": "Completed",
+            "fiscal_year": ["in", open_years],
+            "docstatus": 1
+        },
+        fields=["fiscal_year", "fiscal_month", "start_date", "end_date"]
+    )
     if not completed_cycles:
         return []
 
+    contracts = frappe.get_all(
+        "Service Contract",
+        filters={"status": ["in", ["Active", "Suspended"]], "docstatus": 1},
+        fields=["name", "full_name", "start_date", "reactivation_date",
+                "suspended_since", "status"]
+    )
+
+    existing_bills = frappe.get_all(
+        "Monthly Bill",
+        filters={"fiscal_year": ["in", open_years], "docstatus": ["!=", 2]},
+        fields=["service_contract", "fiscal_year", "fiscal_month"]
+    )
+    billed_lookup = {(b.service_contract, b.fiscal_year, b.fiscal_month)
+                     for b in existing_bills}
+
     gaps = []
 
+    # 5. Lógica de Negocio en Python
     for cycle in completed_cycles:
-        cycle_end = getdate(cycle.end_date)
+        c_start = getdate(cycle.start_date)
+        c_end = getdate(cycle.end_date)
 
-        missing = frappe.db.sql("""
-            SELECT
-                sc.name as contract,
-                sc.full_name,
-                sc.start_date
-            FROM `tabService Contract` sc
-            WHERE sc.status = 'Active'
-            AND sc.docstatus = 1
-            AND sc.start_date <= %s
-            AND sc.name NOT IN (
-                SELECT service_contract
-                FROM `tabMonthly Bill`
-                WHERE fiscal_year = %s
-                AND fiscal_month = %s
-                AND docstatus != 2
-            )
-        """, (cycle_end, cycle.fiscal_year, cycle.fiscal_month), as_dict=1)
+        for c in contracts:
+            # Calcular Fecha Efectiva
+            start = getdate(c.start_date)
+            # Si no hay reactivation_date, usamos el start_date
+            reactivation = (getdate(c.reactivation_date)
+                            if c.reactivation_date else start)
 
-        for m in missing:
-            gaps.append({
-                "contract": m.contract,
-                "full_name": m.full_name,
-                "year": cycle.fiscal_year,
-                "month": cycle.fiscal_month,
-                "period": f"{cycle.fiscal_month} {cycle.fiscal_year}"
-            })
+            effective_start = max(start, reactivation)
+
+            if c.status == "Suspended" and c.suspended_since:
+                if getdate(c.suspended_since) <= c_start:
+                    continue
+
+            if effective_start <= c_end:
+                # Si NO está en nuestro Set de facturas existentes, es un GAP
+                if (
+                    (c.name, cycle.fiscal_year, cycle.fiscal_month)
+                    not in billed_lookup
+                ):
+                    gaps.append({
+                        "contract": c.name,
+                        "full_name": c.full_name,
+                        "year": cycle.fiscal_year,
+                        "month": cycle.fiscal_month,
+                        "period": _("{0} {1}")
+                        .format(_(cycle.fiscal_month), cycle.fiscal_year)
+                    })
 
     return gaps
 

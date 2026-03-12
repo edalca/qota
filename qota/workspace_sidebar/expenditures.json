@@ -1,0 +1,41 @@
+{
+ "app": "qota",
+ "creation": "2026-03-12 09:05:01.917673",
+ "docstatus": 0,
+ "doctype": "Workspace Sidebar",
+ "header_icon": "money-coins-1",
+ "idx": 0,
+ "items": [
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "banknote",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Expense Voucher",
+   "link_to": "Expense Voucher",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "child": 0,
+   "collapsible": 1,
+   "icon": "book-copy",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Expense Category",
+   "link_to": "Expense Category",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-03-12 09:20:01.643034",
+ "modified_by": "Administrator",
+ "module": "Expenditures",
+ "name": "Expenditures",
+ "owner": "Administrator",
+ "standard": 1,
+ "title": "Expenditures"
+}

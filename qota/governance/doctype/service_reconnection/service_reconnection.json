@@ -6,7 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "general_section",
-  "service_contract",
+  "service_suspension",
   "subscriber",
   "full_name",
   "premises",
@@ -28,15 +28,7 @@
    "label": "General Information"
   },
   {
-   "fieldname": "service_contract",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Service Contract",
-   "options": "Service Contract",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "service_contract.subscriber",
+   "fetch_from": "service_suspension.subscriber",
    "fieldname": "subscriber",
    "fieldtype": "Link",
    "label": "Subscriber",
@@ -44,7 +36,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "service_contract.full_name",
+   "fetch_from": "service_suspension.full_name",
    "fieldname": "full_name",
    "fieldtype": "Data",
    "label": "Full Name",
@@ -72,7 +64,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "service_contract.premises",
+   "fetch_from": "service_suspension.premises",
    "fieldname": "premises",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -125,13 +117,22 @@
    "options": "Service Reconnection",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "service_suspension",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Suspension",
+   "link_filters": "[[\"Service Suspension\",\"docstatus\",\"=\",\"1\"],[\"Service Suspension\",\"status\",\"=\",\"Executed\"]]",
+   "options": "Service Suspension",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-25 21:12:12.815459",
+ "modified": "2026-03-03 15:33:30.298074",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Service Reconnection",

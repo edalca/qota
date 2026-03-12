@@ -23,14 +23,15 @@ class ServiceContract(Document):
         end_date: DF.Date | None
         full_name: DF.Data | None
         has_cistern: DF.Check
-        last_status_change: DF.Date | None
         meter_id: DF.Data | None
         premises: DF.Link
+        reactivation_date: DF.Date | None
         service_category: DF.Link
         start_date: DF.Date
         start_reading: DF.Float
         status: DF.Literal["Active", "Suspended", "Closed", "Cancelled"]
         subscriber: DF.Link
+        suspended_since: DF.Date | None
         suspension_reason: DF.Data | None
     # end: auto-generated types
 
@@ -65,9 +66,8 @@ class ServiceContract(Document):
                 frappe.throw(msg.format(self.premises, existing))
 
     def activate_contract(self):
-        """Sets the contract status to Active and updates the timestamp."""
+        """Sets the contract status to Active"""
         self.db_set("status", "Active")
-        self.db_set("last_status_change", today())
 
     def create_activation_log(self):
         """Creates a log entry for the initial activation."""
@@ -78,9 +78,8 @@ class ServiceContract(Document):
         )
 
     def process_cancellation(self):
-        """Updates status and logs the cancellation date."""
+        """Updates status"""
         self.db_set("status", "Cancelled")
-        self.db_set("last_status_change", today())
 
     def add_log_entry(self, change_type, field, description, op_date=None):
         """
@@ -137,7 +136,6 @@ def update_contract_property(
     elif update_type == "Status":
         new_status = data.get("new_status")
         doc.status = new_status
-        doc.last_status_change = op_date
 
         # New parameter handling:
         # Stores the specific reason (Maintenance, Arrears, etc.)
@@ -150,7 +148,8 @@ def update_contract_property(
         if new_status == "Closed":
             doc.end_date = op_date
 
-        doc.add_log_entry("Status Change", f"Status: {new_status}",
+        doc.add_log_entry("Status Change",
+                          _("Status: {0}").format(_(new_status)),
                           description)
 
     doc.flags.ignore_permissions = True

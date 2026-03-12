@@ -115,8 +115,11 @@ class MonthlyBill(Document):
 
     def validate_sequence(self, throw_error: bool = True) -> Optional[str]:
         """
-        Ensures billing continuity according to contract start and open years.
+        Ensures billing continuity.
+        Validates that the previous month is billed ONLY if the contract was active.
         """
+        from frappe.utils import getdate
+
         month_map = {
             "January": 1, "February": 2, "March": 3, "April": 4,
             "May": 5, "June": 6, "July": 7, "August": 8,
@@ -124,71 +127,70 @@ class MonthlyBill(Document):
         }
         rev_month_map = {v: k for k, v in month_map.items()}
 
-        curr_month_val = month_map.get(self.fiscal_month)
-        curr_year_str = frappe.db.get_value(
-            "Billing Year", self.fiscal_year, "year_name"
-        )
+        # 1. Obtener Metadatos del Contrato
+        # Traemos start_date y reactivation_date en un solo viaje
+        contract_data = frappe.db.get_value("Service Contract", self.service_contract, 
+            ["start_date", "reactivation_date"], as_dict=1)
 
-        if not curr_year_str:
+        if not contract_data:
             return None
 
-        curr_idx = (int(curr_year_str) * 12) + curr_month_val
-        c_start_date = frappe.db.get_value(
-            "Service Contract", self.service_contract, "start_date"
-        )
+        # 2. Determinar Fecha Efectiva de Inicio de Facturación
+        start = getdate(contract_data.start_date)
+        reactivation = getdate(contract_data.reactivation_date) if contract_data.reactivation_date else start
+        
+        # El contrato es obligatorio de facturar a partir del mayor de estos dos
+        effective_start = max(start, reactivation)
+        effective_start_idx = (effective_start.year * 12) + effective_start.month
 
-        if not c_start_date:
-            return None
-
-        c_dt = getdate(c_start_date)
-        c_idx = (c_dt.year * 12) + c_dt.month
-
-        oldest_open_year = frappe.db.get_value(
-            "Billing Year", {"is_closed": 0}, "year_name",
-            order_by="year_name asc"
-        )
-
+        # 3. Determinar Límite por Años Abiertos
+        oldest_open_year = frappe.db.get_value("Billing Year", {"is_closed": 0}, "year_name", order_by="year_name asc")
         if not oldest_open_year:
             return None
+            
+        open_year_idx = (int(oldest_open_year) * 12) + 1
+        
+        # El requerimiento de continuidad empieza en el máximo entre la actividad del contrato y el año fiscal abierto
+        required_start_idx = max(effective_start_idx, open_year_idx)
 
-        o_idx = (int(oldest_open_year) * 12) + 1
-        required_start_idx = max(c_idx, o_idx)
+        # 4. Validar Periodo Actual vs Requerido
+        curr_year_val = frappe.db.get_value("Billing Year", self.fiscal_year, "year_name")
+        if not curr_year_val: return None
+        
+        curr_idx = (int(curr_year_val) * 12) + month_map.get(self.fiscal_month)
 
         if curr_idx < required_start_idx:
-            formatted_start = frappe.utils.formatdate(c_start_date)
             frappe.throw(_(
-                "Invalid Period: Contract starts on {0}. "
-                "First billable period is {1} {2}."
-            ).format(
-                formatted_start,
-                _(rev_month_map[required_start_idx % 12 or 12]),
-                (required_start_idx - 1) // 12
-            ))
+                "Invalid Period: Service was inactive or year is closed. "
+                "First billable period is {0} {1}."
+            ).format(_(rev_month_map[required_start_idx % 12 or 12]), (required_start_idx - 1) // 12))
 
+        # 5. Validar Mes Anterior (Continuidad)
+        # Solo validamos el anterior si el actual es mayor al inicio requerido
         if curr_idx > required_start_idx:
             prev_idx = curr_idx - 1
             prev_month_num = prev_idx % 12 or 12
             prev_year_num = (prev_idx - 1) // 12
-            prev_year_link = frappe.db.get_value(
-                "Billing Year", {"year_name": str(prev_year_num)}, "name"
-            )
+            
+            # Buscamos si existe la factura del mes anterior
+            # No necesitamos el link del año, con el valor numérico en el Monthly Bill basta si lo tienes indexado
+            exists = frappe.db.exists("Monthly Bill", {
+                "service_contract": self.service_contract,
+                "fiscal_month": rev_month_map[prev_month_num],
+                "fiscal_year": frappe.db.get_value("Billing Year", {"year_name": str(prev_year_num)}, "name"),
+                "docstatus": ["!=", 2]
+            })
 
-            if prev_year_link:
-                exists = frappe.db.exists("Monthly Bill", {
-                    "service_contract": self.service_contract,
-                    "fiscal_year": prev_year_link,
-                    "fiscal_month": rev_month_map[prev_month_num],
-                    "docstatus": ["!=", 2]
-                })
+            if not exists:
+                error_msg = _(
+                    "Billing Continuity Error: Missing bill for {0} {1}. "
+                    "You must bill sequentially since the last reactivation."
+                ).format(_(rev_month_map[prev_month_num]), prev_year_num)
 
-                if not exists:
-                    error_msg = _(
-                        "Billing Continuity Error: Missing bill for {0} {1}."
-                    ).format(_(rev_month_map[prev_month_num]), prev_year_num)
+                if throw_error:
+                    frappe.throw(error_msg)
+                return error_msg
 
-                    if throw_error:
-                        frappe.throw(error_msg)
-                    return error_msg
         return None
 
     def calculate_breakdown(self) -> None:
@@ -261,7 +263,7 @@ class MonthlyBill(Document):
             ref_dt="Monthly Bill",
             ref_dn=self.name,
             description=_("Monthly Fee: {0} {1}").format(
-                self.fiscal_month, year_val
+                _(self.fiscal_month), year_val
             ),
             fiscal_month=month_map.get(self.fiscal_month),
             fiscal_year=int(year_val)

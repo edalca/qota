@@ -33,7 +33,7 @@ class ServiceReconnection(Document):
         premises: DF.Link | None
         reconnection_fee: DF.Currency
         remarks: DF.SmallText | None
-        service_contract: DF.Link
+        service_suspension: DF.Link
         status: DF.Literal["Draft", "Pending Payment", "Paid", "Scheduled", "Executed", "Cancelled"]
         subscriber: DF.Link | None
     # end: auto-generated types
@@ -45,14 +45,18 @@ class ServiceReconnection(Document):
 
     def validate_contract_status(self) -> None:
         """Ensures the contract is actually suspended."""
+        service_contract = frappe.get_doc(
+            "Service Suspension",
+            self.service_suspension
+        ).service_contract
         status = frappe.db.get_value("Service Contract",
-                                     self.service_contract,
+                                     service_contract,
                                      "status")
         if status != "Suspended":
             frappe.throw(_(
                 "Contract {0} is not suspended. "
                 "Reconnection not applicable.")
-                .format(self.service_contract))
+                .format(service_contract))
 
     def enforce_fee_rules(self) -> None:
         """
@@ -63,7 +67,7 @@ class ServiceReconnection(Document):
         last_suspension = frappe.db.get_value(
             "Service Suspension",
             {
-                "service_contract": self.service_contract,
+                "name": self.service_suspension,
                 "status": "Executed",
                 "docstatus": 1
             },
@@ -96,10 +100,15 @@ class ServiceReconnection(Document):
         Handles financial impact. If fee > 0, creates debt.
         If fee = 0, goes straight to Paid to allow immediate work.
         """
+        service_contract = frappe.get_doc(
+            "Service Suspension",
+            self.service_suspension
+        ).service_contract
+
         if flt(self.reconnection_fee) > 0:
             self.db_set("status", "Pending Payment")
             make_debt_ledger_entry(
-                contract_name=self.service_contract,
+                contract_name=service_contract,
                 entry_type="Reconnection Fee",
                 amount=flt(self.reconnection_fee),
                 ref_dt=self.doctype,
@@ -131,10 +140,13 @@ class ServiceReconnection(Document):
         self.initial_reading = flt(initial_reading)
         self.execution_date = execution_date
         self.status = "Executed"
-
+        service_contract = frappe.get_doc(
+            "Service Suspension",
+            self.service_suspension
+        ).service_contract
         # Restore Contract Status
         update_contract_property(
-            service_contract=self.service_contract,
+            service_contract=service_contract,
             update_type="Status",
             data={
                 "new_status": "Active",
@@ -144,7 +156,8 @@ class ServiceReconnection(Document):
                 .format(self.name)
             }
         )
-
+        frappe.db.set_value("Service Contract", service_contract,
+                            "reactivation_date", self.execution_date)
         # Create meter reading if metered
         if self.billing_basis == "Metered":
             self.create_start_reading()
@@ -153,13 +166,16 @@ class ServiceReconnection(Document):
 
     def create_start_reading(self) -> None:
         """Starts the new billing cycle with a fresh reading."""
+        service_contract = frappe.get_doc(
+            "Service Suspension",
+            self.service_suspension
+        ).service_contract
         reading = frappe.new_doc("Meter Reading")
-        reading.service_contract = self.service_contract
-        reading.reading_date = self.execution_date 
+        reading.service_contract = service_contract
+        reading.reading_date = self.execution_date
         reading.current_reading = self.initial_reading
         reading.remarks = _(
              "Start reading (Reconnection Order {0})"
              ).format(self.name)
         reading.insert(ignore_permissions=True)
         reading.submit()
-

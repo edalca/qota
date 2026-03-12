@@ -3,37 +3,54 @@
 
 frappe.ui.form.on("Service Suspension", {
     onload(frm) {
+        // 1. Filtrar contratos activos usando el query centralizado
         frm.set_query("service_contract", function() {
-           return {
+            return {
                 query: "qota.governance.doctype.service_contract.service_contract.service_contract_query",
                 filters: { docstatus: 1, status: "Active" },
             };
         });
-         frm.events.filter_reasons(frm);
+        
+        // 2. Estado inicial de los filtros y bloqueos
+        frm.events.filter_reasons(frm);
+        frm.events.handle_maintenance_lock(frm);
     },
+
     refresh(frm) {
+        // Helper para la descripción de predios
         if (window.qota && qota.utils && qota.utils.set_premises_description) {
             qota.utils.set_premises_description(frm);
         }
+
+        // Botón de ejecución técnica solo para órdenes enviadas (Scheduled)
         if (frm.doc.docstatus === 1 && frm.doc.status === 'Scheduled') {
             frm.add_custom_button(__('Confirm Technical Cut'), function() {
                 frm.events.open_execution_dialog(frm);
             }, __('Actions'));
         }
     },
+
     suspension_type: function(frm) {
         if (frm.doc.suspension_type === "By Request") {
-            // Seteo automático y limpieza de filtros
+            // Seteo automático para solicitud del abonado
             frm.set_value("reason", "Subscriber Request");
             frm.set_df_property("reason", "read_only", 1);
         } else {
             frm.set_df_property("reason", "read_only", 0);
-            frm.set_value("reason", ""); // Limpiar para que elija una razón admin
+            if (frm.doc.reason === "Subscriber Request") {
+                frm.set_value("reason", ""); 
+            }
         }
         frm.events.filter_reasons(frm);
+        frm.events.handle_maintenance_lock(frm);
     },
+
+    reason: function(frm) {
+        // Disparar lógica de bloqueo de fecha cuando cambie la razón
+        frm.events.handle_maintenance_lock(frm);
+    },
+
     filter_reasons: function(frm) {
-        // Limitamos las opciones del Select dinámicamente
         let options = [];
         if (frm.doc.suspension_type === "Administrative") {
             options = ["Arrears", "Fraud / Bypass", "Sanction", "Maintenance", "Other"];
@@ -42,19 +59,33 @@ frappe.ui.form.on("Service Suspension", {
         }
         frm.set_df_property("reason", "options", options);
     },
-    premises(frm) {
-        if (window.qota && qota.utils && qota.utils.set_premises_description) {
-            qota.utils.set_premises_description(frm);
-        }
 
+    handle_maintenance_lock: function(frm) {
+        /**
+         * Si es Mantenimiento, la fecha efectiva DEBE ser la fecha de hoy/posting.
+         * No permitimos mantenimiento retroactivo.
+         */
+        if (frm.doc.reason === "Maintenance") {
+            // Extraer solo la parte de la fecha de posting_date (que es Datetime)
+            let date_part = frm.doc.posting_date ? frm.doc.posting_date.split(" ")[0] : frappe.datetime.nowdate();
+            
+            frm.set_value("effective_date", date_part);
+            frm.set_df_property("effective_date", "read_only", 1);
+            
+            frappe.show_alert({
+                message: __("Maintenance mode: Effective Date locked to Posting Date."),
+                indicator: 'orange'
+            }, 3);
+        } else {
+            // Para otros motivos, dejamos que el usuario decida la fecha (ej. el caso de Enero)
+            frm.set_df_property("effective_date", "read_only", 0);
+        }
     },
+
     open_execution_dialog: function(frm) {
-        /*
-        Captures technical data from the field.
-        */
         let fields = [{
             label: __('Execution Date'),
-            fieldname: 'reading_date',
+            fieldname: 'executed_date', // Nombre coincidente con tu JSON
             fieldtype: 'Date',
             default: frappe.datetime.nowdate(),
             reqd: 1
@@ -74,12 +105,15 @@ frappe.ui.form.on("Service Suspension", {
             fields: fields,
             primary_action_label: __('Execute Cut'),
             primary_action(values) {
-                // Llamamos a nuestra función personalizada de lógica
                 frm.call('execute_suspension_logic', {
                     final_reading: values.final_reading || 0,
-                    reading_date: values.reading_date
+                    executed_date: values.executed_date
                 }).then(() => {
                     d.hide();
+                    frappe.show_alert({
+                        message: __("Service suspended successfully"),
+                        indicator: 'blue'
+                    });
                     frm.reload_doc();
                 });
             }

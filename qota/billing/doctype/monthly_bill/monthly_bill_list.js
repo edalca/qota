@@ -1,4 +1,4 @@
-frappe.listview_settings["Payment Receipt"] = {
+frappe.listview_settings["Monthly Bill"] = {
     onload: function (listview) {
         listview.premises_data = {};
     },
@@ -36,17 +36,13 @@ frappe.listview_settings["Payment Receipt"] = {
             if (!data) {
                 return `<span class="text-muted">${val}...</span>`;
             }
-
             const html = `
-        <div>
-            <span><b>${val}</b></span>
-            <small>${__("Block: {0} House: {1}", [data.block, data.house_number])}</small>
-        </div>
-    `;
-
+                        <div>
+                            <span><b>${val}</b></span>
+                            <small>${__("Block: {0} House: {1}", [data.block, data.house_number])}</small>
+                        </div>
+                      `;
             return html;
         }
-
-
     },
 };

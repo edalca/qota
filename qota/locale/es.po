@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: qota\n"
 "Report-Msgid-Bugs-To: edwinalonso162@hotmail.com\n"
-"POT-Creation-Date: 2026-02-26 07:26+0000\n"
-"PO-Revision-Date: 2026-02-26 07:29\n"
+"POT-Creation-Date: 2026-03-12 15:29+0000\n"
+"PO-Revision-Date: 2026-03-12 15:50\n"
 "Last-Translator: edwinalonso162@hotmail.com\n"
 "Language-Team: Spanish\n"
 "MIME-Version: 1.0\n"
@@ -32,11 +32,6 @@ msgstr "+91 Días"
 
 #. Header text in the Billing Workspace
 #: qota/billing/workspace/billing/billing.json
-msgid "<span class=\"h4\">Acceso Directo</span>"
-msgstr ""
-
-#. Header text in the Billing Workspace
-#: qota/billing/workspace/billing/billing.json
 msgid "<span class=\"h4\">Billing Dashboard</span>"
 msgstr "<span class=\"h4\">Panel de Facturación</span>"
 
@@ -45,12 +40,14 @@ msgstr "<span class=\"h4\">Panel de Facturación</span>"
 msgid "<span class=\"h4\">Governance Dashboard</span>"
 msgstr "<span class=\"h4\">Tablero de Gobernanza</span>"
 
+#. Header text in the Billing Workspace
 #. Header text in the Governance Workspace
+#: qota/billing/workspace/billing/billing.json
 #: qota/governance/workspace/governance/governance.json
 msgid "<span class=\"h4\">Shortcut</span>"
 msgstr "<span class=\"h4\">Acceso Directo</span>"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:59
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:121
 msgid "A Billing Cycle already exists for {0} {1}"
 msgstr "Ya existe un Ciclo de Facturación para {0} {1}"
 
@@ -58,13 +55,19 @@ msgstr "Ya existe un Ciclo de Facturación para {0} {1}"
 msgid "A Monthly Bill already exists for this contract in {0} {1} (Reference: {2})"
 msgstr "Ya existe una factura mensual para este contrato en {0} {1} (Referencia: {2})"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:317
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:404
 msgid "A critical error occurred. The cycle has been reset to Draft. Please check Error Logs."
 msgstr "Se ha producido un error crítico. El ciclo se ha restablecido al borrador. Por favor, compruebe los registros de errores."
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:338
 msgid "Accepted"
 msgstr "Aceptado"
+
+#. Label of the section_amount (Section Break) field in DocType 'Expense
+#. Voucher'
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+msgid "Accounting"
+msgstr "Contabilidad"
 
 #: qota/billing/doctype/billing_cycle/billing_cycle.js:35
 #: qota/billing/doctype/billing_cycle/billing_cycle.js:47
@@ -78,7 +81,7 @@ msgstr "Aceptado"
 #: qota/governance/doctype/service_contract/service_contract.js:178
 #: qota/governance/doctype/service_contract/service_contract.js:209
 #: qota/governance/doctype/service_reconnection/service_reconnection.js:55
-#: qota/governance/doctype/service_suspension/service_suspension.js:21
+#: qota/governance/doctype/service_suspension/service_suspension.js:29
 msgid "Actions"
 msgstr "Acciones"
 
@@ -120,7 +123,7 @@ msgstr "Cargos Adicionales"
 msgid "Additional Cistern Fee"
 msgstr "Tarifa Adicional por Cisterna"
 
-#: qota/billing/utils.py:282
+#: qota/billing/utils.py:284
 msgid "Additional Fee"
 msgstr "Tarifa Adicional"
 
@@ -146,15 +149,19 @@ msgstr "Dirección"
 msgid "Address Reference"
 msgstr "Referencia de Dirección"
 
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:62
+msgid "Administration"
+msgstr "Administración"
+
 #. Option for the 'Suspension Type' (Select) field in DocType 'Service
 #. Suspension'
 #: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Administrative"
 msgstr "Administrativo"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:120
-msgid "Administrative suspension is not allowed for accounts that are up to date."
-msgstr "No se permite la suspensión administrativa de cuentas al día."
+#: qota/governance/doctype/service_suspension/service_suspension.py:161
+msgid "Administrative suspension requires expired debts as of the Effective Date."
+msgstr "La suspensión administrativa requiere deudas vencidas a la Fecha de Vigencia."
 
 #: qota/billing/report/advance_payments_report/advance_payments_report.py:27
 #: qota/billing/report/advance_payments_report/advance_payments_report.py:105
@@ -168,7 +175,7 @@ msgstr "Importe Anticipado"
 msgid "Advance Balance"
 msgstr "Monto Anticipo"
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.py:293
+#: qota/billing/doctype/payment_receipt/payment_receipt.py:302
 msgid "Advance Payment: {0}"
 msgstr "Pagos Anticipados: {0}"
 
@@ -241,6 +248,7 @@ msgstr "Permitir Descuentos Sociales/Legales"
 #. Label of the amended_from (Link) field in DocType 'Monthly Bill'
 #. Label of the amended_from (Link) field in DocType 'Payment Receipt'
 #. Label of the amended_from (Link) field in DocType 'Service Rate'
+#. Label of the amended_from (Link) field in DocType 'Expense Voucher'
 #. Label of the amended_from (Link) field in DocType 'Service Contract'
 #. Label of the amended_from (Link) field in DocType 'Service Reconnection'
 #. Label of the amended_from (Link) field in DocType 'Service Suspension'
@@ -253,6 +261,7 @@ msgstr "Permitir Descuentos Sociales/Legales"
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/billing/doctype/service_rate/service_rate.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/service_contract/service_contract.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
@@ -279,7 +288,7 @@ msgstr "Elemento de Tabla de Amortización"
 msgid "Amount"
 msgstr "Monto"
 
-#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:198
+#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:199
 msgid "Amount must be greater than zero to create a Debt Ledger Entry."
 msgstr "El monto debe ser mayor que cero para crear una Entrada del Libro de Deuda."
 
@@ -307,7 +316,7 @@ msgstr "Anticipos Aplicados"
 msgid "Applied Benefits"
 msgstr "Beneficios aplicados"
 
-#: qota/billing/utils.py:406
+#: qota/billing/utils.py:408
 msgid "Applied Discounts ({0})"
 msgstr "Descuento Aplicado ({0})"
 
@@ -348,6 +357,10 @@ msgstr "Los registros de auditoría no se pueden modificar una vez creados."
 msgid "August"
 msgstr "Agosto"
 
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:67
+msgid "Authorized By"
+msgstr "Autorizada Por"
+
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:22
 msgid "Available Balance"
 msgstr "Saldo Disponible"
@@ -364,7 +377,9 @@ msgid "Balance Summary"
 msgstr "Resumen de Saldo"
 
 #. Option for the 'Mode of Payment' (Select) field in DocType 'Payment Receipt'
+#. Option for the 'Payment Method' (Select) field in DocType 'Expense Voucher'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 msgid "Bank Transfer"
 msgstr "Transferencia bancaria"
 
@@ -378,6 +393,10 @@ msgstr "Monto base si la conexión tiene medidor."
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Basic Information"
 msgstr "Información Básica"
+
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:74
+msgid "Beneficiary Signature"
+msgstr "Firma del Beneficiario"
 
 #. Label of a Workspace Sidebar Item
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:193
@@ -448,8 +467,8 @@ msgid "Billing Basis Change"
 msgstr "Cambio de base de facturación"
 
 #: qota/billing/doctype/monthly_bill/monthly_bill.py:185
-msgid "Billing Continuity Error: Missing bill for {0} {1}."
-msgstr "Error de facturación continua: Falta la factura de {0} {1}."
+msgid "Billing Continuity Error: Missing bill for {0} {1}. You must bill sequentially since the last reactivation."
+msgstr "Error de continuidad de facturación: falta la factura de {0} {1}. Debe facturar de manera secuencial desde la última reactivación."
 
 #: qota/public/js/custom_block_strings.js:4
 msgid "Billing Continuity Monitor"
@@ -488,11 +507,11 @@ msgstr "Problemas de Facturación"
 msgid "Billing Period"
 msgstr "Período de Facturación"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:309
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:396
 msgid "Billing Process Critical Failure"
 msgstr "Proceso de Facturación Fallido Crítico"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:76
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:139
 msgid "Billing Sequence Error: New cycle must start on {0} to maintain continuity."
 msgstr "Error de secuencia de facturación: El nuevo ciclo debe comenzar en {0} para mantener la continuidad."
 
@@ -530,12 +549,13 @@ msgstr "Fecha de Nacimiento"
 #: qota/billing/report/advance_payments_report/advance_payments_report.js:14
 #: qota/billing/report/advance_payments_report/advance_payments_report.py:23
 #: qota/governance/doctype/premises/premises.json
-#: qota/governance/doctype/service_contract/service_contract.py:177
+#: qota/governance/doctype/service_contract/service_contract.py:176
 #: qota/public/js/utils.js:39
 msgid "Block"
 msgstr "Bloque"
 
-#: qota/billing/doctype/payment_receipt/payment_receipt_list.js:37
+#: qota/billing/doctype/monthly_bill/monthly_bill_list.js:39
+#: qota/billing/doctype/payment_receipt/payment_receipt_list.js:40
 #: qota/billing/report/aging_report/aging_report.py:60
 #: qota/governance/doctype/service_contract/service_contract_list.js:37
 #: qota/governance/doctype/service_reconnection/service_reconnection_list.js:37
@@ -579,32 +599,53 @@ msgstr "Sabe Leer y Escribir"
 #. Option for the 'Status' (Select) field in DocType 'Billing Cycle'
 #. Option for the 'Status' (Select) field in DocType 'Monthly Bill'
 #. Option for the 'Status' (Select) field in DocType 'Payment Receipt'
+#. Option for the 'Status' (Select) field in DocType 'Expense Voucher'
 #. Option for the 'Status' (Select) field in DocType 'Service Contract'
 #. Option for the 'Status' (Select) field in DocType 'Service Reconnection'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/service_contract/service_contract.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 msgid "Cancelled"
 msgstr "Cancelado"
 
-#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:169
+#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:170
 msgid "Cannot cancel because the associated debt has recorded payments ({0}). Please cancel the related Payment Receipts first."
 msgstr "No se puede cancelar porque la deuda asociada ha registrado pagos ({0}). Por favor, cancele los recibos de pago relacionados primero."
 
-#: qota/governance/doctype/service_reconnection/service_reconnection.py:127
+#: qota/governance/doctype/service_reconnection/service_reconnection.py:136
 msgid "Cannot execute. Payment is required for this reconnection."
 msgstr "No se puede ejecutar. El pago es necesario para esta reconexión."
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:61
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:69
+msgid "Cannot generate cycle. The coverage period must end before today. Period ends on: {0}"
+msgstr "No se puede generar el ciclo. El período de cobertura debe terminar antes de hoy. El período termina el: {0}"
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:70
 msgid "Cannot suspend a contract in '{0}' status."
 msgstr "No se puede suspender un contrato en estado '{0}'."
 
+#: qota/governance/doctype/service_suspension/service_suspension.py:120
+msgid "Cannot suspend retroactively to {0}. Monthly Bill {1} already exists within or after this period. Cancel the bills first or adjust the Effective Date."
+msgstr "No se puede suspender retroactivamente hasta {0}. La Factura Mensual {1} ya existe dentro de este período o después. Cancele primero las facturas o ajuste la Fecha de Vigencia."
+
 #. Option for the 'Mode of Payment' (Select) field in DocType 'Payment Receipt'
+#. Option for the 'Payment Method' (Select) field in DocType 'Expense Voucher'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 msgid "Cash"
 msgstr "Efectivo"
+
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:29
+msgid "Category"
+msgstr "Categoría"
+
+#. Label of the category_name (Data) field in DocType 'Expense Category'
+#: qota/expenditures/doctype/expense_category/expense_category.json
+msgid "Category Name"
+msgstr "Nombre de Categoría"
 
 #. Label of the change_type (Select) field in DocType 'Service Contract Log'
 #: qota/governance/doctype/service_contract/service_contract.js:276
@@ -613,7 +654,9 @@ msgid "Change Type"
 msgstr "Tipo de Cambio"
 
 #. Option for the 'Mode of Payment' (Select) field in DocType 'Payment Receipt'
+#. Option for the 'Payment Method' (Select) field in DocType 'Expense Voucher'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 msgid "Check"
 msgstr "Verificar"
 
@@ -631,7 +674,7 @@ msgstr "Error de cronología: Ya existe una lectura más reciente ({0}). Las lec
 msgid "Cistern Capacity (m³)"
 msgstr "Capacidad de la Cisterna (m³)"
 
-#: qota/billing/utils.py:176
+#: qota/billing/utils.py:178
 msgid "Cistern Fee"
 msgstr "Tarifa de Cisterna"
 
@@ -663,7 +706,7 @@ msgstr "¿Cerrado?"
 msgid "Closing Date"
 msgstr "Fecha de cierre"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:222
+#: qota/governance/doctype/service_suspension/service_suspension.py:311
 msgid "Closure reading (Suspension {0})"
 msgstr "Lectura de Cierre ({0} Suspensión)"
 
@@ -681,7 +724,7 @@ msgstr "Completado"
 msgid "Condition Type"
 msgstr "Tipo de Condición"
 
-#: qota/governance/doctype/service_suspension/service_suspension.js:19
+#: qota/governance/doctype/service_suspension/service_suspension.js:27
 msgid "Confirm Technical Cut"
 msgstr "Confirmar Corte Técnico"
 
@@ -749,15 +792,15 @@ msgid "Contract Information"
 msgstr "Información del contrato"
 
 #: qota/governance/doctype/service_contract/service_contract.js:339
-#: qota/governance/doctype/service_contract/service_contract.py:159
+#: qota/governance/doctype/service_contract/service_contract.py:158
 msgid "Contract updated successfully"
 msgstr "Contrato actualizado exitosamente"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:57
+#: qota/governance/doctype/service_suspension/service_suspension.py:66
 msgid "Contract {0} is already suspended."
 msgstr "El contrato {0} ya está suspendido."
 
-#: qota/governance/doctype/service_reconnection/service_reconnection.py:52
+#: qota/governance/doctype/service_reconnection/service_reconnection.py:56
 msgid "Contract {0} is not suspended. Reconnection not applicable."
 msgstr "El contrato {0} no está suspendido. No es aplicable a reconexión."
 
@@ -863,7 +906,7 @@ msgstr "Identificación del Ciclo"
 msgid "Cycle Start Day"
 msgstr "Día de inicio del ciclo"
 
-#: qota/billing/doctype/billing_settings/billing_settings.py:49
+#: qota/billing/doctype/billing_settings/billing_settings.py:50
 msgid "Cycle Start Day must be between 1 and 28 to ensure compatibility with all months."
 msgstr "El día de inicio del ciclo debe estar entre 1 y 28 para asegurar la compatibilidad con todos los meses."
 
@@ -917,11 +960,7 @@ msgstr "Días hasta la fecha de vencimiento"
 msgid "Debit (Charges)"
 msgstr "Débito (Cargos)"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:135
-msgid "Debt ({0}) is below minimum threshold ({1})."
-msgstr "La deuda ({0}) está por debajo del umbral mínimo ({1})."
-
-#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:141
+#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:142
 msgid "Debt Ledger Entries cannot be cancelled manually. This creates accounting inconsistencies."
 msgstr "Las entradas del libro de deuda no pueden cancelarse manualmente. Esto crea inconsistencias contables."
 
@@ -961,6 +1000,7 @@ msgstr "Tarifa de reconexión por defecto"
 #. Label of the description (Data) field in DocType 'Payment Receipt Item'
 #. Label of the description (Data) field in DocType 'Service Rate Additional
 #. Fee'
+#. Label of the description (Small Text) field in DocType 'Expense Category'
 #. Label of the description (Small Text) field in DocType 'Service Category'
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
 #: qota/billing/doctype/discount_rule/discount_rule.json
@@ -969,6 +1009,7 @@ msgstr "Tarifa de reconexión por defecto"
 #: qota/billing/doctype/service_rate_additional_fee/service_rate_additional_fee.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:278
 #: qota/billing/report/customer_statement/customer_statement.py:22
+#: qota/expenditures/doctype/expense_category/expense_category.json
 #: qota/governance/doctype/service_category/service_category.json
 #: qota/governance/doctype/service_contract/service_contract.js:276
 msgid "Description"
@@ -1066,6 +1107,10 @@ msgstr "No suspender si la deuda total es menor a este monto (evita cortar el se
 msgid "Doctype"
 msgstr "Tipo de documento"
 
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:80
+msgid "Document generated by Qota System on"
+msgstr "Documento generado por el Sistema Qota el"
+
 #. Label of the down_payment (Currency) field in DocType 'Debt Refinancing'
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.json
 msgid "Down Payment (Paid Now)"
@@ -1082,11 +1127,13 @@ msgstr "La prima cubre toda la deuda. Por favor use un Recibo de Pago en su luga
 #. Option for the 'Status' (Select) field in DocType 'Billing Cycle'
 #. Option for the 'Status' (Select) field in DocType 'Monthly Bill'
 #. Option for the 'Status' (Select) field in DocType 'Payment Receipt'
+#. Option for the 'Status' (Select) field in DocType 'Expense Voucher'
 #. Option for the 'Status' (Select) field in DocType 'Service Reconnection'
 #. Option for the 'Status' (Select) field in DocType 'Service Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Draft"
@@ -1113,15 +1160,25 @@ msgstr "Duplicado detectado"
 msgid "Duplicate Error: Another reading exists within the {0}-day window (Check: {1})"
 msgstr "Error de duplicado: Existe otra lectura dentro de la ventana de {0} días (Ver: {1})"
 
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:14
+msgid "EXPENSE VOUCHER"
+msgstr "COMPROBANTE DE GASTO"
+
 #. Label of the edit_posting_date (Check) field in DocType 'Billing Cycle'
 #. Label of the edit_posting_date (Check) field in DocType 'Monthly Bill'
+#. Label of the edit_posting_date (Check) field in DocType 'Payment Receipt'
+#. Label of the edit_posting_date (Check) field in DocType 'Service Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
+#: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Edit Posting Date"
 msgstr "Editar Fecha de Registro"
 
 #. Label of the effective_date (Date) field in DocType 'Benefit Discount'
+#. Label of the effective_date (Date) field in DocType 'Service Suspension'
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Effective Date"
 msgstr "Fecha de vigencia"
 
@@ -1172,9 +1229,13 @@ msgstr "Fin del rango. Dejar vacío para 'Infinito'."
 msgid "Entry Type"
 msgstr "Tipo de Entrada"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:219
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:287
 msgid "Error cancelling bill {0} during cycle rollback"
 msgstr "Error al cancelar la factura {0} durante la cancelación del ciclo"
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:256
+msgid "Error cancelling meter reading {0} during suspension rollback"
+msgstr "Error al cancelar la lectura del medidor {0} durante la reversión de la suspensión"
 
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:138
 msgid "Error loading technical details."
@@ -1188,11 +1249,11 @@ msgstr "¡Error! La lectura actual ({0}) no puede ser menor que la lectura anter
 msgid "Error! Current reading is lower than previous reading."
 msgstr "¡Error! La lectura actual es menor que la lectura anterior."
 
-#: qota/billing/utils.py:248
+#: qota/billing/utils.py:250
 msgid "Excess: {0} m3 at {1}/m3"
 msgstr "Excesos: {0} m3 en {1}/m3"
 
-#: qota/governance/doctype/service_suspension/service_suspension.js:75
+#: qota/governance/doctype/service_suspension/service_suspension.js:106
 msgid "Execute Cut"
 msgstr "Ejecutar Corte"
 
@@ -1203,6 +1264,11 @@ msgstr "Ejecutar Corte"
 msgid "Executed"
 msgstr "Ejecutado"
 
+#. Label of the executed_date (Date) field in DocType 'Service Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Executed Date"
+msgstr "Fecha de Ejecución"
+
 #. Label of a number card in the Governance Workspace
 #: qota/governance/workspace/governance/governance.json
 msgid "Executed Service Suspensions — This Year"
@@ -1211,7 +1277,7 @@ msgstr "Suspensiones de Servicio Ejecutado — Este Año"
 #. Label of the execution_date (Date) field in DocType 'Service Reconnection'
 #: qota/governance/doctype/service_reconnection/service_reconnection.js:62
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
-#: qota/governance/doctype/service_suspension/service_suspension.js:56
+#: qota/governance/doctype/service_suspension/service_suspension.js:87
 msgid "Execution Date"
 msgstr "Fecha de Ejecución"
 
@@ -1225,6 +1291,38 @@ msgstr "Problemas de Ejecución"
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 msgid "Execution Summary"
 msgstr "Resumen de Ejecución"
+
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:10
+msgid "Expenditure & Cash Management"
+msgstr "Gestión de Gastos y Efectivo"
+
+#. Label of a Desktop Icon
+#. Title of a Workspace Sidebar
+#: qota/desktop_icon/expenditures.json qota/workspace_sidebar/expenditures.json
+msgid "Expenditures"
+msgstr "Gastos"
+
+#. Name of a DocType
+#. Label of the expense_category (Link) field in DocType 'Expense Voucher'
+#. Label of a Workspace Sidebar Item
+#: qota/expenditures/doctype/expense_category/expense_category.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+#: qota/workspace_sidebar/expenditures.json
+msgid "Expense Category"
+msgstr "Categoría de Gastos"
+
+#. Label of the section_details (Section Break) field in DocType 'Expense
+#. Voucher'
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+msgid "Expense Details"
+msgstr "Detalles del Gasto"
+
+#. Name of a DocType
+#. Label of a Workspace Sidebar Item
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+#: qota/workspace_sidebar/expenditures.json
+msgid "Expense Voucher"
+msgstr "Comprobante de Gasto"
 
 #. Label of the id_expiration_date (Date) field in DocType 'Subscriber'
 #: qota/governance/doctype/subscriber/subscriber.json
@@ -1279,26 +1377,20 @@ msgstr "El campo '{0}' es permanente y no puede ser cambiado."
 msgid "Field Changed"
 msgstr "Campo cambiado"
 
-#: qota/governance/doctype/service_suspension/service_suspension.js:65
+#: qota/governance/doctype/service_suspension/service_suspension.js:96
 msgid "Final Meter Reading"
 msgstr "Lectura Final de Medidor"
-
-#. Label of the meter_reading_section (Section Break) field in DocType 'Service
-#. Suspension'
-#: qota/governance/doctype/service_suspension/service_suspension.json
-msgid "Final Reading"
-msgstr "Lectura Final"
 
 #. Label of the final_reading (Float) field in DocType 'Service Suspension'
 #: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Final Reading Value"
 msgstr "Valor de Lectura Final"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:146
+#: qota/governance/doctype/service_suspension/service_suspension.py:185
 msgid "Final Reading is mandatory for metered services."
 msgstr "La lectura final es obligatoria para los servicios medidos después de la ejecución."
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:156
+#: qota/governance/doctype/service_suspension/service_suspension.py:195
 msgid "Final reading ({0}) cannot be lower than the last recorded reading ({1})."
 msgstr "La lectura final ({0}) no puede ser inferior a la última lectura grabada ({1})."
 
@@ -1307,7 +1399,7 @@ msgstr "La lectura final ({0}) no puede ser inferior a la última lectura grabad
 msgid "Financial Balances"
 msgstr "Saldos Financieros"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:304
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:390
 msgid "Finished: {0} bills created."
 msgstr "Finalizado: {0} Facturas creadas."
 
@@ -1344,7 +1436,7 @@ msgstr "El monto pagado debe ser mayor que 0"
 msgid "Fixed Charge (Base)"
 msgstr "Cargo fijo (base)"
 
-#: qota/billing/utils.py:218
+#: qota/billing/utils.py:220
 msgid "Fixed Charge (Up to {0} m3)"
 msgstr "Cargo Fijo (hasta {0} m3)"
 
@@ -1357,6 +1449,7 @@ msgstr "Cargo Fijo (hasta {0} m3)"
 #. Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/service_rate/service_rate.json
+#: qota/billing/utils.py:173 qota/billing/utils.py:183
 #: qota/governance/doctype/service_contract/service_contract.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
@@ -1387,7 +1480,7 @@ msgstr "Se encontraron {0} ciclos mensuales pendientes."
 msgid "Fraud / Bypass"
 msgstr "Fraude / Evasión"
 
-#: qota/governance/doctype/service_reconnection/service_reconnection.py:83
+#: qota/governance/doctype/service_reconnection/service_reconnection.py:87
 msgid "Free Reconnection: Previous suspension was due to {0}."
 msgstr "Reconexión libre: La suspensión anterior se debió a {0}."
 
@@ -1496,7 +1589,7 @@ msgid "Home"
 msgstr "Inicio"
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:233
-#: qota/governance/doctype/service_contract/service_contract.py:178
+#: qota/governance/doctype/service_contract/service_contract.py:177
 msgid "House"
 msgstr "Casa"
 
@@ -1620,7 +1713,7 @@ msgstr "Fecha de instalación"
 msgid "Installments must be at least 1."
 msgstr "Las cuotas deben ser al menos 1."
 
-#: qota/billing/utils.py:93
+#: qota/billing/utils.py:94
 msgid "Invalid Billing Basis for contract {0}"
 msgstr "Base de facturación no válida para el contrato {0}"
 
@@ -1628,9 +1721,9 @@ msgstr "Base de facturación no válida para el contrato {0}"
 msgid "Invalid Input"
 msgstr "Entrada inválida"
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:159
-msgid "Invalid Period: Contract starts on {0}. First billable period is {1} {2}."
-msgstr "Período no válido: el contrato comienza el {0}. El primer periodo facturable es {1} {2}."
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:163
+msgid "Invalid Period: Service was inactive or year is closed. First billable period is {0} {1}."
+msgstr "Período inválido: el servicio estaba inactivo o el año está cerrado. El primer período facturable es {0} {1}."
 
 #. Option for the 'Requires Cistern?' (Select) field in DocType 'Discount Rule'
 #: qota/billing/doctype/discount_rule/discount_rule.json
@@ -1638,7 +1731,9 @@ msgid "Irrelevant"
 msgstr "Irrelevante"
 
 #. Label of the is_active (Check) field in DocType 'Discount Rule'
+#. Label of the is_active (Check) field in DocType 'Expense Category'
 #: qota/billing/doctype/discount_rule/discount_rule.json
+#: qota/expenditures/doctype/expense_category/expense_category.json
 msgid "Is Active"
 msgstr "Está Activo"
 
@@ -1697,11 +1792,6 @@ msgstr "Persona jurídica"
 msgid "Justification/Reason"
 msgstr "Justificación/Razón"
 
-#. Label of the last_status_change (Date) field in DocType 'Service Contract'
-#: qota/governance/doctype/service_contract/service_contract.json
-msgid "Last Status Change"
-msgstr "Último Cambio de Estado"
-
 #. Option for the 'Entry Type' (Select) field in DocType 'Debt Ledger Entry'
 #. Option for the 'Payment Concept' (Select) field in DocType 'Payment Receipt
 #. Item'
@@ -1710,7 +1800,7 @@ msgstr "Último Cambio de Estado"
 msgid "Late Fee"
 msgstr "Cargo por mora"
 
-#: qota/billing/doctype/billing_settings/billing_settings.py:58
+#: qota/billing/doctype/billing_settings/billing_settings.py:59
 msgid "Late Fee Percentage must be between 0 and 100."
 msgstr "El porcentaje de cargo por mora debe estar entre 0 y 100."
 
@@ -1728,6 +1818,12 @@ msgstr "Valor de cargo por mora"
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Late Fees / Penalties"
 msgstr "Cargos por mora / Multas"
+
+#. Description of the 'Reactivation Date' (Date) field in DocType 'Service
+#. Contract'
+#: qota/governance/doctype/service_contract/service_contract.json
+msgid "Latest date the service was restored after a suspension."
+msgstr "Última fecha en que el servicio fue restablecido después de una suspensión."
 
 #. Label of the representation_sb (Section Break) field in DocType 'Subscriber'
 #: qota/governance/doctype/subscriber/subscriber.json
@@ -1760,6 +1856,10 @@ msgstr "Error de lógica"
 msgid "Maintenance"
 msgstr "Mantenimiento"
 
+#: qota/governance/doctype/service_suspension/service_suspension.js:76
+msgid "Maintenance mode: Effective Date locked to Posting Date."
+msgstr "Modo de mantenimiento: la Fecha de Vigencia está bloqueada a la Fecha de Registro."
+
 #. Option for the 'Gender' (Select) field in DocType 'Subscriber'
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Male"
@@ -1781,6 +1881,12 @@ msgstr "Marzo"
 #: qota/workspace_sidebar/billing.json
 msgid "Masters"
 msgstr "Maestros"
+
+#. Label of the max_backdating_limit_days (Int) field in DocType 'Billing
+#. Settings'
+#: qota/billing/doctype/billing_settings/billing_settings.json
+msgid "Max Backdating Limit (Days)"
+msgstr "Límite Máximo para Retroceder Fecha (días)"
 
 #. Label of the max_discounts_per_connection (Int) field in DocType 'Billing
 #. Settings'
@@ -1804,6 +1910,12 @@ msgstr "Edad máxima"
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Maximum number of connections a single subscriber can have discounts on."
 msgstr "Número máximo de conexiones en las que un mismo abonado puede tener descuentos."
+
+#. Description of the 'Max Backdating Limit (Days)' (Int) field in DocType
+#. 'Billing Settings'
+#: qota/billing/doctype/billing_settings/billing_settings.json
+msgid "Maximum number of days allowed to record a billing cycle into the past."
+msgstr "Máximo de días permitidos para retroceder la fecha de un ciclo de facturación."
 
 #. Option for the 'Fiscal Month' (Select) field in DocType 'Billing Cycle'
 #. Option for the 'Fiscal Month' (Select) field in DocType 'Monthly Bill'
@@ -1830,6 +1942,10 @@ msgstr "Información del medidor"
 #: qota/workspace_sidebar/billing.json
 msgid "Meter Reading"
 msgstr "Lectura del medidor"
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:251
+msgid "Meter Reading {0} has been cancelled."
+msgstr "La lectura del medidor {0} ha sido cancelada."
 
 #. Option for the 'Billing Basis' (Select) field in DocType 'Billing Cycle'
 #. Option for the 'Billing Basis' (Select) field in DocType 'Service Rate'
@@ -1912,7 +2028,7 @@ msgstr "Elemento de Facturación Mensual"
 msgid "Monthly Fee"
 msgstr "Cuota Mensual"
 
-#: qota/billing/doctype/monthly_bill/monthly_bill.py:263
+#: qota/billing/doctype/monthly_bill/monthly_bill.py:265
 msgid "Monthly Fee: {0} {1}"
 msgstr "Cuota Mensual: {0} {1}"
 
@@ -1966,7 +2082,7 @@ msgstr "Nueva tabla de pagos"
 msgid "No"
 msgstr "No"
 
-#: qota/billing/utils.py:141
+#: qota/billing/utils.py:142
 msgid "No active Service Rate found for category '{0}' on {1}"
 msgstr "No se encontró una tasa de servicio activa para la categoría '{0}' efectiva en {1}"
 
@@ -1982,7 +2098,7 @@ msgstr "No se encontraron meses disponibles para los avances."
 msgid "No issues detected. Ready for billing."
 msgstr "No se detectaron problemas. Listo para la facturación."
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:99
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:164
 msgid "No submitted bills found for {0}-{1}"
 msgstr "No se encontraron facturas enviadas para {0}-{1}"
 
@@ -2063,8 +2179,10 @@ msgstr "Nombre de la organización"
 msgid "Original Amount"
 msgstr "Monto Original"
 
+#. Option for the 'Payment Method' (Select) field in DocType 'Expense Voucher'
 #. Option for the 'Reason' (Select) field in DocType 'Service Suspension'
 #. Option for the 'Gender' (Select) field in DocType 'Subscriber'
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Other"
@@ -2090,12 +2208,14 @@ msgstr "RECIBO DE PAGO"
 #. Option for the 'Status' (Select) field in DocType 'Debt Ledger Entry'
 #. Option for the 'Status' (Select) field in DocType 'Monthly Bill'
 #. Option for the 'Status' (Select) field in DocType 'Payment Receipt'
+#. Option for the 'Status' (Select) field in DocType 'Expense Voucher'
 #. Option for the 'Status' (Select) field in DocType 'Service Reconnection'
 #: qota/billing/doctype/amortization_schedule_item/amortization_schedule_item.json
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.js:21
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 msgid "Paid"
 msgstr "Pagado"
@@ -2112,6 +2232,12 @@ msgstr "Parcialmente Pagado"
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "Passport"
 msgstr "Pasaporte"
+
+#. Label of the payee (Data) field in DocType 'Expense Voucher'
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:35
+msgid "Payee"
+msgstr "Beneficiario"
 
 #. Label of the payment_concept (Select) field in DocType 'Payment Receipt
 #. Item'
@@ -2133,6 +2259,12 @@ msgstr "Fecha de pago"
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:244
 msgid "Payment Details"
 msgstr "Detalles de pago"
+
+#. Label of the mode_of_payment (Select) field in DocType 'Expense Voucher'
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:25
+msgid "Payment Method"
+msgstr "Método de Pago"
 
 #. Name of a DocType
 #. Label of a shortcut in the Billing Workspace
@@ -2214,16 +2346,29 @@ msgstr "Por favor, defina primero el límite 'Hasta (m3)' en la fila anterior."
 msgid "Please select a Service Contract first."
 msgstr "Seleccione primero un contrato de servicio."
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:46
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:104
 msgid "Please set the Start and End dates for the coverage period."
 msgstr "Por favor, establezca las fechas de inicio y fin para el período de cobertura."
 
 #. Label of the posting_date (Date) field in DocType 'Billing Cycle'
 #. Label of the posting_date (Date) field in DocType 'Monthly Bill'
+#. Label of the posting_date (Datetime) field in DocType 'Expense Voucher'
+#. Label of the posting_date (Datetime) field in DocType 'Service Suspension'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:23
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Posting Date"
 msgstr "Fecha de Registro"
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:76
+msgid "Posting Date cannot be in the future."
+msgstr "La Fecha de Registro no puede ser futura."
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:84
+msgid "Posting Date is too far in the past. Max allowed backdating is {0} days (Earliest: {1})."
+msgstr "La fecha de registro es demasiado antigua. Máximo permitido: {0} días (Fecha más antigua válida: {1})."
 
 #. Label of the premises (Link) field in DocType 'Benefit Discount'
 #. Label of the premises (Link) field in DocType 'Debt Refinancing'
@@ -2251,6 +2396,10 @@ msgstr "Fecha de Registro"
 msgid "Premises"
 msgstr "Predio"
 
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:61
+msgid "Prepared By"
+msgstr "Preparado por"
+
 #. Label of the previous_reading (Float) field in DocType 'Meter Reading'
 #: qota/billing/doctype/meter_reading/meter_reading.json
 msgid "Previous Reading"
@@ -2262,7 +2411,7 @@ msgstr "Lectura anterior"
 msgid "Price per m3"
 msgstr "Precio por m3"
 
-#: qota/billing/doctype/service_rate/service_rate.py:41
+#: qota/billing/doctype/service_rate/service_rate.py:42
 msgid "Price values cannot be negative."
 msgstr "Los valores de precio no pueden ser negativos."
 
@@ -2270,7 +2419,7 @@ msgstr "Los valores de precio no pueden ser negativos."
 msgid "Process Completed"
 msgstr "Proceso completado"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:189
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:254
 msgid "Process queued for background execution."
 msgstr "Proceso en cola para ejecución en segundo plano."
 
@@ -2312,10 +2461,13 @@ msgstr "Nombre de la tarifa"
 msgid "Rates"
 msgstr "Tarifas"
 
+#. Label of the reactivation_date (Date) field in DocType 'Service Contract'
+#: qota/governance/doctype/service_contract/service_contract.json
+msgid "Reactivation Date"
+msgstr "Fecha de Reactivación"
+
 #. Label of the reading_date (Date) field in DocType 'Meter Reading'
-#. Label of the reading_date (Date) field in DocType 'Service Suspension'
 #: qota/billing/doctype/meter_reading/meter_reading.json
-#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Reading Date"
 msgstr "Fecha de lectura"
 
@@ -2345,6 +2497,7 @@ msgid "Receipt"
 msgstr "Recibo"
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:333
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:73
 msgid "Received By"
 msgstr "Recibido por"
 
@@ -2365,7 +2518,7 @@ msgstr "Valores por defecto de reconexión"
 msgid "Reconnection Fee"
 msgstr "Tarifa de reconexión"
 
-#: qota/governance/doctype/service_reconnection/service_reconnection.py:107
+#: qota/governance/doctype/service_reconnection/service_reconnection.py:116
 msgid "Reconnection Fee - Order {0}"
 msgstr "Cargo Reconexión - Pedido {0}"
 
@@ -2392,6 +2545,12 @@ msgstr "Tipo de documento de referencia"
 msgid "Reference Name"
 msgstr "Nombre de Referencia"
 
+#. Label of the reference_no (Data) field in DocType 'Expense Voucher'
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:31
+msgid "Reference No"
+msgstr "No Referencia"
+
 #. Label of the reference_no (Data) field in DocType 'Payment Receipt'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/billing/report/daily_collection/daily_collection.py:24
@@ -2413,14 +2572,20 @@ msgid "Remaining Debt"
 msgstr "Deuda Restante"
 
 #. Label of the remarks (Small Text) field in DocType 'Payment Receipt'
+#. Label of the remarks (Small Text) field in DocType 'Expense Voucher'
 #. Label of the remarks (Small Text) field in DocType 'Service Reconnection'
 #. Label of the remarks (Small Text) field in DocType 'Service Suspension'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:299
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Remarks"
 msgstr "Observaciones"
+
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:43
+msgid "Remarks / Description"
+msgstr "Comentarios / Descripción"
 
 #: qota/governance/doctype/service_contract/service_contract.js:87
 msgid "Remove Cistern"
@@ -2453,15 +2618,15 @@ msgstr "Restaurar Servicio"
 msgid "Review Missing Bills"
 msgstr "Revisar facturas faltantes"
 
-#: qota/billing/doctype/service_rate/service_rate.py:63
+#: qota/billing/doctype/service_rate/service_rate.py:66
 msgid "Row {0}: 'From' unit cannot be less than the previous limit ({1})."
 msgstr "Fila {0}: La unidad 'Desde' no puede ser menor al límite anterior ({1})."
 
-#: qota/billing/doctype/service_rate/service_rate.py:59
+#: qota/billing/doctype/service_rate/service_rate.py:62
 msgid "Row {0}: 'To' unit must be greater than 'From' unit."
 msgstr "Fila {0}: La unidad 'Hasta' debe ser mayor que la unidad 'Desde'."
 
-#: qota/billing/doctype/service_rate/service_rate.py:54
+#: qota/billing/doctype/service_rate/service_rate.py:55
 msgid "Row {0}: Price per unit cannot be negative."
 msgstr "Fila {0}: El precio por unidad no puede ser negativo."
 
@@ -2499,7 +2664,7 @@ msgstr "Seleccionar meses para adelantar"
 msgid "September"
 msgstr "Septiembre"
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.py:100
+#: qota/billing/doctype/payment_receipt/payment_receipt.py:101
 msgid "Sequence error: There is a gap between {0} and {1}. Payments must be sequential."
 msgstr "Error de secuencia: hay un vacío entre {0} y {1}. Los pagos deben ser secuenciales."
 
@@ -2528,7 +2693,6 @@ msgstr "Categoría de Servicio"
 #. Label of a shortcut in the Billing Workspace
 #. Name of a DocType
 #. Label of the service_contract (Link) field in DocType 'Service Contract Log'
-#. Label of the service_contract (Link) field in DocType 'Service Reconnection'
 #. Label of the service_contract (Link) field in DocType 'Service Suspension'
 #. Label of a shortcut in the Governance Workspace
 #. Label of a Workspace Sidebar Item
@@ -2546,7 +2710,6 @@ msgstr "Categoría de Servicio"
 #: qota/billing/workspace/billing/billing.json
 #: qota/governance/doctype/service_contract/service_contract.json
 #: qota/governance/doctype/service_contract_log/service_contract_log.json
-#: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/workspace/governance/governance.json
 #: qota/workspace_sidebar/governance.json
@@ -2555,7 +2718,10 @@ msgstr "Contrato de Servicio"
 
 #. Label of the service_contract_information_section (Section Break) field in
 #. DocType 'Payment Receipt'
+#. Label of the section_break_hgdk (Section Break) field in DocType 'Service
+#. Suspension'
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
+#: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Service Contract Information"
 msgstr "Información del Contrato de Servicio"
 
@@ -2564,7 +2730,7 @@ msgstr "Información del Contrato de Servicio"
 msgid "Service Contract Log"
 msgstr "Bitácora de contrato de servicio"
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:48
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:108
 msgid "Service End Date cannot be earlier than Service Start Date"
 msgstr "La fecha de fin del servicio no puede ser anterior a la fecha de inicio del servicio"
 
@@ -2605,8 +2771,11 @@ msgstr "Reconexión del servicio"
 msgid "Service Start Date and End Date are required."
 msgstr "Servicio de fecha de inicio y fecha de fin son requeridos."
 
+#. Label of the service_suspension (Link) field in DocType 'Service
+#. Reconnection'
 #. Name of a DocType
 #. Label of a Workspace Sidebar Item
+#: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/workspace_sidebar/governance.json
 msgid "Service Suspension"
@@ -2617,13 +2786,17 @@ msgstr "Suspensión de Servicio"
 msgid "Service Suspensions Scheduled — This Year"
 msgstr "Servicio de Suspensiones Programadas — Este año"
 
-#: qota/governance/doctype/service_reconnection/service_reconnection.py:143
+#: qota/governance/doctype/service_reconnection/service_reconnection.py:155
 msgid "Service restored via technical order {0}"
 msgstr "Servicio restaurado por pedido técnico {0}"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:206
-msgid "Service suspended by technical order {0}"
-msgstr "Servicio suspendido por pedido técnico {0}"
+#: qota/governance/doctype/service_suspension/service_suspension.js:114
+msgid "Service suspended successfully"
+msgstr "Servicio suspendido correctamente"
+
+#: qota/governance/doctype/service_suspension/service_suspension.py:285
+msgid "Service suspended technically on {0}. Effective since {1}."
+msgstr "Servicio suspendido técnicamente el {0}. Vigente desde {1}."
 
 #: qota/governance/doctype/service_contract/service_contract.js:132
 msgid "Set to Flat Rate"
@@ -2684,7 +2857,7 @@ msgstr "Fecha de Inicio"
 msgid "Start of the consumption block."
 msgstr "Inicio del bloque de consumo."
 
-#: qota/governance/doctype/service_reconnection/service_reconnection.py:160
+#: qota/governance/doctype/service_reconnection/service_reconnection.py:177
 msgid "Start reading (Reconnection Order {0})"
 msgstr "Empezar a leer (Orden de Reconexión {0})"
 
@@ -2695,6 +2868,7 @@ msgstr "Empezar a leer (Orden de Reconexión {0})"
 #. Label of the status (Select) field in DocType 'Monthly Bill'
 #. Label of the status (Select) field in DocType 'Payment Receipt'
 #. Label of the status (Select) field in DocType 'Service Rate'
+#. Label of the status (Select) field in DocType 'Expense Voucher'
 #. Label of the status (Select) field in DocType 'Premises'
 #. Label of the status (Select) field in DocType 'Service Contract'
 #. Label of the status (Select) field in DocType 'Service Reconnection'
@@ -2708,6 +2882,7 @@ msgstr "Empezar a leer (Orden de Reconexión {0})"
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/billing/doctype/service_rate/service_rate.json
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:259
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/premises/premises.json
 #: qota/governance/doctype/service_contract/service_contract.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
@@ -2725,6 +2900,10 @@ msgstr "Cambio de Estado"
 #: qota/billing/doctype/billing_cycle/billing_cycle.js:32
 msgid "Status reset successfully"
 msgstr "Estado restablecido correctamente"
+
+#: qota/governance/doctype/service_contract/service_contract.py:152
+msgid "Status: {0}"
+msgstr "Estado: {0}"
 
 #. Label of the is_late_fee_applicable (Check) field in DocType 'Service Rate
 #. Additional Fee'
@@ -2787,11 +2966,15 @@ msgstr "Solicitud del Abonado"
 msgid "Subscriber Type"
 msgstr "Tipo de Abonado"
 
-#: qota/billing/utils.py:539
+#: qota/governance/doctype/service_suspension/service_suspension.py:134
+msgid "Subscriber has unpaid debts prior to the requested suspension date."
+msgstr "El Abonado tiene deudas pendientes anteriores a la fecha de suspensión solicitada."
+
+#: qota/billing/utils.py:556
 msgid "Successfully generated {0} bills."
 msgstr "Facturas {0} generadas con éxito."
 
-#: qota/billing/doctype/billing_cycle/billing_cycle.py:162
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:227
 msgid "Successfully reprocessed {0} bills for {1}-{2}"
 msgstr "Facturas {0} reprocesadas con éxito por {1}-{2}"
 
@@ -2800,10 +2983,10 @@ msgstr "Facturas {0} reprocesadas con éxito por {1}-{2}"
 msgid "Suspended"
 msgstr "Suspendido"
 
-#. Label of the suspension_date (Date) field in DocType 'Service Suspension'
-#: qota/governance/doctype/service_suspension/service_suspension.json
-msgid "Suspension Date"
-msgstr "Fecha de Suspensión"
+#. Label of the suspended_since (Date) field in DocType 'Service Contract'
+#: qota/governance/doctype/service_contract/service_contract.json
+msgid "Suspended Since"
+msgstr "Suspendido Desde"
 
 #. Label of the suspension_reason (Data) field in DocType 'Service Contract'
 #: qota/governance/doctype/service_contract/service_contract.json
@@ -2821,13 +3004,17 @@ msgstr "Umbral de suspensión (meses)"
 msgid "Suspension Type"
 msgstr "Tipo de Suspensión"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:69
+#: qota/governance/doctype/service_suspension/service_suspension.py:91
 msgid "Suspension date cannot be earlier than contract start date."
 msgstr "La fecha de suspensión no puede ser anterior a la fecha de inicio del contrato."
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:176
-msgid "Suspension order {0} cancelled."
-msgstr "Orden de suspensión {0} cancelada."
+#: qota/governance/doctype/service_suspension/service_suspension.py:218
+msgid "Suspension order {0} cancelled. Restoring activity markers."
+msgstr "Orden de suspensión {0} cancelada. Restaurando marcadores de actividad."
+
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:82
+msgid "System Integrity Checked"
+msgstr "Integridad del Sistema Comprobada"
 
 #. Name of a role
 #: qota/billing/doctype/benefit_discount/benefit_discount.json
@@ -2841,6 +3028,8 @@ msgstr "Orden de suspensión {0} cancelada."
 #: qota/billing/doctype/meter_reading/meter_reading.json
 #: qota/billing/doctype/monthly_bill/monthly_bill.json
 #: qota/billing/doctype/service_rate/service_rate.json
+#: qota/expenditures/doctype/expense_category/expense_category.json
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/premises/premises.json
 #: qota/governance/doctype/service_category/service_category.json
 #: qota/governance/doctype/service_contract/service_contract.json
@@ -2851,6 +3040,10 @@ msgstr "Orden de suspensión {0} cancelada."
 msgid "System Manager"
 msgstr "Administrador del Sistema"
 
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:49
+msgid "TOTAL AMOUNT PAID"
+msgstr "TOTAL PAGADO"
+
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:325
 msgid "TOTAL PAID"
 msgstr "Total Pagado"
@@ -2860,7 +3053,7 @@ msgstr "Total Pagado"
 msgid "Tax Percentage"
 msgstr "Porcentaje de impuesto"
 
-#: qota/billing/doctype/billing_settings/billing_settings.py:54
+#: qota/billing/doctype/billing_settings/billing_settings.py:55
 msgid "Tax Percentage must be between 0 and 100."
 msgstr "El porcentaje de impuesto debe estar entre 0 y 100."
 
@@ -2869,9 +3062,15 @@ msgstr "El porcentaje de impuesto debe estar entre 0 y 100."
 msgid "Taxes"
 msgstr "Impuestos"
 
-#: qota/governance/doctype/service_suspension/service_suspension.js:73
+#: qota/governance/doctype/service_suspension/service_suspension.js:104
 msgid "Technical Confirmation"
 msgstr "Confirmación Técnica"
+
+#. Label of the technical_cut_section (Section Break) field in DocType 'Service
+#. Suspension'
+#: qota/governance/doctype/service_suspension/service_suspension.json
+msgid "Technical Cut Information"
+msgstr "Información de Corte Técnico"
 
 #. Label of the technical_section (Section Break) field in DocType 'Service
 #. Reconnection'
@@ -2882,6 +3081,10 @@ msgstr "Ejecución Técnica"
 #: qota/governance/doctype/service_reconnection/service_reconnection.js:80
 msgid "Technical Restoration"
 msgstr "Restauración Técnica"
+
+#: qota/billing/doctype/billing_cycle/billing_cycle.py:95
+msgid "Technical Window Error: You must wait until {0} to process this cycle, allowing {1} days for meter reading entry."
+msgstr "Error de Ventana Técnica: Debes esperar hasta el {0} para procesar este ciclo, permitiendo {1} días para el ingreso de lecturas de medidor."
 
 #: qota/governance/doctype/service_contract/service_contract.js:206
 msgid "Terminate Contract"
@@ -2895,7 +3098,7 @@ msgstr "Gracias por su pago."
 msgid "The 'To' limit ({0}) must be greater than the 'From' limit ({1})."
 msgstr "El límite 'Hasta' ({0}) debe ser mayor que el límite 'Desde' ({1})."
 
-#: qota/governance/doctype/service_contract/service_contract.py:63
+#: qota/governance/doctype/service_contract/service_contract.py:64
 msgid "The Premises {0} is already associated with an Active contract: {1}."
 msgstr "El predio {0} ya está asociado a un contrato activo: {1}."
 
@@ -2904,6 +3107,16 @@ msgstr "El predio {0} ya está asociado a un contrato activo: {1}."
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.json
 msgid "The amount that will be split into installments (Total - Down Payment)."
 msgstr "El monto que será dividido en cuotas (Total - Prima)."
+
+#. Description of the 'Suspended Since' (Date) field in DocType 'Service
+#. Contract'
+#: qota/governance/doctype/service_contract/service_contract.json
+msgid "The date the service effectively stopped"
+msgstr "La fecha en que el servicio se detuvo efectivamente"
+
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.py:44
+msgid "The expense amount {0} must be greater than zero."
+msgstr "El monto del gasto {0} debe ser mayor que cero."
 
 #: qota/governance/doctype/service_contract/service_contract.js:238
 msgid "The premises {0} is already linked to active contract {1}."
@@ -2917,13 +3130,17 @@ msgstr "El rango de fechas seleccionado se solapará con una factura mensual exi
 msgid "The total connection fee must be greater than zero."
 msgstr "La tarifa de conexión total debe ser mayor a cero."
 
+#: qota/governance/doctype/service_suspension/service_suspension.py:81
+msgid "There is already a pending suspension order ({0}) for this contract."
+msgstr "Ya existe una orden de suspensión pendiente ({0}) para este contrato."
+
 #: qota/billing/doctype/connection_fee/connection_fee.py:48
 msgid "There is already an active Connection Fee ({0}) for Service Category '{1}'. Please disable the existing one first."
 msgstr "Ya existe una tarifa de conexión activa ({0}) para la categoría de servicio '{1}'. Por favor desactive la existente primero."
 
-#: qota/billing/doctype/service_rate/service_rate.py:82
-msgid "There is already an active Rate ({0}) for Category '{1}'. Please deactivate it first."
-msgstr "Ya existe una tarifa activa ({0}) para la categoría '{1}'. Por favor desactívela primero."
+#: qota/billing/doctype/service_rate/service_rate.py:86
+msgid "There is already an active Rate ({0}) for Category '{1}'.Please deactivate it first."
+msgstr "Ya existe una Tarifa activa ({0}) para la Categoría ‘{1}’. Por favor, desactívela primero."
 
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.py:47
 msgid "This contract has no debt to refinance."
@@ -2945,9 +3162,9 @@ msgstr "Este elemento no tiene un desglose detallado."
 msgid "This will cancel and regenerate all UNPAID bills for this cycle with current rates. Continue?"
 msgstr "Esto cancelará y regenerará todas las facturas Sin Pagar para este ciclo con las tasas actuales. ¿Continuar?"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:128
-msgid "Threshold not met. Required: {0} months. Current expired: {1}."
-msgstr "Umbral no alcanzado. Requerido: {0} meses. Actual expirado: {1}."
+#: qota/governance/doctype/service_suspension/service_suspension.py:167
+msgid "Threshold not met at {0}. Required: {1} months. Current expired: {2}."
+msgstr "Umbral no cumplido en {0}. Requerido: {1} meses. Expirado actual: {2}."
 
 #. Label of the to_unit (Float) field in DocType 'Service Rate Consumption
 #. Range'
@@ -2964,6 +3181,11 @@ msgstr "Hasta la Fecha"
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:204
 msgid "Total"
 msgstr "Total"
+
+#. Label of the amount (Currency) field in DocType 'Expense Voucher'
+#: qota/expenditures/doctype/expense_voucher/expense_voucher.json
+msgid "Total Amount"
+msgstr "Monto Total"
 
 #. Label of the total_generated (Currency) field in DocType 'Billing Cycle'
 #: qota/billing/doctype/billing_cycle/billing_cycle.json
@@ -3004,6 +3226,10 @@ msgstr "Total Pagado"
 msgid "Total Pending"
 msgstr "Total Pendiente"
 
+#: qota/governance/doctype/service_suspension/service_suspension.py:175
+msgid "Total expired debt ({0}) is below the minimum threshold ({1})."
+msgstr "La deuda total vencida ({0}) está por debajo del umbral mínimo ({1})."
+
 #: qota/public/js/custom_block_strings.js:16
 msgid "Total items:"
 msgstr "Total de Elementos:"
@@ -3031,6 +3257,10 @@ msgstr "Total a Pagar"
 #: qota/billing/doctype/debt_refinancing/debt_refinancing.json
 msgid "Transaction Date"
 msgstr "Fecha de transacción"
+
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:68
+msgid "Treasurer / Board"
+msgstr "Tesorería / Junta"
 
 #. Label of the truncate_discount_decimals (Check) field in DocType 'Billing
 #. Settings'
@@ -3084,9 +3314,9 @@ msgstr "Ver Deudas Generadas"
 msgid "View History Log"
 msgstr "Ver Historial"
 
-#: qota/governance/doctype/service_suspension/service_suspension.py:109
-msgid "Voluntary suspension denied. Subscriber must pay all debts ({0}) first."
-msgstr "Suspensión voluntaria denegada. El suscriptor debe pagar todas las deudas ({0}) primero."
+#: qota/expenditures/print_format/expense_voucher/expense_voucher.html:7
+msgid "WATER BOARD"
+msgstr "JUNTA DE AGUA"
 
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:143
 msgid "Water Service"
@@ -3107,7 +3337,7 @@ msgstr "Año"
 msgid "Yes"
 msgstr "Si"
 
-#: qota/billing/doctype/payment_receipt/payment_receipt.py:88
+#: qota/billing/doctype/payment_receipt/payment_receipt.py:89
 msgid "You cannot skip pending debts. Please include {0} before adding future months."
 msgstr "No puede saltarse las deudas pendientes. Por favor, incluya {0} antes de añadir meses futuros."
 
@@ -3120,13 +3350,9 @@ msgstr "m3 ya incluidos en el cargo fijo."
 msgid "years"
 msgstr "años"
 
-#: qota/billing/utils.py:170
-msgid "{0} (Flat Rate - {1})"
-msgstr "{0} (Tarifa Fija- {1})"
-
-#: qota/billing/utils.py:180
-msgid "{0} (Flat Rate)"
-msgstr "{0} (Tarifa Fija)"
+#: qota/billing/utils.py:497
+msgid "{0} {1}"
+msgstr "{0} {1}"
 
 #. Count format of shortcut in the Billing Workspace
 #. Count format of shortcut in the Governance Workspace

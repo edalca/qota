@@ -28,6 +28,7 @@ class PaymentReceipt(Document):
 
         amended_from: DF.Link | None
         current_debt: DF.Currency
+        edit_posting_date: DF.Check
         full_name: DF.Data | None
         mode_of_payment: DF.Literal["Cash", "Bank Transfer", "Check", "Credit Card"]
         payment_date: DF.Datetime
@@ -117,7 +118,7 @@ class PaymentReceipt(Document):
 
     def on_cancel(self):
         """
-        Al cancelar el recibo, devolvemos el saldo a las deudas (revertir operación).
+        Al cancelar el recibo, devolvemos el saldo a las deudas.
         """
         self.process_ledger_updates(cancel=True)
 
@@ -215,6 +216,13 @@ class PaymentReceipt(Document):
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ]
+        contract_start = getdate(contract.start_date)
+        reactivation_dt = (getdate(contract.reactivation_date)
+                           if contract.reactivation_date else None)
+        effective_start_date = (reactivation_dt
+                                if reactivation_dt and
+                                reactivation_dt > contract_start
+                                else contract_start)
 
         existing_periods = set()
         if not ignore_existing:
@@ -251,9 +259,8 @@ class PaymentReceipt(Document):
         if ignore_existing:
             current_date = date(min_year, 1, 1)
         else:
-            contract_start = getdate(contract.start_date)
-            start_year = max(contract_start.year, min_year)
-            current_date = date(start_year, contract_start.month, 1)
+            start_year = max(effective_start_date.year, min_year)
+            current_date = date(start_year, effective_start_date.month, 1)
 
         advances = []
         today_date = nowdate()
@@ -267,7 +274,8 @@ class PaymentReceipt(Document):
 
             fiscal_year_link = open_years_map.get(y_num)
             if not fiscal_year_link:
-                break
+                current_date = add_months(current_date, 1)
+                continue
 
             if ignore_existing or (period_id not in existing_periods):
                 month_str = month_names[m_num - 1]
@@ -289,7 +297,8 @@ class PaymentReceipt(Document):
                     "year": y_num,
                     "due_date": today_date,
                     "amount": flt(breakdown.get("total_to_bill", 0)),
-                    "discount_amount": flt(breakdown.get("discount_amount", 0)),
+                    "discount_amount":
+                    flt(breakdown.get("discount_amount", 0)),
                     "description": _("Advance Payment: {0}").format(
                         format_date(current_date, 'MMMM YYYY')),
                     "billing_details": breakdown.get("detailed_items", [])
@@ -305,24 +314,31 @@ def get_pending_balances(contract):
     """
     Fetches existing debts and determines mandatory status based on due dates.
     """
-    debts = frappe.get_all("Debt Ledger Entry",
+    debts = frappe.get_all(
+        "Debt Ledger Entry",
         filters={
             "service_contract": contract,
             "outstanding_amount": [">", 0],
-            "docstatus": 0
+            "docstatus": ["!=", 2]
         },
-        fields=["name as debt_id", "entry_type as payment_concept", "outstanding_amount as amount", "due_date", "description","billing_period"],
+        fields=["name as debt_id",
+                "entry_type as payment_concept",
+                "outstanding_amount as amount",
+                "due_date",
+                "description",
+                "billing_period"],
         order_by="creation asc"
     )
 
     current_date = getdate(today())
     for d in debts:
         # Una deuda es obligatoria si ya pasó su fecha de vencimiento
-        d['days_diff'] = frappe.utils.date_diff(d['due_date'], current_date) if d['due_date'] else 0
-        
+        d['days_diff'] = (
+            frappe.utils.date_diff(d['due_date'], current_date)
+            if d['due_date'] else 0
+        )
+
     return {
         "debts": debts,
         "current_debt": sum(flt(d['amount']) for d in debts)
     }
-
-    

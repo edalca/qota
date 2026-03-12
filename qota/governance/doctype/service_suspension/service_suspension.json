@@ -5,33 +5,30 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "suspension_date",
+  "section_break_vtbt",
+  "posting_date",
+  "edit_posting_date",
+  "effective_date",
+  "column_break_5",
+  "suspension_type",
+  "reason",
+  "status",
+  "section_break_hgdk",
   "service_contract",
   "subscriber",
   "full_name",
+  "column_break_ioqv",
   "premises",
-  "column_break_5",
-  "suspension_type",
   "billing_basis",
-  "reason",
-  "status",
-  "meter_reading_section",
+  "technical_cut_section",
+  "executed_date",
+  "column_break_mcpe",
   "final_reading",
-  "column_break_11",
-  "reading_date",
   "notes_section",
   "remarks",
   "amended_from"
  ],
  "fields": [
-  {
-   "default": "Today",
-   "fieldname": "suspension_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Suspension Date",
-   "reqd": 1
-  },
   {
    "fieldname": "service_contract",
    "fieldtype": "Link",
@@ -85,27 +82,11 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.billing_basis==\"Metered\"",
-   "fieldname": "meter_reading_section",
-   "fieldtype": "Section Break",
-   "label": "Final Reading"
-  },
-  {
    "fieldname": "final_reading",
    "fieldtype": "Float",
    "label": "Final Reading Value",
-   "mandatory_depends_on": "eval:doc.billing_basis==\"Metered\""
-  },
-  {
-   "fieldname": "column_break_11",
-   "fieldtype": "Column Break"
-  },
-  {
-   "default": "Today",
-   "fieldname": "reading_date",
-   "fieldtype": "Date",
-   "label": "Reading Date",
-   "mandatory_depends_on": "eval:doc.billing_basis==\"Metered\""
+   "mandatory_depends_on": "eval:doc.billing_basis==\"Metered\"",
+   "read_only": 1
   },
   {
    "fieldname": "notes_section",
@@ -142,13 +123,63 @@
    "label": "Billing Basis",
    "options": "\nFlat Rate\nMetered",
    "read_only": 1
+  },
+  {
+   "default": "Now",
+   "fieldname": "posting_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "read_only_depends_on": "eval:!doc.edit_posting_date",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "edit_posting_date",
+   "fieldtype": "Check",
+   "label": "Edit Posting Date"
+  },
+  {
+   "fieldname": "section_break_hgdk",
+   "fieldtype": "Section Break",
+   "label": "Service Contract Information"
+  },
+  {
+   "fieldname": "column_break_ioqv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_vtbt",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "effective_date",
+   "fieldtype": "Date",
+   "label": "Effective Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "executed_date",
+   "fieldtype": "Date",
+   "label": "Executed Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_mcpe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.executed_date",
+   "fieldname": "technical_cut_section",
+   "fieldtype": "Section Break",
+   "label": "Technical Cut Information"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-25 21:13:53.630553",
+ "modified": "2026-03-11 14:50:59.922817",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Service Suspension",
@@ -171,6 +202,7 @@
  ],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
+ "search_fields": "full_name",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [

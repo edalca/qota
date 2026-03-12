@@ -38,7 +38,6 @@
   {
    "fieldname": "service_contract",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Service Contract",
    "options": "Service Contract",
@@ -134,6 +133,7 @@
    "fetch_from": "service_contract.premises",
    "fieldname": "premises",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Premises",
    "options": "Premises",
    "read_only": 1
@@ -186,7 +186,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-24 22:53:51.699230",
+ "modified": "2026-03-03 00:28:07.392410",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Monthly Bill",

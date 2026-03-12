@@ -51,9 +51,10 @@ class DebtLedgerEntry(Document):
         else:
             self.status = "Unpaid"
 
-    def on_submit(self) -> None:
+    def after_insert(self) -> None:
         """
-        Triggers reconciliation with any existing advance payments.
+        Triggers reconciliation with existing advances
+        immediately after creation.
         """
         self.apply_advance_payments()
 
@@ -236,7 +237,4 @@ def make_debt_ledger_entry(
     })
 
     debt.insert(ignore_permissions=True)
-
-    debt.submit()
-
     return debt

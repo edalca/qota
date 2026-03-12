@@ -27,6 +27,7 @@ class BillingSettings(Document):
         isv_percent: DF.Percent
         late_fee_type: DF.Literal["Fixed Amount", "Percentage"]
         late_fee_value: DF.Currency
+        max_backdating_limit_days: DF.Int
         max_discounts_per_connection: DF.Int
         max_discounts_per_subscriber: DF.Int
         min_debt_for_suspension: DF.Currency
