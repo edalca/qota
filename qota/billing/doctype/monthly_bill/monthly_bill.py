@@ -8,7 +8,6 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt, getdate
 
-# Import centralized ledger functions
 from qota.billing.doctype.debt_ledger_entry.debt_ledger_entry import (
     make_debt_ledger_entry,
     clear_and_delete_debt
@@ -50,9 +49,6 @@ class MonthlyBill(Document):
     # end: auto-generated types
 
     def validate(self) -> None:
-        """
-        Runs all mandatory billing validations before saving.
-        """
         self.validate_dates()
         self.check_duplicate_fiscal_period()
         self.check_duplicate_period()
@@ -127,36 +123,30 @@ class MonthlyBill(Document):
         }
         rev_month_map = {v: k for k, v in month_map.items()}
 
-        # 1. Obtener Metadatos del Contrato
-        # Traemos start_date y reactivation_date en un solo viaje
-        contract_data = frappe.db.get_value("Service Contract", self.service_contract, 
+        contract_data = frappe.db.get_value("Service Contract", self.service_contract,
             ["start_date", "reactivation_date"], as_dict=1)
 
         if not contract_data:
             return None
 
-        # 2. Determinar Fecha Efectiva de Inicio de Facturación
         start = getdate(contract_data.start_date)
         reactivation = getdate(contract_data.reactivation_date) if contract_data.reactivation_date else start
-        
-        # El contrato es obligatorio de facturar a partir del mayor de estos dos
+
         effective_start = max(start, reactivation)
         effective_start_idx = (effective_start.year * 12) + effective_start.month
 
-        # 3. Determinar Límite por Años Abiertos
         oldest_open_year = frappe.db.get_value("Billing Year", {"is_closed": 0}, "year_name", order_by="year_name asc")
         if not oldest_open_year:
             return None
-            
+
         open_year_idx = (int(oldest_open_year) * 12) + 1
-        
-        # El requerimiento de continuidad empieza en el máximo entre la actividad del contrato y el año fiscal abierto
+
         required_start_idx = max(effective_start_idx, open_year_idx)
 
-        # 4. Validar Periodo Actual vs Requerido
         curr_year_val = frappe.db.get_value("Billing Year", self.fiscal_year, "year_name")
-        if not curr_year_val: return None
-        
+        if not curr_year_val:
+            return None
+
         curr_idx = (int(curr_year_val) * 12) + month_map.get(self.fiscal_month)
 
         if curr_idx < required_start_idx:
@@ -165,15 +155,11 @@ class MonthlyBill(Document):
                 "First billable period is {0} {1}."
             ).format(_(rev_month_map[required_start_idx % 12 or 12]), (required_start_idx - 1) // 12))
 
-        # 5. Validar Mes Anterior (Continuidad)
-        # Solo validamos el anterior si el actual es mayor al inicio requerido
         if curr_idx > required_start_idx:
             prev_idx = curr_idx - 1
             prev_month_num = prev_idx % 12 or 12
             prev_year_num = (prev_idx - 1) // 12
-            
-            # Buscamos si existe la factura del mes anterior
-            # No necesitamos el link del año, con el valor numérico en el Monthly Bill basta si lo tienes indexado
+
             exists = frappe.db.exists("Monthly Bill", {
                 "service_contract": self.service_contract,
                 "fiscal_month": rev_month_map[prev_month_num],
@@ -218,18 +204,11 @@ class MonthlyBill(Document):
             self.grand_total = flt(breakdown.get("total_to_bill"))
 
     def on_submit(self) -> None:
-        """
-        Finalizes the bill and delegates financial impact to the Ledger.
-        """
         self.db_set("status", "Unpaid")
         self.create_debt_entry()
         self.prepare_audit_json()
 
     def on_cancel(self) -> None:
-        """
-        Reverts the bill and delegates debt cleanup to the Ledger.
-        """
-        # Centralized cleanup in Debt Ledger Entry
         clear_and_delete_debt(self.doctype, self.name)
         self.db_set("status", "Cancelled")
 

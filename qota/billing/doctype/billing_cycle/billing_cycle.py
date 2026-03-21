@@ -46,7 +46,6 @@ class BillingCycle(Document):
     # end: auto-generated types
 
     def validate(self):
-        """Restoring all your original validations"""
         self.validate_dates()
         self.check_duplicate_cycle()
         self.validate_sequence()
@@ -64,18 +63,15 @@ class BillingCycle(Document):
         end_dt = getdate(self.end_date)
         post_dt = getdate(self.posting_date)
 
-        # 1. Period Integrity: Cannot bill a month that hasn't finished yet
         if end_dt >= curr_today:
             frappe.throw(_(
                 "Cannot generate cycle. The coverage period must end "
                 "before today. Period ends on: {0}"
             ).format(formatdate(self.end_date)))
 
-        # 2. Posting Date: No future dates allowed
         if post_dt > curr_today:
             frappe.throw(_("Posting Date cannot be in the future."))
 
-        # 3. Posting Date: Backdating limit enforcement
         if self.edit_posting_date:
             limit_days = int(settings.max_backdating_limit_days or 0)
             earliest_allowed = add_days(curr_today, -limit_days)
@@ -149,11 +145,9 @@ class BillingCycle(Document):
         """
         from qota.billing.utils import get_monthly_billing_breakdown
 
-        # Usamos los valores del documento actual (self)
         fiscal_month = self.fiscal_month
         fiscal_year = self.fiscal_year
 
-        # 1. Get all submitted bills for the period
         bills = frappe.get_all("Monthly Bill", filters={
             "fiscal_month": fiscal_month,
             "fiscal_year": fiscal_year,
@@ -167,7 +161,6 @@ class BillingCycle(Document):
 
         count = 0
         for b in bills:
-            # 2. Identify and Reset Payment Links
             dle_name = frappe.db.get_value("Debt Ledger Entry",
                                            {"reference_name": b.name}, "name")
 
@@ -178,7 +171,6 @@ class BillingCycle(Document):
                     WHERE debt_ledger_entry = %s
                 """, dle_name)
 
-            # 3. Recalculate
             breakdown = get_monthly_billing_breakdown(
                 contract_name=b.service_contract,
                 billing_month=fiscal_month,
@@ -189,7 +181,6 @@ class BillingCycle(Document):
 
             new_total = flt(breakdown.get("total_to_bill"))
 
-            # 4. Update Items
             frappe.db.delete("Monthly Bill Item", {"parent": b.name})
             for item in breakdown.get("detailed_items", []):
                 frappe.get_doc({
@@ -201,14 +192,12 @@ class BillingCycle(Document):
                     "amount": item["amount"]
                 }).db_insert()
 
-            # 5. Update Bill Header
             frappe.db.set_value("Monthly Bill", b.name, {
                 "grand_total": new_total,
                 "billing_details_json": json.dumps(
                     breakdown.get("detailed_items", []))
             }, update_modified=True)
 
-            # 6. Update Debt Ledger
             if dle_name:
                 frappe.db.set_value("Debt Ledger Entry", dle_name, {
                     "amount": new_total,
@@ -217,7 +206,6 @@ class BillingCycle(Document):
                     "status": "Unpaid"
                 })
 
-            # 7. Re-apply payments
             doc = frappe.get_doc("Monthly Bill", b.name)
             doc.apply_advance_payments()
 
@@ -243,7 +231,6 @@ class BillingCycle(Document):
         return True
 
     def on_submit(self):
-        """Triggers the background process for real execution"""
         self.db_set("status", "Queue")
         frappe.enqueue(
             method=execute_billing_process,
@@ -256,7 +243,6 @@ class BillingCycle(Document):
             alert=True)
 
     def on_cancel(self):
-        """Rollback: Cancels all linked bills and updates status"""
         self.cancel_generated_bills()
         self.db_set("status", "Cancelled")
 

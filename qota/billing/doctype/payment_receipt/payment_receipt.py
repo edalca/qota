@@ -107,19 +107,12 @@ class PaymentReceipt(Document):
 
     def before_submit(self):
         for item in self.payment_items:
-            # Al inicio, el saldo disponible es el total del item
             item.balance = item.amount
 
     def on_submit(self):
-        """
-        Al confirmar el recibo, actualizamos el saldo de las deudas vinculadas.
-        """
         self.process_ledger_updates(cancel=False)
 
     def on_cancel(self):
-        """
-        Al cancelar el recibo, devolvemos el saldo a las deudas.
-        """
         self.process_ledger_updates(cancel=True)
 
     def status_update(self):
@@ -158,7 +151,6 @@ class PaymentReceipt(Document):
 
                     item.balance = flt(item.balance) - amount_to_apply
 
-                # --- Gestión de Estados de la Deuda ---
                 if flt(debt.outstanding_amount) <= 0.01:
                     debt.status = "Paid"
                 elif flt(debt.paid_amount) > 0:
@@ -166,24 +158,19 @@ class PaymentReceipt(Document):
                 else:
                     debt.status = "Unpaid"
 
-                # Guardar cambios en la Deuda
                 debt.flags.ignore_validate_update_after_submit = True
                 debt.save(ignore_permissions=True)
 
-                # Guardar el nuevo balance en el ítem del recibo
                 item.db_set("balance", item.balance)
 
     def calculate_totals(self):
         total_to_pay = 0.0
         unallocated_amount = 0.0
 
-        # Recorremos la única tabla: payment_items
         if self.get("payment_items"):
             for item in self.payment_items:
-                # Sumar al total pagado
                 total_to_pay += flt(item.amount)
 
-                # Si NO tiene debt_ledger_entry, es un adelanto (unallocated)
                 if not item.debt_ledger_entry:
                     unallocated_amount += flt(item.amount)
 
@@ -244,7 +231,6 @@ class PaymentReceipt(Document):
             for pa in paid:
                 existing_periods.add(pa.billing_period)
 
-        # 3. Mapa de Años Fiscales Abiertos
         open_years = frappe.get_all(
             "Billing Year",
             filters={"is_closed": 0},
@@ -332,7 +318,6 @@ def get_pending_balances(contract):
 
     current_date = getdate(today())
     for d in debts:
-        # Una deuda es obligatoria si ya pasó su fecha de vencimiento
         d['days_diff'] = (
             frappe.utils.date_diff(d['due_date'], current_date)
             if d['due_date'] else 0

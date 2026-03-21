@@ -43,13 +43,11 @@ class DiscountRule(Document):
                 flt(self.discount_percentage) > 100
             ):
                 frappe.throw(_("Discount percentage must be between 1 and 100"))
-            # Optional: Clear fixed_amount if type is Percentage
             self.fixed_amount = 0
 
         elif self.discount_type == "Fixed Amount":
             if flt(self.fixed_amount) <= 0:
                 frappe.throw(_("Fixed Amount must be greater than 0"))
-            # Optional: Clear percentage if type is Fixed
             self.discount_percentage = 0
 
     def validate_age_range(self):

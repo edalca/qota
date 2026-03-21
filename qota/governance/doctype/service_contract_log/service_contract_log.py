@@ -25,26 +25,14 @@ class ServiceContractLog(Document):
     # end: auto-generated types
 
     def validate(self):
-        """
-        Prevents modification of log entries after they are created to ensure
-        an immutable audit trail.
-        """
         if not self.is_new():
             frappe.throw(_(
                 "Audit logs cannot be modified "
                 "once they are created."))
 
     def on_trash(self):
-        """
-        Optional: Prevents deletion of logs for security purposes.
-        If the administrator needs to delete them, this can be commented out.
-        """
         if not "System Manager" in frappe.get_roles():
             frappe.throw(_("Only System Managers can delete audit logs."))
 
     def before_insert(self):
-        """
-        Ensures the user field is always populated with
-        the current session user.
-        """
         self.user = frappe.session.user

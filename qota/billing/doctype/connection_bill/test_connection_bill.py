@@ -13,9 +13,9 @@ IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
 
-class IntegrationTestConnectionFee(IntegrationTestCase):
+class IntegrationTestConnectionBill(IntegrationTestCase):
 	"""
-	Integration tests for ConnectionFee.
+	Integration tests for ConnectionBill.
 	Use this class for testing interactions between multiple components.
 	"""
 

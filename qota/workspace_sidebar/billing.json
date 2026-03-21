@@ -33,6 +33,17 @@
   {
    "child": 0,
    "collapsible": 1,
+   "icon": "list",
+   "indent": 0,
+   "keep_closed": 0,
+   "label": "Operations",
+   "link_type": "DocType",
+   "show_arrow": 0,
+   "type": "Section Break"
+  },
+  {
+   "child": 1,
+   "collapsible": 1,
    "icon": "calendar-clock",
    "indent": 0,
    "keep_closed": 0,
@@ -43,7 +54,7 @@
    "type": "Link"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "icon": "calendar-sync",
    "indent": 0,
@@ -55,18 +66,20 @@
    "type": "Link"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
-   "icon": "list",
+   "icon": "cable",
    "indent": 0,
    "keep_closed": 0,
-   "label": "Operations",
+   "label": "Connection Bill",
+   "link_to": "Connection Bill",
    "link_type": "DocType",
+   "navigate_to_tab": "",
    "show_arrow": 0,
-   "type": "Section Break"
+   "type": "Link"
   },
   {
-   "child": 0,
+   "child": 1,
    "collapsible": 1,
    "icon": "circle-gauge",
    "indent": 0,
@@ -101,17 +114,6 @@
    "type": "Link"
   },
   {
-   "child": 0,
-   "collapsible": 1,
-   "icon": "money-coins-1",
-   "indent": 1,
-   "keep_closed": 1,
-   "label": "Rates",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Section Break"
-  },
-  {
    "child": 1,
    "collapsible": 1,
    "icon": "",
@@ -119,18 +121,6 @@
    "keep_closed": 0,
    "label": "Service Rate",
    "link_to": "Service Rate",
-   "link_type": "DocType",
-   "show_arrow": 0,
-   "type": "Link"
-  },
-  {
-   "child": 1,
-   "collapsible": 1,
-   "icon": "",
-   "indent": 0,
-   "keep_closed": 0,
-   "label": "Connection Fee",
-   "link_to": "Connection Fee",
    "link_type": "DocType",
    "show_arrow": 0,
    "type": "Link"
@@ -266,7 +256,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-02-23 08:59:48.114891",
+ "modified": "2026-03-13 17:01:13.797941",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing",

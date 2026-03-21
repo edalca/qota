@@ -6,6 +6,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import getdate, today
 
+
 class Subscriber(Document):
     # begin: auto-generated types
     # This code is auto-generated. Do not modify anything in this block.
@@ -54,23 +55,21 @@ class Subscriber(Document):
         if not self.id_number:
             return
 
-        # 1. No spaces allowed
         if " " in self.id_number:
             frappe.throw(_("ID Number cannot contain spaces."))
 
         id_clean = self.id_number.replace("-", "")
 
-        # 2. Automated Checks based on ID Type
         if self.id_type == "DNI":
             if not id_clean.isdigit() or len(id_clean) != 13:
                 frappe.throw(_("DNI must be exactly 13 digits."))
             self.is_honduran = 1
             self.is_resident = 1
-        
+
         elif self.id_type == "Residence Card":
             self.is_honduran = 0
             self.is_resident = 1
-            
+
         elif self.id_type == "RTN":
             if not id_clean.isdigit() or len(id_clean) != 14:
                 frappe.throw(_("RTN must be exactly 14 digits."))
@@ -78,11 +77,9 @@ class Subscriber(Document):
                 frappe.throw(_("Natural Persons cannot use RTN as primary ID."))
             self.is_honduran = 0
             self.is_resident = 0
-            
-        else: # Passport
+
+        else:
             self.is_honduran = 0
-            # Residents with passports are rare unless they have a card, 
-            # so we default to 0
             self.is_resident = 0
 
     def validate_id_dates(self):
@@ -94,11 +91,11 @@ class Subscriber(Document):
 
     def check_board_eligibility(self):
         """Art. 13: Honduran, Resident, Read/Write, 18+ years old"""
-        if (self.subscriber_type == "Natural Person" and 
-            self.is_honduran and 
-            self.is_resident and 
-            self.can_read_and_write and 
-            self.age >= 18):
+        if (self.subscriber_type == "Natural Person" and
+                self.is_honduran and
+                self.is_resident and
+                self.can_read_and_write and
+                self.age >= 18):
             self.eligible_for_board = 1
         else:
             self.eligible_for_board = 0

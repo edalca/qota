@@ -36,16 +36,13 @@ class ServiceContract(Document):
     # end: auto-generated types
 
     def validate(self):
-        """Main validation dispatcher."""
         self.check_active_contract_on_save()
 
     def on_submit(self):
-        """Actions to perform on document submission."""
         self.activate_contract()
         self.create_activation_log()
 
     def on_cancel(self):
-        """Actions to perform on document cancellation."""
         self.process_cancellation()
 
     def check_active_contract_on_save(self):
@@ -137,9 +134,6 @@ def update_contract_property(
         new_status = data.get("new_status")
         doc.status = new_status
 
-        # New parameter handling:
-        # Stores the specific reason (Maintenance, Arrears, etc.)
-        # Clears it if the status returns to 'Active'
         if new_status == "Suspended":
             doc.suspension_reason = data.get("suspension_reason")
         else:
@@ -159,30 +153,19 @@ def update_contract_property(
 
 
 @frappe.whitelist()
-def service_contract_query(
-    doctype,
-    txt,
-    searchfield,
-    start,
-    page_len,
-    filters
-):
+def service_contract_query(doctype, txt, searchfield, start, page_len, filters):
+    """Return Service Contract search results with premises info in the display label.
+
+    Supports multi-token search: "15 10" matches contracts where one field contains
+    "15" AND another contains "10", allowing combined block + house_number lookups.
     """
-    Custom search query for Service Contract selection.
-    Includes translated premises labels (Block/House) in the display column.
-    """
-    search_txt = f"%{txt}%"
-    # 1. Translate labels in Python before building the query
-    block_label = _("Block")
-    house_label = _("House")
-    # 2. Build conditions
+    if isinstance(filters, str):
+        filters = frappe.parse_json(filters)
+
     conditions = [f"sc.docstatus = {int(filters.get('docstatus', 1))}"]
-    status_filter = filters.get('status')
+    status_filter = filters.get("status")
     if status_filter:
-        if (
-            isinstance(status_filter, (list, tuple)) and
-            status_filter[0] == 'in'
-        ):
+        if isinstance(status_filter, (list, tuple)) and status_filter[0] == "in":
             vals = ", ".join([frappe.db.escape(v) for v in status_filter[1]])
             conditions.append(f"sc.status IN ({vals})")
         else:
@@ -190,38 +173,41 @@ def service_contract_query(
     else:
         conditions.append("sc.status = 'Active'")
 
-    if filters.get('billing_basis'):
-        basis = frappe.db.escape(filters.get('billing_basis'))
-        conditions.append(f"sc.billing_basis = {basis}")
+    if filters.get("billing_basis"):
+        conditions.append(f"sc.billing_basis = {frappe.db.escape(filters.get('billing_basis'))}")
+
+    tokens = [t for t in (txt or "").split() if t]
+    params = {"start": int(start), "page_len": int(page_len)}
+    token_clauses = []
+    for i, token in enumerate(tokens):
+        key = f"tok{i}"
+        params[key] = f"%{token}%"
+        token_clauses.append(
+            f"(sc.name LIKE %({key})s OR sc.full_name LIKE %({key})s"
+            f" OR p.block LIKE %({key})s OR p.house_number LIKE %({key})s)"
+        )
 
     where_clause = " AND ".join(conditions)
+    search_clause = " AND ".join(token_clauses) if token_clauses else "1=1"
+    block_label = _("Block")
+    house_label = _("House")
 
-    # 3. Construct Query with translated labels
-    # We use f-string only for the translated prefixes
     query = f"""
         SELECT
             sc.name,
             CONCAT(
                 sc.full_name,
-                ' ({block_label}: ', p.block, ' |
-                {house_label}: ', p.house_number, ')'
+                ' ({block_label}: ', p.block, ' | {house_label}: ', p.house_number, ')'
             ) AS display_name
         FROM `tabService Contract` sc
         JOIN `tabPremises` p ON sc.premises = p.name
         WHERE {where_clause}
-        AND (
-            sc.name LIKE %(txt)s OR sc.full_name LIKE %(txt)s OR
-            p.block LIKE %(txt)s OR p.house_number LIKE %(txt)s
-        )
+        AND ({search_clause})
         ORDER BY sc.name ASC
         LIMIT %(start)s, %(page_len)s
     """
 
-    return frappe.db.sql(query, {
-        "txt": search_txt,
-        "start": int(start),
-        "page_len": int(page_len)
-    })
+    return frappe.db.sql(query, params)
 
 
 @frappe.whitelist()

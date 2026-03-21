@@ -28,10 +28,6 @@ class ExpenseVoucher(Document):
     # end: auto-generated types
 
     def validate(self) -> None:
-        """
-        Main validation lifecycle.
-        Ensures document data is consistent before saving.
-        """
         self.validate_amount()
         self.sync_status_with_docstatus()
 
@@ -58,14 +54,7 @@ class ExpenseVoucher(Document):
             self.status = "Cancelled"
 
     def on_submit(self) -> None:
-        """
-        Finalizes the transaction.
-        Updates the status and triggers accounting hooks if necessary.
-        """
         self.db_set("status", "Paid")
 
     def on_cancel(self) -> None:
-        """
-        Ensures accounting symmetry by marking the voucher as Cancelled.
-        """
         self.db_set("status", "Cancelled")

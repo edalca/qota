@@ -24,7 +24,6 @@
   "credit_policy_section",
   "suspension_months_limit",
   "column_break_policy",
-  "connection_debt_deadline_days",
   "min_debt_for_suspension",
   "discounts_sb",
   "max_discounts_per_subscriber",
@@ -39,6 +38,9 @@
   "late_fee_type",
   "late_fee_value",
   "section_break_reconn",
+  "default_connection_fee",
+  "connection_debt_deadline_days",
+  "column_break_umuo",
   "reconnection_fee_item",
   "section_break_focd",
   "bill_footer_message"
@@ -229,7 +231,13 @@
   {
    "fieldname": "section_break_reconn",
    "fieldtype": "Section Break",
-   "label": "Reconnection Defaults"
+   "label": "Connection & Reconnection Defaults"
+  },
+  {
+   "description": "Default amount charged when creating a new service connection. Can be overridden per Connection Bill.",
+   "fieldname": "default_connection_fee",
+   "fieldtype": "Currency",
+   "label": "Default Connection Fee"
   },
   {
    "fieldname": "section_break_focd",
@@ -265,13 +273,17 @@
    "fieldtype": "Int",
    "label": "Max Backdating Limit (Days)",
    "non_negative": 1
+  },
+  {
+   "fieldname": "column_break_umuo",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-03-02 22:36:05.904656",
+ "modified": "2026-03-13 17:05:27.405022",
  "modified_by": "Administrator",
  "module": "Billing",
  "name": "Billing Settings",
