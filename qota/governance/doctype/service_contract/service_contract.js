@@ -16,20 +16,6 @@ frappe.ui.form.on("Service Contract", {
 			};
 		});
 
-		// Filter: Connection Fee by Service Category
-		frm.set_query("connection_fee", () => {
-			return {
-				filters: [
-					["disabled", "=", 0],
-					["service_category", "=", frm.doc.service_category],
-				],
-			};
-		});
-	},
-
-	// Si cambia la categoría, limpiamos la tarifa
-	service_category: function (frm) {
-		frm.set_value("connection_fee", "");
 	},
 
 	refresh: function (frm) {
@@ -41,8 +27,6 @@ frappe.ui.form.on("Service Contract", {
 			"start_reading",
 			"has_cistern",
 			"cistern_capacity",
-			"connection_fee",
-			"connection_fee_posted",
 			"service_category",
 		];
 
@@ -329,8 +313,8 @@ frappe.ui.form.on("Service Contract", {
 
 	call_update_method: function (frm, type, data) {
 		frappe.call({
-			method: "qota.billing.doctype.service_contract.service_contract.update_contract_property",
-			args: { contract_id: frm.doc.name, update_type: type, data: data },
+			method: "qota.governance.doctype.service_contract.service_contract.update_contract_property",
+			args: { service_contract: frm.doc.name, update_type: type, data: data },
 			freeze: true,
 			callback: function (r) {
 				if (!r.exc) {
