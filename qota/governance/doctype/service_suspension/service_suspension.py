@@ -224,7 +224,6 @@ class ServiceSuspension(Document):
 			filters={
 				"service_contract": self.service_contract,
 				"docstatus": 1,
-				"remarks": ["like", f"%{self.name}%"],
 			},
 			pluck="name",
 		)

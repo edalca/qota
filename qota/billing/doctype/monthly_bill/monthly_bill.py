@@ -123,6 +123,9 @@ class MonthlyBill(Document):
         }
         rev_month_map = {v: k for k, v in month_map.items()}
 
+        if frappe.flags.get("skip_billing_continuity_check"):
+            return None
+
         contract_data = frappe.db.get_value("Service Contract", self.service_contract,
             ["start_date", "reactivation_date"], as_dict=1)
 
@@ -131,7 +134,6 @@ class MonthlyBill(Document):
 
         start = getdate(contract_data.start_date)
         reactivation = getdate(contract_data.reactivation_date) if contract_data.reactivation_date else start
-
         effective_start = max(start, reactivation)
         effective_start_idx = (effective_start.year * 12) + effective_start.month
 

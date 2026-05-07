@@ -408,7 +408,6 @@ def get_billing_gaps():
 		for c in contracts:
 			start = getdate(c.start_date)
 			reactivation = getdate(c.reactivation_date) if c.reactivation_date else start
-
 			effective_start = max(start, reactivation)
 
 			if c.status == "Suspended" and c.suspended_since:
@@ -464,6 +463,8 @@ def generate_bills_and_link_advances(gap_list):
 		"December": 12,
 	}
 
+	gap_list.sort(key=lambda g: (int(g.get("year")), month_map[g.get("month")]))
+
 	success_count = 0
 	for gap in gap_list:
 		try:
@@ -490,6 +491,119 @@ def generate_bills_and_link_advances(gap_list):
 			frappe.log_error(f"Gap Error {contract_id}: {e!s}", "Billing")
 
 	return _("Successfully generated {0} bills.").format(success_count)
+
+
+@frappe.whitelist()
+def get_missing_periods_for_contract(contract, from_date, to_date):
+	"""
+	Returns all year/month combinations between from_date and to_date
+	that do not yet have a Monthly Bill for the given contract.
+	"""
+	import json
+	from datetime import date
+
+	from frappe.utils import getdate
+
+	start = getdate(from_date)
+	end = getdate(to_date)
+
+	if start > end:
+		frappe.throw(_("From date must be before To date."))
+
+	existing = frappe.get_all(
+		"Monthly Bill",
+		filters={"service_contract": contract, "docstatus": ["!=", 2]},
+		fields=["fiscal_year", "fiscal_month"],
+	)
+	year_docs = frappe.get_all("Billing Year", fields=["name", "year_name"])
+	year_name_map = {y.name: int(y.year_name) for y in year_docs}
+	year_by_num = {int(y.year_name): y.name for y in year_docs}
+
+	month_map = {
+		"January": 1, "February": 2, "March": 3, "April": 4,
+		"May": 5, "June": 6, "July": 7, "August": 8,
+		"September": 9, "October": 10, "November": 11, "December": 12,
+	}
+	rev_month_map = {v: k for k, v in month_map.items()}
+
+	billed = set()
+	for b in existing:
+		yr = year_name_map.get(b.fiscal_year)
+		mn = month_map.get(b.fiscal_month)
+		if yr and mn:
+			billed.add((yr, mn))
+
+	settings = frappe.get_single("Billing Settings")
+	start_day = int(settings.cycle_start_day or 1)
+
+	missing = []
+	yr, mn = start.year, start.month
+	end_yr, end_mn = end.year, end.month
+
+	while (yr, mn) <= (end_yr, end_mn):
+		if (yr, mn) not in billed:
+			billing_year_name = year_by_num.get(yr)
+			if billing_year_name:
+				period_start = date(yr, mn, start_day)
+				from frappe.utils import add_months, add_days
+				period_end = add_days(add_months(period_start, 1), -1)
+				missing.append({
+					"year": billing_year_name,
+					"year_num": yr,
+					"month": rev_month_map[mn],
+					"month_num": mn,
+					"period": _("{0} {1}").format(_(rev_month_map[mn]), yr),
+					"start_date": str(period_start),
+					"end_date": str(period_end),
+				})
+		mn += 1
+		if mn > 12:
+			mn = 1
+			yr += 1
+
+	return missing
+
+
+@frappe.whitelist()
+def generate_bills_for_periods(contract, periods):
+	"""
+	Generates Monthly Bills for the given periods bypassing the
+	billing continuity check. Periods must be generated in ascending order.
+	"""
+	import json
+
+	if isinstance(periods, str):
+		periods = json.loads(periods)
+
+	periods.sort(key=lambda p: (p["year_num"], p["month_num"]))
+
+	frappe.flags.skip_billing_continuity_check = True
+	success_count = 0
+	errors = []
+
+	try:
+		for p in periods:
+			try:
+				bill = frappe.new_doc("Monthly Bill")
+				bill.service_contract = contract
+				bill.fiscal_year = p["year"]
+				bill.fiscal_month = p["month"]
+				bill.start_date = p["start_date"]
+				bill.end_date = p["end_date"]
+				bill.posting_date = frappe.utils.today()
+				bill.insert()
+				bill.submit()
+				success_count += 1
+			except Exception as e:
+				errors.append(f"{p['period']}: {e!s}")
+				frappe.log_error(f"Bill generation error {contract} {p['period']}: {e!s}", "Billing")
+	finally:
+		frappe.flags.skip_billing_continuity_check = False
+
+	msg = _("Successfully generated {0} bill(s).").format(success_count)
+	if errors:
+		msg += " " + _("Errors: {0}").format(", ".join(errors))
+	return msg
 
 
 def update_dle_totals(dle_name):
