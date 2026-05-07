@@ -23,10 +23,20 @@ class Premises(Document):
 	# end: auto-generated types
 
 	def validate(self):
+		self.validate_integer_fields()
 		self.validate_unique_location()
 
 		if not self.is_new():
 			self.check_immutable_fields()
+
+	def validate_integer_fields(self):
+		for fieldname, label in (("sector", "Sector"), ("block", "Block"), ("house_number", "House Number")):
+			value = self.get(fieldname)
+			if value is not None and value != "":
+				try:
+					self.set(fieldname, str(int(value)))
+				except (ValueError, TypeError):
+					frappe.throw(_("{0} must be a valid integer.").format(_(label)))
 
 	def validate_unique_location(self):
 		"""Prevent duplicate physical locations (block + house number)."""

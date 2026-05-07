@@ -31,13 +31,13 @@ def get_columns():
 		{
 			"label": _("Block"),
 			"fieldname": "block",
-			"fieldtype": "Data",
+			"fieldtype": "Int",
 			"width": 90,
 		},
 		{
 			"label": _("House No."),
 			"fieldname": "house_number",
-			"fieldtype": "Data",
+			"fieldtype": "Int",
 			"width": 90,
 		},
 		{
@@ -83,6 +83,13 @@ def get_columns():
 			"width": 120,
 		},
 	]
+
+
+def _to_int(value):
+	try:
+		return int(value)
+	except (TypeError, ValueError):
+		return None
 
 
 def get_data(filters):
@@ -165,8 +172,8 @@ def get_data(filters):
 			grouped[cid] = {
 				"contract": cid,
 				"subscriber_name": contract.full_name,
-				"block": p.get("block") or "-",
-				"house_number": p.get("house_number") or "-",
+				"block": _to_int(p.get("block")),
+				"house_number": _to_int(p.get("house_number")),
 				"contract_status": contract.status,
 				"overdue_periods": 0,
 				"total_outstanding": 0.0,
@@ -198,7 +205,7 @@ def get_data(filters):
 	for r in rows:
 		r.pop("oldest_due_date", None)
 
-	rows.sort(key=lambda r: r["net_outstanding"], reverse=True)
+	rows.sort(key=lambda r: (r["block"] or 0, r["house_number"] or 0))
 	return rows
 
 

@@ -37,13 +37,13 @@ def get_columns():
 		{
 			"label": _("Block"),
 			"fieldname": "block",
-			"fieldtype": "Data",
+			"fieldtype": "Int",
 			"width": 80,
 		},
 		{
 			"label": _("House No."),
 			"fieldname": "house_number",
-			"fieldtype": "Data",
+			"fieldtype": "Int",
 			"width": 80,
 		},
 		{
@@ -78,6 +78,13 @@ def get_columns():
 			"width": 120,
 		},
 	]
+
+
+def _to_int(value):
+	try:
+		return int(value)
+	except (TypeError, ValueError):
+		return None
 
 
 def get_data(filters):
@@ -146,8 +153,8 @@ def get_data(filters):
 			"suspension": s.name,
 			"full_name": s.full_name,
 			"sector": p.get("sector") or "-",
-			"block": p.get("block") or "-",
-			"house_number": p.get("house_number") or "-",
+			"block": _to_int(p.get("block")),
+			"house_number": _to_int(p.get("house_number")),
 			"service_contract": s.service_contract,
 			"suspension_type": _(s.suspension_type),
 			"reason": _(s.reason),
@@ -155,6 +162,7 @@ def get_data(filters):
 			"outstanding": outstanding_map.get(s.service_contract, 0),
 		})
 
+	rows.sort(key=lambda r: (r["block"] or 0, r["house_number"] or 0))
 	return rows
 
 
