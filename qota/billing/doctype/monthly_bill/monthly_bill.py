@@ -247,7 +247,8 @@ class MonthlyBill(Document):
                 _(self.fiscal_month), year_val
             ),
             fiscal_month=month_map.get(self.fiscal_month),
-            fiscal_year=int(year_val)
+            fiscal_year=int(year_val),
+            reference_date=str(self.end_date),
         )
 
     def prepare_audit_json(self) -> None:

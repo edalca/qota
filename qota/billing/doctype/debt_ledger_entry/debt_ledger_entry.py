@@ -173,9 +173,14 @@ def make_debt_ledger_entry(
 	description: str | None = None,
 	fiscal_month: int | None = None,
 	fiscal_year: int | None = None,
+	reference_date: str | None = None,
 ) -> "DebtLedgerEntry":
 	"""
-	Creates and submits a Debt Ledger Entry with specialized period logic.
+	Creates a Debt Ledger Entry with specialized period and due date logic.
+
+	Args:
+		reference_date: Anchor date for due date calculation. For Monthly Fee this
+		                should be the bill's end_date. Defaults to today.
 	"""
 	if flt(amount) <= 0:
 		frappe.throw(_("Amount must be greater than zero to create a Debt Ledger Entry."))
@@ -189,17 +194,32 @@ def make_debt_ledger_entry(
 		y: int = current_date.year
 
 	billing_period: str = f"{m:02d}-{y}"
+
+	duplicate = frappe.db.get_value(
+		"Debt Ledger Entry",
+		{"service_contract": contract_name, "billing_period": billing_period, "entry_type": entry_type},
+		"name",
+	)
+	if duplicate:
+		frappe.throw(
+			_("A Debt Ledger Entry of type {0} already exists for period {1} on contract {2} ({3}).").format(
+				entry_type, billing_period, contract_name, duplicate
+			)
+		)
+
 	settings = frappe.get_doc("Billing Settings")
 
-	days_to_add: int = 0
 	if entry_type == "Connection Fee":
-		days_to_add = int(settings.connection_debt_deadline_days or 30)
+		days_to_add: int = int(settings.connection_debt_deadline_days or 30)
 	elif entry_type == "Monthly Fee":
 		days_to_add = int(settings.days_until_due or 15)
+	elif entry_type in ("Late Fee", "Reconnection Fee"):
+		days_to_add = 0
 	else:
 		days_to_add = int(settings.grace_period or 0)
 
-	calculated_due_date: str = add_days(today(), days_to_add)
+	anchor: str = reference_date or today()
+	calculated_due_date: str = add_days(anchor, days_to_add)
 
 	debt = frappe.get_doc(
 		{

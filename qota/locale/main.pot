@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Qota VERSION\n"
 "Report-Msgid-Bugs-To: edwinalonso162@hotmail.com\n"
-"POT-Creation-Date: 2026-05-07 08:24+0000\n"
-"PO-Revision-Date: 2026-05-07 08:24+0000\n"
+"POT-Creation-Date: 2026-05-25 21:15+0000\n"
+"PO-Revision-Date: 2026-05-25 21:15+0000\n"
 "Last-Translator: edwinalonso162@hotmail.com\n"
 "Language-Team: edwinalonso162@hotmail.com\n"
 "MIME-Version: 1.0\n"
@@ -51,6 +51,10 @@ msgstr ""
 
 #: qota/billing/doctype/connection_bill/connection_bill.py:69
 msgid "A Connection Bill ({0}) already exists for contract {1}."
+msgstr ""
+
+#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:205
+msgid "A Debt Ledger Entry of type {0} already exists for period {1} on contract {2} ({3})."
 msgstr ""
 
 #: qota/billing/doctype/monthly_bill/monthly_bill.py:71
@@ -153,6 +157,7 @@ msgstr ""
 
 #. Label of the address_reference (Small Text) field in DocType 'Premises'
 #: qota/governance/doctype/premises/premises.json
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:71
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:58
 msgid "Address Reference"
 msgstr ""
@@ -299,7 +304,7 @@ msgstr ""
 msgid "Amount"
 msgstr ""
 
-#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:181
+#: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.py:186
 msgid "Amount must be greater than zero to create a Debt Ledger Entry."
 msgstr ""
 
@@ -369,6 +374,7 @@ msgid "August"
 msgstr ""
 
 #: qota/expenditures/print_format/expense_voucher/expense_voucher.html:61
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:131
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:107
 msgid "Authorized By"
 msgstr ""
@@ -470,6 +476,7 @@ msgstr ""
 #: qota/governance/doctype/service_contract/service_contract.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:51
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:44
 msgid "Billing Basis"
 msgstr ""
@@ -566,6 +573,8 @@ msgstr ""
 #: qota/billing/report/advance_payments_report/advance_payments_report.py:22
 #: qota/governance/doctype/premises/premises.json
 #: qota/governance/doctype/service_contract/service_contract.py:192
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:64
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:66
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:51
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:53
 #: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:32
@@ -673,6 +682,10 @@ msgstr ""
 #: qota/governance/doctype/service_contract/service_contract.js:265
 #: qota/governance/doctype/service_contract_log/service_contract_log.json
 msgid "Change Type"
+msgstr ""
+
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:84
+msgid "Charged"
 msgstr ""
 
 #. Option for the 'Mode of Payment' (Select) field in DocType 'Payment Receipt'
@@ -814,6 +827,7 @@ msgstr ""
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:225
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:26
 #: qota/billing/report/aging_report/aging_report.py:17
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:49
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:42
 #: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:19
 #: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:50
@@ -956,6 +970,10 @@ msgstr ""
 msgid "Cycle Start Day must be between 1 and 28 to ensure compatibility with all months."
 msgstr ""
 
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:32
+msgid "DELINQUENCY NOTICE"
+msgstr ""
+
 #. Option for the 'ID Type' (Select) field in DocType 'Subscriber'
 #: qota/governance/doctype/subscriber/subscriber.json
 msgid "DNI"
@@ -976,6 +994,7 @@ msgstr ""
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:203
 #: qota/billing/report/customer_statement/customer_statement.py:20
 #: qota/billing/report/daily_collection/daily_collection.py:20
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:38
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:31
 msgid "Date"
 msgstr ""
@@ -1056,7 +1075,7 @@ msgstr ""
 #. Name of a report
 #. Label of a Workspace Sidebar Item
 #: qota/governance/report/delinquent_subscribers/delinquent_subscribers.json
-#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:248
+#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:255
 #: qota/workspace_sidebar/governance.json
 msgid "Delinquent Subscribers"
 msgstr ""
@@ -1170,6 +1189,7 @@ msgid "Doctype"
 msgstr ""
 
 #: qota/expenditures/print_format/expense_voucher/expense_voucher.html:74
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:139
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:123
 msgid "Document generated by Qota System on"
 msgstr ""
@@ -1208,6 +1228,7 @@ msgstr ""
 #: qota/billing/doctype/amortization_schedule_item/amortization_schedule_item.json
 #: qota/billing/doctype/debt_ledger_entry/debt_ledger_entry.json
 #: qota/billing/doctype/payment_receipt_item/payment_receipt_item.json
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:87
 msgid "Due Date"
 msgstr ""
 
@@ -1436,7 +1457,7 @@ msgstr ""
 msgid "Field"
 msgstr ""
 
-#: qota/governance/doctype/premises/premises.py:48
+#: qota/governance/doctype/premises/premises.py:58
 msgid "Field '{0}' is permanent and cannot be changed."
 msgstr ""
 
@@ -1658,7 +1679,7 @@ msgstr ""
 msgid "Grace Period (Days)"
 msgstr ""
 
-#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:254
+#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:261
 msgid "Gross Outstanding"
 msgstr ""
 
@@ -1674,10 +1695,12 @@ msgstr ""
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:233
 #: qota/governance/doctype/service_contract/service_contract.py:193
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:66
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:53
 msgid "House"
 msgstr ""
 
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:64
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:51
 #: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:38
 #: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:44
@@ -1697,6 +1720,10 @@ msgstr ""
 #. 'Billing Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "How many different benefit rules can apply to a single connection."
+msgstr ""
+
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:56
+msgid "ID"
 msgstr ""
 
 #. Label of the id_details_sb (Section Break) field in DocType 'Subscriber'
@@ -1937,7 +1964,7 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: qota/governance/doctype/premises/premises.py:39
+#: qota/governance/doctype/premises/premises.py:49
 msgid "Location ( Block, House) is already registered under ID {0}"
 msgstr ""
 
@@ -2175,7 +2202,7 @@ msgid "Natural Persons cannot use RTN as primary ID."
 msgstr ""
 
 #: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:68
-#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:266
+#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:273
 msgid "Net Outstanding"
 msgstr ""
 
@@ -2208,6 +2235,10 @@ msgstr ""
 
 #: qota/billing/doctype/monthly_bill/monthly_bill_list.js:178
 msgid "No missing periods found for this range."
+msgstr ""
+
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:104
+msgid "No outstanding debts found."
 msgstr ""
 
 #: qota/billing/doctype/billing_cycle/billing_cycle.py:158
@@ -2316,6 +2347,7 @@ msgstr ""
 msgid "Other Fee"
 msgstr ""
 
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:86
 #: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:75
 msgid "Outstanding"
 msgstr ""
@@ -2352,6 +2384,7 @@ msgstr ""
 #: qota/billing/doctype/payment_receipt/payment_receipt.json
 #: qota/expenditures/doctype/expense_voucher/expense_voucher.json
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:85
 msgid "Paid"
 msgstr ""
 
@@ -2453,6 +2486,7 @@ msgstr ""
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:279
 #: qota/billing/report/advances_and_surplus/advances_and_surplus.py:34
 #: qota/billing/report/billing_and_collections/billing_and_collections.py:16
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:82
 #: qota/public/js/custom_block_strings.js:15
 msgid "Period"
 msgstr ""
@@ -2660,6 +2694,7 @@ msgid "Reconnection Fee - Order {0}"
 msgstr ""
 
 #: qota/billing/print_format/annual_coupon_book/annual_coupon_book.html:216
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:36
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:29
 msgid "Ref"
 msgstr ""
@@ -2794,7 +2829,7 @@ msgstr ""
 #. Name of a report
 #. Label of a Workspace Sidebar Item
 #: qota/governance/report/scheduled_suspensions/scheduled_suspensions.json
-#: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:168
+#: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:176
 #: qota/workspace_sidebar/governance.json
 msgid "Scheduled Suspensions"
 msgstr ""
@@ -2805,6 +2840,7 @@ msgstr ""
 
 #. Label of the sector (Data) field in DocType 'Premises'
 #: qota/governance/doctype/premises/premises.json
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:62
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:49
 #: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:32
 msgid "Sector"
@@ -3002,6 +3038,7 @@ msgstr ""
 msgid "Signature"
 msgstr ""
 
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:132
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:108
 msgid "Signature and Stamp"
 msgstr ""
@@ -3122,6 +3159,7 @@ msgstr ""
 #: qota/governance/doctype/service_reconnection/service_reconnection.json
 #: qota/governance/doctype/service_suspension/service_suspension.json
 #: qota/governance/doctype/subscriber/subscriber.json
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:45
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:38
 #: qota/governance/workspace/governance/governance.json
 #: qota/public/js/custom_block_strings.js:14
@@ -3173,6 +3211,10 @@ msgstr ""
 
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:94
 msgid "Subscriber {0} is hereby notified that the water service for contract {1} will be suspended"
+msgstr ""
+
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:119
+msgid "Subscriber {0}, holder of contract {1}, is hereby notified of an outstanding balance of"
 msgstr ""
 
 #: qota/billing/utils.py:603
@@ -3390,7 +3432,7 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:260
+#: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:267
 msgid "Total Advance Balance"
 msgstr ""
 
@@ -3419,8 +3461,9 @@ msgid "Total Contracts Processed"
 msgstr ""
 
 #: qota/billing/report/aging_report/aging_report.py:20
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:110
 #: qota/governance/report/delinquent_subscribers/delinquent_subscribers.py:56
-#: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:174
+#: qota/governance/report/scheduled_suspensions/scheduled_suspensions.py:182
 msgid "Total Outstanding"
 msgstr ""
 
@@ -3477,6 +3520,10 @@ msgstr ""
 msgid "Truncate Discount Decimals?"
 msgstr ""
 
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:83
+msgid "Type"
+msgstr ""
+
 #: qota/billing/report/advance_payments_report/advance_payments_report.py:118
 msgid "Unknown"
 msgstr ""
@@ -3524,11 +3571,13 @@ msgid "View History Log"
 msgstr ""
 
 #: qota/expenditures/print_format/expense_voucher/expense_voucher.html:7
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:4
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:1
 msgid "WATER BOARD"
 msgstr ""
 
 #: qota/billing/print_format/annual_payment_breakdown/annual_payment_breakdown.html:143
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:5
 #: qota/governance/print_format/service_suspension_notice/service_suspension_notice.html:2
 msgid "Water Service"
 msgstr ""
@@ -3536,6 +3585,10 @@ msgstr ""
 #. Label of the water_service_label (Data) field in DocType 'Billing Settings'
 #: qota/billing/doctype/billing_settings/billing_settings.json
 msgid "Water Service Label"
+msgstr ""
+
+#: qota/governance/print_format/delinquency_notice/delinquency_notice.html:124
+msgid "We kindly request that payment be settled at the water board office as soon as possible to avoid suspension of the water service."
 msgstr ""
 
 #. Label of the year_name (Int) field in DocType 'Billing Year'
@@ -3567,6 +3620,10 @@ msgstr ""
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:220
 msgid "years"
+msgstr ""
+
+#: qota/governance/doctype/premises/premises.py:39
+msgid "{0} must be a valid integer."
 msgstr ""
 
 #: qota/billing/utils.py:425 qota/billing/utils.py:555
