@@ -6,7 +6,7 @@ frappe.ui.form.on('Payment Receipt', {
         frm.set_query("service_contract", function () {
             return {
                 query: "qota.governance.doctype.service_contract.service_contract.service_contract_query",
-                filters: { docstatus: 1, status: "Active" },
+                filters: { docstatus: 1, status: ["in", ["Active", "Suspended"]] },
             };
         });
         frm.get_field("payment_items").grid.cannot_add_rows = true;
@@ -20,13 +20,17 @@ frappe.ui.form.on('Payment Receipt', {
             qota.utils.set_premises_description(frm);
         }
         if (frm.doc.docstatus === 0) {
-            frm.add_custom_button(__("Add Monthly Advance"), function () {
-                if (!frm.doc.service_contract) {
-                    frappe.msgprint(__("Please select a Service Contract first."));
-                    return;
+            frappe.db.get_value("Service Contract", frm.doc.service_contract, "status").then(r => {
+                if (r && r.message && r.message.status !== "Suspended") {
+                    frm.add_custom_button(__("Add Monthly Advance"), function () {
+                        if (!frm.doc.service_contract) {
+                            frappe.msgprint(__("Please select a Service Contract first."));
+                            return;
+                        }
+                        open_advance_dialog(frm);
+                    }, __("Actions"));
                 }
-                open_advance_dialog(frm);
-            }, __("Actions"));
+            });
         }
 
     },

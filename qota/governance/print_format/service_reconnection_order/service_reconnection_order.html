@@ -1,0 +1,141 @@
+<style>
+* { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }
+</style>
+{% set company = frappe.db.get_single_value("Billing Settings", "company_name") or _("WATER BOARD") %}
+{% set water_label = frappe.db.get_single_value("Billing Settings", "water_service_label") or _("Water Service") %}
+{% set premises = frappe.get_doc("Premises", doc.premises) if doc.premises else None %}
+{% set subscriber_doc = frappe.get_doc("Subscriber", doc.subscriber) if doc.subscriber else None %}
+{% set suspension = frappe.get_doc("Service Suspension", doc.service_suspension) if doc.service_suspension else None %}
+
+<div style="font-family: 'Segoe UI', Arial, sans-serif; color: #2d3436; max-width: 680px; margin: 0 auto; padding: 10px;">
+
+    {# HEADER #}
+    <div style="text-align: center; border-bottom: 3px solid #2d98da; padding-bottom: 14px; margin-bottom: 20px;">
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+            {{ company }}
+        </div>
+        <div style="font-size: 11px; color: #636e72; text-transform: uppercase; margin-top: 3px;">
+            {{ water_label }}
+        </div>
+        <div style="margin-top: 12px; display: inline-block; background: #2d98da; border-radius: 4px; padding: 6px 22px;">
+            <span style="font-size: 15px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">
+                {{ _("SERVICE RECONNECTION ORDER") }}
+            </span>
+        </div>
+        <div style="margin-top: 8px; font-size: 11px; color: #636e72;">
+            {{ _("Ref") }}: <strong>{{ doc.name }}</strong>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            {{ _("Date") }}: <strong>{{ frappe.utils.format_date(frappe.utils.today(), "dd/MM/yyyy") }}</strong>
+        </div>
+    </div>
+
+    {# SUBSCRIBER INFO #}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
+        <tr>
+            <td style="width: 30%; background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Subscriber") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; font-weight: 600; font-size: 14px;" colspan="3">{{ doc.full_name or "—" }}</td>
+        </tr>
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Contract") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ doc.service_contract }}</td>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Billing Basis") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(doc.billing_basis) if doc.billing_basis else "—" }}</td>
+        </tr>
+        {% if subscriber_doc and subscriber_doc.id_number %}
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _(subscriber_doc.id_type) if subscriber_doc.id_type else _("ID") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;" colspan="3">{{ subscriber_doc.id_number }}</td>
+        </tr>
+        {% endif %}
+        {% if premises %}
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Sector") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ premises.sector or "—" }}</td>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Block") }} / {{ _("House No.") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">
+                {{ _("Block") }} <strong>{{ premises.block or "—" }}</strong> &nbsp; {{ _("House") }} <strong>{{ premises.house_number or "—" }}</strong>
+            </td>
+        </tr>
+        {% if premises.address_reference %}
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Address Reference") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;" colspan="3">{{ premises.address_reference }}</td>
+        </tr>
+        {% endif %}
+        {% endif %}
+    </table>
+
+    {# RECONNECTION DETAILS #}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
+        <tr>
+            <td colspan="4" style="background: #2d98da; color: #ffffff; font-weight: 700; padding: 8px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">{{ _("Reconnection Details") }}</td>
+        </tr>
+        <tr>
+            <td style="width: 30%; background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Previous Suspension") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ doc.service_suspension or "—" }}</td>
+            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Reconnection Fee") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; font-weight: 800; font-size: 15px; color: #2d98da;">
+                {% if doc.reconnection_fee > 0 %}
+                    {{ frappe.utils.fmt_money(doc.reconnection_fee) }}
+                {% else %}
+                    {{ _("Free Reconnection") }}
+                {% endif %}
+            </td>
+        </tr>
+        {% if suspension %}
+        <tr>
+            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Suspension Type") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(suspension.suspension_type) }}</td>
+            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Reason") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(suspension.reason) }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Status") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; font-weight: 700;">{{ _(doc.status) }}</td>
+            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Execution Date") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; font-weight: 700;">
+                {{ frappe.utils.format_date(doc.execution_date, "dd/MM/yyyy") if doc.execution_date else "—" }}
+            </td>
+        </tr>
+        {% if doc.billing_basis == "Metered" and doc.initial_reading %}
+        <tr>
+            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Initial Reading") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; font-weight: 700;" colspan="3">{{ doc.initial_reading }}</td>
+        </tr>
+        {% endif %}
+    </table>
+
+    {# REMARKS #}
+    {% if doc.remarks %}
+    <div style="border-left: 4px solid #2d98da; border-radius: 0 4px 4px 0; padding: 10px 14px; margin-bottom: 18px; background: #eef7fd; font-size: 11px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #636e72; margin-bottom: 4px;">{{ _("Remarks") }}</div>
+        <div>{{ doc.remarks }}</div>
+    </div>
+    {% endif %}
+
+    {# SIGNATURES #}
+    <table style="width: 100%; font-size: 11px; text-align: center; margin-top: 60px;">
+        <tr>
+            <td style="width: 45%; padding: 0 20px;">
+                <div style="border-top: 1.5px solid #2d3436; padding-top: 8px;">
+                    <div style="font-weight: 700;">{{ _("Authorized By") }}</div>
+                    <div style="color: #636e72;">{{ _("Signature and Stamp") }}</div>
+                </div>
+            </td>
+            <td style="width: 10%;"></td>
+            <td style="width: 45%; padding: 0 20px;">
+                <div style="border-top: 1.5px solid #2d3436; padding-top: 8px;">
+                    <div style="font-weight: 700;">{{ _("Technician") }}</div>
+                    <div style="color: #636e72;">{{ _("Signature") }}</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    {# FOOTER #}
+    <div style="margin-top: 30px; text-align: center; font-size: 9px; color: #b2bec3; border-top: 1px dashed #dfe6e9; padding-top: 10px;">
+        {{ _("Document generated by Qota System on") }} {{ frappe.utils.format_datetime(frappe.utils.now_datetime(), "dd/MM/yyyy HH:mm") }}
+    </div>
+
+</div>

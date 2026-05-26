@@ -30,8 +30,9 @@ class ServiceReconnection(Document):
 		premises: DF.Link | None
 		reconnection_fee: DF.Currency
 		remarks: DF.SmallText | None
+		service_contract: DF.Link
 		service_suspension: DF.Link
-		status: DF.Literal["Draft", "Pending Payment", "Paid", "Scheduled", "Executed", "Cancelled"]
+		status: DF.Literal["Draft", "Unpaid", "Paid", "Scheduled", "Executed", "Cancelled"]
 		subscriber: DF.Link | None
 	# end: auto-generated types
 
@@ -39,14 +40,40 @@ class ServiceReconnection(Document):
 		"""Runs business logic before submission."""
 		self.validate_contract_status()
 		self.enforce_fee_rules()
+		self.set_default_remarks()
+
+	def set_default_remarks(self) -> None:
+		"""Populate remarks with a default message if not already set."""
+		if self.remarks:
+			return
+
+		suspension = frappe.db.get_value(
+			"Service Suspension",
+			self.service_suspension,
+			["suspension_type", "reason", "effective_date"],
+			as_dict=True,
+		)
+		if not suspension:
+			return
+
+		fee_line = (
+			f"{_('Reconnection Fee')}: {frappe.utils.fmt_money(flt(self.reconnection_fee))}"
+			if flt(self.reconnection_fee) > 0
+			else _("Free Reconnection")
+		)
+
+		self.remarks = (
+			f"{_('Reconnection for contract')} {self.service_contract} | "
+			f"{_('Previous suspension')}: {_(suspension.suspension_type)} — {_(suspension.reason)} | "
+			f"{fee_line}"
+		)
 
 	def validate_contract_status(self) -> None:
 		"""Ensures the contract is actually suspended."""
-		service_contract = frappe.get_doc("Service Suspension", self.service_suspension).service_contract
-		status = frappe.db.get_value("Service Contract", service_contract, "status")
+		status = frappe.db.get_value("Service Contract", self.service_contract, "status")
 		if status != "Suspended":
 			frappe.throw(
-				_("Contract {0} is not suspended. Reconnection not applicable.").format(service_contract)
+				_("Contract {0} is not suspended. Reconnection not applicable.").format(self.service_contract)
 			)
 
 	def enforce_fee_rules(self) -> None:
@@ -76,7 +103,7 @@ class ServiceReconnection(Document):
 					)
 			elif self.is_new() and not self.reconnection_fee:
 				# Not free and new document: load the default fee from settings
-				default_fee = frappe.db.get_single_value("Billing Settings", "default_reconnection_fee")
+				default_fee = frappe.db.get_single_value("Billing Settings", "reconnection_fee_item")
 				self.reconnection_fee = flt(default_fee)
 
 	def on_submit(self) -> None:
@@ -87,7 +114,7 @@ class ServiceReconnection(Document):
 		service_contract = frappe.get_doc("Service Suspension", self.service_suspension).service_contract
 
 		if flt(self.reconnection_fee) > 0:
-			self.db_set("status", "Pending Payment")
+			self.db_set("status", "Unpaid")
 			make_debt_ledger_entry(
 				contract_name=service_contract,
 				entry_type="Reconnection Fee",

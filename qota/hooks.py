@@ -151,23 +151,11 @@ website_context = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"qota.tasks.all"
-# 	],
-# 	"daily": [
-# 		"qota.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"qota.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"qota.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"qota.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"weekly": [
+		"qota.billing.tasks.run_monthly_billing_cycle"
+	],
+}
 
 # Testing
 # -------

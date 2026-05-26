@@ -13,6 +13,7 @@
   "service_category",
   "premises",
   "amount",
+  "status",
   "section_break_description",
   "description",
   "amended_from"
@@ -68,6 +69,16 @@
    "in_list_view": 1,
    "label": "Amount",
    "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Unpaid",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Draft\nUnpaid\nPaid\nCancelled",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_description",
@@ -129,6 +140,11 @@
  "show_title_field_in_link": 1,
  "sort_field": "creation",
  "sort_order": "DESC",
- "states": [],
+ "states": [
+  {"color": "Gray", "title": "Draft"},
+  {"color": "Red", "title": "Unpaid"},
+  {"color": "Green", "title": "Paid"},
+  {"color": "Gray", "title": "Cancelled"}
+ ],
  "title_field": "full_name"
 }

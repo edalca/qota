@@ -1,352 +1,134 @@
-{% set settings = frappe.get_doc("Billing Settings") %}
-
-{% set subscriber_age = 0 %}
-{% if doc.subscriber %}
-    {% set dob = frappe.db.get_value("Subscriber", doc.subscriber, "birth_date") %}
-    {% if dob %}
-        {% set days_diff = frappe.utils.date_diff(frappe.utils.nowdate(), dob) %}
-        {% set subscriber_age = (days_diff / 365.25) | int %}
-    {% endif %}
-{% endif %}
-
 <style>
-    .print-format {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        font-size: 10pt;
-        color: #444;
-        line-height: 1.5;
-    }
-    
-    /* Utility Classes */
-    .text-right { text-align: right; }
-    .text-center { text-align: center; }
-    .text-uppercase { text-transform: uppercase; }
-    .text-bold { font-weight: 700; color: #000; }
-    .text-muted { color: #888; font-size: 9pt; }
-    
-    /* Header */
-    .header-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        padding-bottom: 20px;
-        border-bottom: 2px solid #eaeaea;
-        margin-bottom: 20px;
-    }
-    .company-name {
-        font-size: 18pt;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        color: #2c3e50;
-        margin-bottom: 5px;
-        text-transform: uppercase;
-    }
-    .receipt-badge {
-        background-color: #2c3e50;
-        color: #fff;
-        padding: 5px 15px;
-        border-radius: 4px;
-        font-size: 14pt;
-        font-weight: bold;
-        display: inline-block;
-        margin-bottom: 5px;
-    }
-    .receipt-number {
-        font-size: 12pt;
-        color: #7f8c8d;
-    }
-    
-    /* Info Grid */
-    .info-container {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 30px;
-        gap: 20px;
-    }
-    .info-box {
-        flex: 1;
-        background-color: #fcfcfc;
-        border: 1px solid #f0f0f0;
-        border-radius: 6px;
-        padding: 15px;
-    }
-    .info-title {
-        font-size: 8pt;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #95a5a6;
-        margin-bottom: 10px;
-        font-weight: 600;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 5px;
-    }
-    .data-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 6px;
-    }
-    .data-label {
-        color: #666;
-        font-weight: 500;
-    }
-    
-    /* Status Badge */
-    .status-badge {
-        font-size: 8pt;
-        padding: 2px 8px;
-        border-radius: 10px;
-        text-transform: uppercase;
-        font-weight: bold;
-    }
-    .status-submitted { background-color: #e6fffa; color: #2c7a7b; border: 1px solid #b2f5ea; }
-    .status-draft { background-color: #fffaf0; color: #c05621; border: 1px solid #fbd38d; }
-    .status-cancelled { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
-
-    /* Table */
-    .table-container {
-        margin-bottom: 30px;
-    }
-    .custom-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .custom-table th {
-        background-color: #34495e;
-        color: #fff;
-        font-size: 9pt;
-        text-transform: uppercase;
-        padding: 10px;
-        text-align: left;
-    }
-    .custom-table td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #eee;
-        font-size: 10pt;
-    }
-    .custom-table tr:last-child td {
-        border-bottom: 2px solid #34495e;
-    }
-
-    /* Totals & Remarks */
-    .summary-section {
-        display: flex;
-        justify-content: space-between;
-    }
-    .remarks-box {
-        width: 55%;
-        padding-right: 20px;
-    }
-    .remarks-content {
-        background-color: #f9f9f9;
-        padding: 10px;
-        border-radius: 4px;
-        font-size: 9pt;
-        border-left: 3px solid #ccc;
-        font-style: italic;
-    }
-    
-    .totals-box {
-        width: 40%;
-    }
-    .total-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 6px 0;
-        border-bottom: 1px dashed #eee;
-    }
-    .main-total {
-        color: #000;
-        padding: 10px;
-        border-radius: 4px;
-        margin-top: 10px;
-        font-size: 12pt;
-        font-weight: bold;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    /* Signatures & Footer */
-    .signatures-section {
-        margin-top: 60px;
-        display: flex;
-        justify-content: space-between;
-        gap: 50px;
-    }
-    .signature-line {
-        flex: 1;
-        border-top: 1px solid #ccc;
-        text-align: center;
-        padding-top: 8px;
-        font-size: 9pt;
-        color: #666;
-    }
-    
-    .footer-section {
-        margin-top: 50px;
-        text-align: center;
-        font-size: 8pt;
-        color: #999;
-        border-top: 1px solid #eee;
-        padding-top: 15px;
-    }
+* { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }
 </style>
+{% set settings = frappe.get_doc("Billing Settings") %}
+{% set company = settings.company_name or _("WATER BOARD") %}
+{% set water_label = settings.water_service_label or _("Water Service") %}
+{% set premises = frappe.get_doc("Premises", doc.premises) if doc.premises else None %}
+{% set subscriber_doc = frappe.get_doc("Subscriber", doc.subscriber) if doc.subscriber else None %}
 
-<div class="header-section">
-    <div>
-        <div class="company-name">{{ settings.company_name or "COMPANY NAME" }}</div>
-    </div>
-    <div class="text-right">
-        <div class="receipt-badge">{{ _("PAYMENT RECEIPT") }}</div>
-        <div class="receipt-number"># {{ doc.name }}</div>
-        <div style="margin-top: 5px;">
-            {{ _("Date") }}: <span class="text-bold">{{ doc.get_formatted("payment_date") }}</span>
+<div style="font-family: 'Segoe UI', Arial, sans-serif; color: #2d3436; max-width: 680px; margin: 0 auto; padding: 10px;">
+
+    {# HEADER #}
+    <div style="text-align: center; border-bottom: 3px solid #00b894; padding-bottom: 14px; margin-bottom: 20px;">
+        <div style="font-size: 20px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+            {{ company }}
         </div>
-    </div>
-</div>
-
-<div class="info-container">
-    <div class="info-box">
-        <div class="info-title">{{ _("Customer Details") }}</div>
-        
-        <div class="data-row">
-            <span class="data-label">{{ _("Name") }}:</span>
-            <span class="text-bold">{{ doc.full_name or doc.subscriber }}</span>
+        <div style="font-size: 11px; color: #636e72; text-transform: uppercase; margin-top: 3px;">
+            {{ water_label }}
         </div>
-
-        {% if subscriber_age > 0 %}
-        <div class="data-row">
-            <span class="data-label">{{ _("Age") }}:</span>
-            <span>{{ subscriber_age }} {{ _("years") }}</span>
-        </div>
-        {% endif %}
-
-        <div class="data-row">
-            <span class="data-label">{{ _("Contract") }}:</span>
-            <span class="text-bold">{{ doc.service_contract }}</span>
-        </div>
-
-        {% set premises_txt = doc.premises %}
-        {% if doc.premises %}
-            {% set p_doc = frappe.get_doc("Premises", doc.premises) %}
-            {% if p_doc %}
-                {% set premises_txt = _("Block") ~ ": " ~ (p_doc.block or '-') ~ " - " ~ _("House") ~ ": " ~ (p_doc.house_number or '-') %}
-            {% endif %}
-        {% endif %}
-
-        <div class="data-row">
-            <span class="data-label">{{ _("Premises") }}:</span>
-            <span>{{ premises_txt }}</span>
-        </div>
-    </div>
-
-    <div class="info-box">
-        <div class="info-title">{{ _("Payment Details") }}</div>
-        
-        <div class="data-row">
-            <span class="data-label">{{ _("Mode of Payment") }}:</span>
-            <span>{{ _(doc.mode_of_payment) }}</span>
-        </div>
-        
-        {% if doc.reference_no %}
-        <div class="data-row">
-            <span class="data-label">{{ _("Ref. No") }}:</span>
-            <span>{{ doc.reference_no }}</span>
-        </div>
-        {% endif %}
-
-        <div class="data-row">
-            <span class="data-label">{{ _("Status") }}:</span>
-            <span>
-                {% if doc.docstatus == 1 %} 
-                    <span class="status-badge status-submitted">{{ _(doc.status) }}</span>
-                {% elif doc.docstatus == 2 %} 
-                    <span class="status-badge status-cancelled">{{ _(doc.status) }}</span>
-                {% else %} 
-                    <span class="status-badge status-draft">{{ _(doc.status) }}</span>
-                {% endif %}
+        <div style="margin-top: 12px; display: inline-block; background: #00b894; border-radius: 4px; padding: 6px 22px;">
+            <span style="font-size: 15px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">
+                {{ _("PAYMENT RECEIPT") }}
             </span>
         </div>
+        <div style="margin-top: 8px; font-size: 11px; color: #636e72;">
+            {{ _("Ref") }}: <strong>{{ doc.name }}</strong>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            {{ _("Date") }}: <strong>{{ frappe.utils.format_date(doc.payment_date, "dd/MM/yyyy") if doc.payment_date else "—" }}</strong>
+        </div>
     </div>
-</div>
 
-<div class="table-container">
-    <table class="custom-table">
+    {# SUBSCRIBER & PAYMENT INFO #}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
+        <tr>
+            <td style="width: 30%; background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Subscriber") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; font-weight: 600; font-size: 14px;" colspan="3">{{ doc.full_name or doc.subscriber or "—" }}</td>
+        </tr>
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Contract") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ doc.service_contract }}</td>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Mode of Payment") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(doc.mode_of_payment) if doc.mode_of_payment else "—" }}</td>
+        </tr>
+        {% if subscriber_doc and subscriber_doc.id_number %}
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _(subscriber_doc.id_type) if subscriber_doc.id_type else _("ID") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;" colspan="3">{{ subscriber_doc.id_number }}</td>
+        </tr>
+        {% endif %}
+        {% if premises %}
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Sector") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ premises.sector or "—" }}</td>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Block") }} / {{ _("House No.") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">
+                {{ _("Block") }} <strong>{{ premises.block or "—" }}</strong> &nbsp; {{ _("House") }} <strong>{{ premises.house_number or "—" }}</strong>
+            </td>
+        </tr>
+        {% endif %}
+        {% if doc.reference_no %}
+        <tr>
+            <td style="background: #f5f6fa; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Reference No.") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;" colspan="3">{{ doc.reference_no }}</td>
+        </tr>
+        {% endif %}
+    </table>
+
+    {# PAYMENT ITEMS TABLE #}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
         <thead>
             <tr>
-                <th width="35%">{{ _("Payment Concept") }}</th>
-                <th width="30%">{{ _("Description") }}</th>
-                <th width="20%">{{ _("Period") }}</th>
-                <th width="15%" class="text-right">{{ _("Amount") }}</th>
+                <td style="padding: 7px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #f5f6fa !important; color: #2d3436 !important; border: 1px solid #dfe6e9; width: 30%;">{{ _("Payment Concept") }}</td>
+                <td style="padding: 7px 10px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #f5f6fa !important; color: #2d3436 !important; border: 1px solid #dfe6e9; width: 30%;">{{ _("Description") }}</td>
+                <td style="padding: 7px 10px; text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #f5f6fa !important; color: #2d3436 !important; border: 1px solid #dfe6e9; width: 20%;">{{ _("Period") }}</td>
+                <td style="padding: 7px 10px; text-align: right; font-size: 10px; font-weight: 700; text-transform: uppercase; background: #f5f6fa !important; color: #2d3436 !important; border: 1px solid #dfe6e9; width: 20%;">{{ _("Amount") }}</td>
             </tr>
         </thead>
         <tbody>
             {% for item in doc.payment_items %}
             <tr>
-                <td class="text-bold">{{ _(item.payment_concept) }}</td>
-                <td class="text-muted">{{ item.description or '-' }}</td>
-                <td>{{ item.billing_period or '-' }}</td>
-                <td class="text-right text-bold">{{ item.get_formatted("amount", doc) }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; font-weight: 600; background: {{ '#f9fffe' if loop.index is odd else '#ffffff' }};">{{ _(item.payment_concept) }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; color: #636e72; background: {{ '#f9fffe' if loop.index is odd else '#ffffff' }};">{{ item.description or "—" }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; text-align: center; background: {{ '#f9fffe' if loop.index is odd else '#ffffff' }};">{{ item.billing_period or "—" }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; text-align: right; font-weight: 600; background: {{ '#f9fffe' if loop.index is odd else '#ffffff' }};">{{ frappe.utils.fmt_money(item.amount) }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-</div>
 
-<div class="summary-section">
-    <div class="remarks-box">
-        {% if doc.remarks %}
-            <div style="font-size: 9pt; font-weight: bold; margin-bottom: 5px;">{{ _("Remarks") }}:</div>
-            <div class="remarks-content">
-                {{ doc.remarks }}
-            </div>
+    {# TOTALS #}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
+        {% if doc.unallocated_amount and doc.unallocated_amount > 0 %}
+        <tr>
+            <td style="width: 70%; padding: 6px 10px; border-bottom: 1px dashed #dfe6e9; color: #636e72;">{{ _("Advance Balance") }}</td>
+            <td style="padding: 6px 10px; border-bottom: 1px dashed #dfe6e9; text-align: right; font-weight: 700;">{{ frappe.utils.fmt_money(doc.unallocated_amount) }}</td>
+        </tr>
         {% endif %}
+        <tr>
+            <td style="width: 70%; padding: 6px 10px; border-bottom: 1px dashed #dfe6e9; color: #636e72;">{{ _("Remaining Debt") }}</td>
+            <td style="padding: 6px 10px; border-bottom: 1px dashed #dfe6e9; text-align: right; font-weight: 700;">{{ frappe.utils.fmt_money(doc.current_debt) }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 10px; font-weight: 700; text-transform: uppercase; font-size: 13px; background-color: #00b894; color: #ffffff;">{{ _("TOTAL PAID") }}</td>
+            <td style="padding: 8px 10px; text-align: right; font-weight: 800; font-size: 16px; background-color: #00b894; color: #ffffff;">{{ frappe.utils.fmt_money(doc.total_to_pay) }}</td>
+        </tr>
+    </table>
+
+    {# REMARKS #}
+    {% if doc.remarks %}
+    <div style="border-left: 4px solid #00b894; border-radius: 0 4px 4px 0; padding: 10px 14px; margin-bottom: 18px; background: #f0fdf9; font-size: 11px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #636e72; margin-bottom: 4px;">{{ _("Remarks") }}</div>
+        <div>{{ doc.remarks }}</div>
     </div>
-
-    <div class="totals-box">
-        {% if doc.unallocated_amount > 0 %}
-        <div class="total-row">
-            <span class="text-muted">{{ _("Advance Balance") }}</span>
-            <span class="text-bold">{{ doc.get_formatted("unallocated_amount") }}</span>
-        </div>
-        {% endif %}
-
-        <div class="total-row">
-            <span class="text-muted">{{ _("Remaining Debt") }}</span>
-            <span style="color: #c0392b; font-weight: bold;">{{ doc.get_formatted("current_debt") }}</span>
-        </div>
-
-        <div class="total-row">
-            <span class="text-muted">{{ _("Total Pending") }}</span>
-            <span class="text-bold">{{ doc.get_formatted("total_pending") }}</span>
-        </div>
-
-        <div class="main-total">
-            <span>{{ _("TOTAL PAID") }}</span>
-            <span>{{ doc.get_formatted("total_to_pay") }}</span>
-        </div>
-    </div>
-</div>
-
-<div class="signatures-section">
-    <div class="signature-line">
-        {{ _("Received By") }}<br>
-        <span style="font-size: 8pt; color: #999;">({{ doc.owner }})</span>
-    </div>
-    <div class="signature-line">
-        {{ _("Customer Signature") }}<br>
-        <span style="font-size: 8pt; color: #999;">{{ _("Accepted") }}</span>
-    </div>
-</div>
-
-<div class="footer-section">
-    {% if settings.bill_footer_message %}
-        <div>{{ settings.bill_footer_message }}</div>
-    {% else %}
-        <div>{{ _("Thank you for your payment.") }}</div>
     {% endif %}
-    
-    <div style="margin-top: 5px;">
-        {{ _("Generated on") }}: {{ frappe.utils.format_datetime(frappe.utils.now_datetime(), "dd-MM-yyyy HH:mm") }}
+
+    {# SIGNATURE #}
+    <div style="margin-top: 60px; text-align: center; font-size: 11px;">
+        <div style="display: inline-block; width: 200px;">
+            <div style="border-top: 1.5px solid #2d3436; padding-top: 8px;">
+                <div style="font-weight: 700;">{{ _("Received By") }}</div>
+                <div style="color: #636e72;">{{ doc.owner }}</div>
+            </div>
+        </div>
     </div>
+
+    {# FOOTER #}
+    <div style="margin-top: 30px; text-align: center; font-size: 9px; color: #b2bec3; border-top: 1px dashed #dfe6e9; padding-top: 10px;">
+        {% if settings.bill_footer_message %}
+            <div style="margin-bottom: 5px;">{{ settings.bill_footer_message }}</div>
+        {% endif %}
+        {{ _("Document generated by Qota System on") }} {{ frappe.utils.format_datetime(frappe.utils.now_datetime(), "dd/MM/yyyy HH:mm") }}
+    </div>
+
 </div>

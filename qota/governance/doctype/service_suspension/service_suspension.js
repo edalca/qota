@@ -46,7 +46,6 @@ frappe.ui.form.on("Service Suspension", {
     },
 
     reason: function(frm) {
-        // Disparar lógica de bloqueo de fecha cuando cambie la razón
         frm.events.handle_maintenance_lock(frm);
     },
 

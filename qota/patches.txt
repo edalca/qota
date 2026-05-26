@@ -5,3 +5,6 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 qota.patches.fix_monthly_bill_status_from_debt_ledger
+qota.patches.backfill_reconnection_service_contract
+qota.patches.backfill_connection_bill_status
+qota.patches.backfill_service_reconnection_status

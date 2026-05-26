@@ -48,9 +48,31 @@ class ServiceSuspension(Document):
 		self.validate_contract_eligibility()
 		self.validate_posting_date()
 		self.validate_suspension_rules()
+		self.set_default_remarks()
 
 		if self.status == "Executed":
 			self.validate_technical_execution()
+
+	def set_default_remarks(self) -> None:
+		"""Populate remarks with a default message if not already set."""
+		if self.remarks:
+			return
+		if not self.suspension_type or not self.reason:
+			return
+
+		if self.reason == "Arrears":
+			from qota.billing.doctype.debt_refinancing.debt_refinancing import get_contract_balance
+			outstanding = get_contract_balance(self.service_contract)
+			self.remarks = (
+				f"{_('Suspension Type')}: {_(self.suspension_type)} | "
+				f"{_('Reason')}: {_(self.reason)} | "
+				f"{_('Outstanding Debt')}: {frappe.utils.fmt_money(outstanding)}"
+			)
+		else:
+			self.remarks = (
+				f"{_('Suspension Type')}: {_(self.suspension_type)} | "
+				f"{_('Reason')}: {_(self.reason)}"
+			)
 
 	def validate_contract_eligibility(self) -> None:
 		"""Checks if the contract is Active and ready for suspension."""
@@ -124,7 +146,7 @@ class ServiceSuspension(Document):
 					"service_contract": self.service_contract,
 					"status": ["in", ["Unpaid", "Partially Paid"]],
 					"due_date": ["<", eff_date],
-					"docstatus": 1,
+					"docstatus": ["!=", 2],
 				},
 			)
 			if previous_debts:
@@ -137,7 +159,7 @@ class ServiceSuspension(Document):
 					"service_contract": self.service_contract,
 					"entry_type": "Monthly Fee",
 					"status": ["in", ["Unpaid", "Partially Paid"]],
-					"docstatus": 1,
+					"docstatus": ["!=", 2],
 				},
 				fields=["due_date", "outstanding_amount"],
 			)

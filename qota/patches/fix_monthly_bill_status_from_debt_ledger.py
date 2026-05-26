@@ -22,7 +22,7 @@ def execute():
 		filters={
 			"reference_doctype": "Monthly Bill",
 			"reference_name": ["in", stale_bills],
-			"docstatus": 1,
+			"docstatus": ["!=", 2],
 		},
 		fields=["reference_name", "status", "outstanding_amount"],
 	)

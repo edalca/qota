@@ -21,7 +21,7 @@ class DebtLedgerEntry(Document):
 		billing_period: DF.Data | None
 		description: DF.SmallText | None
 		due_date: DF.Date | None
-		entry_type: DF.Literal["Monthly Fee", "Connection Fee", "Late Fee", "Reconnection Fee", "Other Fee"]
+		entry_type: DF.Literal["Monthly Fee", "Connection Fee", "Late Fee", "Reconnection Fee", "Other Fee", "Refinancing Down Payment", "Refinancing Installment"]
 		outstanding_amount: DF.Currency
 		paid_amount: DF.Currency
 		reference_doctype: DF.Link | None
@@ -107,16 +107,28 @@ class DebtLedgerEntry(Document):
 	def sync_reference_document_status(self) -> None:
 		"""
 		Directly pushes the current status to the source document.
+		For submittable documents, only pushes "Paid" to avoid overwriting
+		workflow-managed statuses (e.g. "Pending Payment", "Executed").
 		"""
 		if not self.reference_doctype or not self.reference_name:
 			return
 
-		if frappe.db.get_value("DocType", self.reference_doctype, "name"):
-			meta = frappe.get_meta(self.reference_doctype)
-			if meta.has_field("status"):
+		if not frappe.db.get_value("DocType", self.reference_doctype, "name"):
+			return
+
+		meta = frappe.get_meta(self.reference_doctype)
+		if not meta.has_field("status"):
+			return
+
+		if meta.is_submittable:
+			if self.status == "Paid":
 				frappe.db.set_value(
-					self.reference_doctype, self.reference_name, "status", self.status, update_modified=True
+					self.reference_doctype, self.reference_name, "status", "Paid", update_modified=False
 				)
+		else:
+			frappe.db.set_value(
+				self.reference_doctype, self.reference_name, "status", self.status, update_modified=False
+			)
 
 	def on_cancel(self):
 		"""
@@ -174,6 +186,7 @@ def make_debt_ledger_entry(
 	fiscal_month: int | None = None,
 	fiscal_year: int | None = None,
 	reference_date: str | None = None,
+	skip_duplicate_check: bool = False,
 ) -> "DebtLedgerEntry":
 	"""
 	Creates a Debt Ledger Entry with specialized period and due date logic.
@@ -195,7 +208,7 @@ def make_debt_ledger_entry(
 
 	billing_period: str = f"{m:02d}-{y}"
 
-	duplicate = frappe.db.get_value(
+	duplicate = None if skip_duplicate_check else frappe.db.get_value(
 		"Debt Ledger Entry",
 		{"service_contract": contract_name, "billing_period": billing_period, "entry_type": entry_type},
 		"name",
@@ -213,7 +226,7 @@ def make_debt_ledger_entry(
 		days_to_add: int = int(settings.connection_debt_deadline_days or 30)
 	elif entry_type == "Monthly Fee":
 		days_to_add = int(settings.days_until_due or 15)
-	elif entry_type in ("Late Fee", "Reconnection Fee"):
+	elif entry_type in ("Late Fee", "Reconnection Fee", "Refinancing Down Payment", "Refinancing Installment"):
 		days_to_add = 0
 	else:
 		days_to_add = int(settings.grace_period or 0)

@@ -29,6 +29,7 @@ class ConnectionBill(Document):
 		premises: DF.Link | None
 		service_category: DF.Link | None
 		service_contract: DF.Link
+		status: DF.Literal["Draft", "Unpaid", "Paid", "Cancelled"]
 		subscriber: DF.Link | None
 	# end: auto-generated types
 
@@ -38,10 +39,12 @@ class ConnectionBill(Document):
 		self.check_no_duplicate()
 
 	def on_submit(self):
+		self.db_set("status", "Unpaid")
 		self.create_debt_ledger_entry()
 
 	def on_cancel(self):
 		self.remove_debt_ledger_entry()
+		self.db_set("status", "Cancelled")
 
 	def fetch_service_category(self):
 		"""Set service_category from the linked Service Contract."""

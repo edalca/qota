@@ -25,7 +25,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Payment Concept",
-   "options": "Connection Fee\nMonthly Fee\nLate Fee\nReconnection Fee",
+   "options": "Connection Fee\nMonthly Fee\nLate Fee\nReconnection Fee\nOther Fee\nRefinancing Down Payment\nRefinancing Installment",
    "read_only": 1
   },
   {

@@ -20,15 +20,15 @@
 <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #2d3436; max-width: 680px; margin: 0 auto; padding: 10px;">
 
     {# HEADER #}
-    <div style="text-align: center; border-bottom: 3px solid #2d3436; padding-bottom: 14px; margin-bottom: 20px;">
+    <div style="text-align: center; border-bottom: 3px solid #0984e3; padding-bottom: 14px; margin-bottom: 20px;">
         <div style="font-size: 20px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
             {{ company }}
         </div>
         <div style="font-size: 11px; color: #636e72; text-transform: uppercase; margin-top: 3px;">
             {{ water_label }}
         </div>
-        <div style="margin-top: 12px; display: inline-block; border: 2px solid #0984e3; border-radius: 4px; padding: 4px 18px;">
-            <span style="font-size: 15px; font-weight: 700; color: #0984e3; text-transform: uppercase; letter-spacing: 1px;">
+        <div style="margin-top: 12px; display: inline-block; background: #0984e3; border-radius: 4px; padding: 6px 22px;">
+            <span style="font-size: 15px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 1px;">
                 {{ _("DELINQUENCY NOTICE") }}
             </span>
         </div>
@@ -75,6 +75,45 @@
         {% endif %}
     </table>
 
+    {# CONTRACT DETAILS #}
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
+        <tr>
+            <td colspan="4" style="background: #0984e3; color: #ffffff; font-weight: 700; padding: 8px 10px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">{{ _("Contract Details") }}</td>
+        </tr>
+        <tr>
+            <td style="width: 30%; background: #e8f0fe; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Status") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; font-weight: 700;">
+                {% if doc.status == "Active" %}
+                    <span style="color: #00b894;">{{ _(doc.status) }}</span>
+                {% elif doc.status == "Suspended" %}
+                    <span style="color: #e17055;">{{ _(doc.status) }}</span>
+                {% else %}
+                    {{ _(doc.status) }}
+                {% endif %}
+            </td>
+            <td style="background: #e8f0fe; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Service Category") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ doc.service_category or "—" }}</td>
+        </tr>
+        <tr>
+            <td style="background: #e8f0fe; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Start Date") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ frappe.utils.format_date(doc.start_date, "dd/MM/yyyy") if doc.start_date else "—" }}</td>
+            {% if doc.billing_basis == "Metered" and doc.meter_id %}
+            <td style="background: #e8f0fe; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Meter ID") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ doc.meter_id }}</td>
+            {% else %}
+            <td style="border: 1px solid #dfe6e9;" colspan="2"></td>
+            {% endif %}
+        </tr>
+        {% if doc.status == "Suspended" %}
+        <tr>
+            <td style="background: #e8f0fe; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Suspended Since") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9; color: #e17055; font-weight: 700;">{{ frappe.utils.format_date(doc.suspended_since, "dd/MM/yyyy") if doc.suspended_since else "—" }}</td>
+            <td style="background: #e8f0fe; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Reason") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(doc.suspension_reason) if doc.suspension_reason else "—" }}</td>
+        </tr>
+        {% endif %}
+    </table>
+
     {# ACCOUNT STATEMENT #}
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
         <thead>
@@ -89,13 +128,13 @@
         </thead>
         <tbody>
             {% for d in debts %}
-            <tr style="background: {{ '#fff5f4' if loop.index is odd else '#ffffff' }};">
-                <td style="padding: 6px 10px; border-bottom: 1px solid #dfe6e9; font-weight: 600;">{{ d.billing_period or "—" }}</td>
-                <td style="padding: 6px 10px; border-bottom: 1px solid #dfe6e9;">{{ _(d.entry_type) }}</td>
-                <td style="padding: 6px 10px; border-bottom: 1px solid #dfe6e9; text-align: right;">{{ frappe.utils.fmt_money(d.amount) }}</td>
-                <td style="padding: 6px 10px; border-bottom: 1px solid #dfe6e9; text-align: right;">{{ frappe.utils.fmt_money(d.paid_amount) }}</td>
-                <td style="padding: 6px 10px; border-bottom: 1px solid #dfe6e9; text-align: right; font-weight: 700; color: #d63031;">{{ frappe.utils.fmt_money(d.outstanding_amount) }}</td>
-                <td style="padding: 6px 10px; border-bottom: 1px solid #dfe6e9; text-align: center;">
+            <tr>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; font-weight: 600;">{{ d.billing_period or "—" }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9;">{{ _(d.entry_type) }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; text-align: right;">{{ frappe.utils.fmt_money(d.amount) }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; text-align: right;">{{ frappe.utils.fmt_money(d.paid_amount) }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; text-align: right; font-weight: 700; color: #d63031;">{{ frappe.utils.fmt_money(d.outstanding_amount) }}</td>
+                <td style="padding: 6px 10px; border: 1px solid #dfe6e9; text-align: center;">
                     {{ frappe.utils.format_date(d.due_date, "dd/MM/yyyy") if d.due_date else "—" }}
                 </td>
             </tr>
@@ -107,20 +146,20 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4" style="padding: 8px 10px; font-weight: 700; text-transform: uppercase; font-size: 11px; background-color: #2d3436; color: #ffffff;">{{ _("Total Outstanding") }}</td>
-                <td style="padding: 8px 10px; text-align: right; font-weight: 800; font-size: 15px; background-color: #2d3436; color: #ffffff;">{{ frappe.utils.fmt_money(total_outstanding) }}</td>
-                <td style="background-color: #2d3436;"></td>
+                <td colspan="4" style="padding: 8px 10px; font-weight: 700; text-transform: uppercase; font-size: 11px; background-color: #0984e3; color: #ffffff;">{{ _("Total Outstanding") }}</td>
+                <td style="padding: 8px 10px; text-align: right; font-weight: 800; font-size: 15px; background-color: #0984e3; color: #ffffff;">{{ frappe.utils.fmt_money(total_outstanding) }}</td>
+                <td style="background-color: #0984e3;"></td>
             </tr>
         </tfoot>
     </table>
 
     {# NOTICE TEXT #}
-    <div style="border: 1px solid #d63031; border-radius: 4px; padding: 12px 16px; margin-bottom: 24px; background: #fff5f4; font-size: 11.5px; line-height: 1.7;">
+    <div style="border-left: 4px solid #0984e3; border-radius: 0 4px 4px 0; padding: 12px 16px; margin-bottom: 24px; background: #e8f0fe; font-size: 11.5px; line-height: 1.7;">
         {{ _("Subscriber {0}, holder of contract {1}, is hereby notified of an outstanding balance of").format(
             "<strong>" + doc.full_name + "</strong>",
             "<strong>" + doc.name + "</strong>"
         ) }}
-        <strong style="color: #d63031; font-size: 13px;"> {{ frappe.utils.fmt_money(total_outstanding) }}</strong>.
+        <strong style="color: #0984e3; font-size: 13px;"> {{ frappe.utils.fmt_money(total_outstanding) }}</strong>.
         {{ _("We kindly request that payment be settled at the water board office as soon as possible to avoid suspension of the water service.") }}
     </div>
 

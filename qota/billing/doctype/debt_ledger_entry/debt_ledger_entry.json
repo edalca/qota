@@ -47,7 +47,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Entry Type",
-   "options": "Monthly Fee\nConnection Fee\nLate Fee\nReconnection Fee\nOther Fee",
+   "options": "Monthly Fee\nConnection Fee\nLate Fee\nReconnection Fee\nOther Fee\nRefinancing Down Payment\nRefinancing Installment",
    "reqd": 1
   },
   {

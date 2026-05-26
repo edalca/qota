@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "general_section",
+  "service_contract",
   "service_suspension",
   "subscriber",
   "full_name",
@@ -28,7 +29,23 @@
    "label": "General Information"
   },
   {
-   "fetch_from": "service_suspension.subscriber",
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  },
+  {
+   "fieldname": "service_suspension",
+   "fieldtype": "Link",
+   "label": "Service Suspension",
+   "options": "Service Suspension",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fetch_from": "service_contract.subscriber",
    "fieldname": "subscriber",
    "fieldtype": "Link",
    "label": "Subscriber",
@@ -36,7 +53,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "service_suspension.full_name",
+   "fetch_from": "service_contract.full_name",
    "fieldname": "full_name",
    "fieldtype": "Data",
    "label": "Full Name",
@@ -60,11 +77,11 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nPending Payment\nPaid\nScheduled\nExecuted\nCancelled",
+   "options": "Draft\nUnpaid\nPaid\nScheduled\nExecuted\nCancelled",
    "read_only": 1
   },
   {
-   "fetch_from": "service_suspension.premises",
+   "fetch_from": "service_contract.premises",
    "fieldname": "premises",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -117,15 +134,6 @@
    "options": "Service Reconnection",
    "print_hide": 1,
    "read_only": 1
-  },
-  {
-   "fieldname": "service_suspension",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Service Suspension",
-   "link_filters": "[[\"Service Suspension\",\"docstatus\",\"=\",\"1\"],[\"Service Suspension\",\"status\",\"=\",\"Executed\"]]",
-   "options": "Service Suspension",
-   "reqd": 1
   }
  ],
  "grid_page_length": 50,
@@ -164,7 +172,7 @@
   },
   {
    "color": "Yellow",
-   "title": "Pending Payment"
+   "title": "Unpaid"
   },
   {
    "color": "Green",

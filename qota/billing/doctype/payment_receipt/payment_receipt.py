@@ -48,6 +48,7 @@ class PaymentReceipt(Document):
         self.calculate_totals()
         self.status_update()
         self.validate_payment_sequence()
+        self.validate_reconnection_fee_eligibility()
 
     def validate_payment_sequence(self):
         """
@@ -104,6 +105,55 @@ class PaymentReceipt(Document):
                     .format(frappe.bold(selected_items[i].billing_period),
                             frappe.bold(selected_items[i+1].billing_period))
                 )
+
+    def validate_reconnection_fee_eligibility(self):
+        """
+        If this receipt includes a Reconnection Fee, all outstanding overdue
+        debts for the contract must be included in the same receipt.
+        Refinancing Installments are exempt (the original debt was already zeroed).
+        """
+        has_reconnection_fee = any(
+            d.payment_concept == "Reconnection Fee"
+            for d in self.payment_items
+        )
+        if not has_reconnection_fee:
+            return
+
+        # DLE IDs already covered by this receipt
+        covered_dle_ids = {
+            d.debt_ledger_entry
+            for d in self.payment_items
+            if d.debt_ledger_entry
+        }
+
+        # Outstanding overdue debts NOT covered by this receipt
+        # Refinancing Installments are excluded — the original debt was zeroed on refinancing
+        exempt_types = ("Refinancing Installment", "Refinancing Down Payment")
+        pending = frappe.get_all(
+            "Debt Ledger Entry",
+            filters={
+                "service_contract": self.service_contract,
+                "outstanding_amount": [">", 0.01],
+                "entry_type": ["not in", list(exempt_types)],
+                "docstatus": ["!=", 2],
+                "name": ["not in", list(covered_dle_ids)] if covered_dle_ids else ["!=", ""],
+            },
+            fields=["name", "entry_type", "billing_period", "outstanding_amount"],
+            order_by="due_date asc",
+        )
+
+        if pending:
+            details = ", ".join(
+                f"{d.billing_period or d.entry_type} ({frappe.utils.fmt_money(d.outstanding_amount)})"
+                for d in pending[:5]
+            )
+            frappe.throw(
+                _(
+                    "Cannot pay the Reconnection Fee while there are outstanding debts "
+                    "not included in this receipt: {0}. "
+                    "Include all pending debts in this payment or create a Debt Refinancing first."
+                ).format(frappe.bold(details))
+            )
 
     def before_submit(self):
         for item in self.payment_items:

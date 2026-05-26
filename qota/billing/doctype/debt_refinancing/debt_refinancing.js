@@ -9,7 +9,7 @@ frappe.ui.form.on("Debt Refinancing", {
 				query: "qota.governance.doctype.service_contract.service_contract.service_contract_query",
 				filters: {
 					docstatus: 1,
-					status: "Active",
+					status: ["in", ["Active", "Suspended"]],
 				},
 			};
 		});
