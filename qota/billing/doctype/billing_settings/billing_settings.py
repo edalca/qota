@@ -42,6 +42,12 @@ class BillingSettings(Document):
 	# end: auto-generated types
 
 	def validate(self):
+		self.apply_late_fee = 0
+		self.late_fee_policy = _(
+			"Overdue months do not generate a surcharge. Arrears can suspend the service. "
+			"A reconnection fee applies only after disconnection. Misuse of water is charged "
+			"with a Service Fine. The cut is still done from Service Suspension."
+		)
 		self.validate_cycle_day()
 		self.validate_percents()
 

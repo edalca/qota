@@ -15,19 +15,19 @@ app_logo_url = "/assets/qota/logo.svg"
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
-    {
-        "name": "Qota",
-        "logo": app_logo_url,
-        "title": "Qota",
-      }
- ]
+	{
+		"name": app_name,
+		"logo": app_logo_url,
+		"title": "Qota",
+	}
+]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/qota/css/qota.css"
-app_include_js = "qota.bundle.js"
+app_include_js = ["qota.bundle.js", "/assets/qota/js/dock_labels.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/qota/css/qota.css"
@@ -45,7 +45,7 @@ app_include_js = "qota.bundle.js"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {"WA Account": "public/js/wa_account_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -94,12 +94,13 @@ website_context = {
 # ------------
 
 # before_install = "qota.install.before_install"
-# after_install = "qota.install.after_install"
+after_install = "qota.setup.after_install"
+after_migrate = "qota.install.after_migrate"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "qota.uninstall.before_uninstall"
+before_uninstall = "qota.setup.before_uninstall"
 # after_uninstall = "qota.uninstall.after_uninstall"
 
 # Integration Setup
@@ -140,13 +141,17 @@ website_context = {
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"Payment Receipt": {
+		"on_submit": "qota.events.whatsapp_notices.enqueue_payment_notice",
+	},
+	"Service Suspension": {
+		"on_submit": "qota.events.whatsapp_notices.enqueue_suspension_notice",
+	},
+	"WA Account": {
+		"validate": "qota.setup.validate_wa_account",
+	},
+}
 
 # Scheduled Tasks
 # ---------------

@@ -11,9 +11,7 @@ frappe.ui.form.on("Service Suspension", {
             };
         });
         
-        // 2. Estado inicial de los filtros y bloqueos
-        frm.events.filter_reasons(frm);
-        frm.events.handle_maintenance_lock(frm);
+        frm.events.setup_service_fine(frm);
     },
 
     refresh(frm) {
@@ -21,6 +19,7 @@ frappe.ui.form.on("Service Suspension", {
         if (window.qota && qota.utils && qota.utils.set_premises_description) {
             qota.utils.set_premises_description(frm);
         }
+        frm.events.setup_service_fine(frm);
 
         // Botón de ejecución técnica solo para órdenes enviadas (Scheduled)
         if (frm.doc.docstatus === 1 && frm.doc.status === 'Scheduled') {
@@ -31,54 +30,29 @@ frappe.ui.form.on("Service Suspension", {
     },
 
     suspension_type: function(frm) {
-        if (frm.doc.suspension_type === "By Request") {
-            // Seteo automático para solicitud del abonado
-            frm.set_value("reason", "Subscriber Request");
-            frm.set_df_property("reason", "read_only", 1);
-        } else {
-            frm.set_df_property("reason", "read_only", 0);
-            if (frm.doc.reason === "Subscriber Request") {
-                frm.set_value("reason", ""); 
-            }
+        if (frm.doc.suspension_type !== "By Fine" && frm.doc.service_fine) {
+            frm.set_value("service_fine", "");
         }
-        frm.events.filter_reasons(frm);
-        frm.events.handle_maintenance_lock(frm);
+        frm.events.setup_service_fine(frm);
     },
 
-    reason: function(frm) {
-        frm.events.handle_maintenance_lock(frm);
+    service_contract: function(frm) {
+        frm.events.setup_service_fine(frm);
     },
 
-    filter_reasons: function(frm) {
-        let options = [];
-        if (frm.doc.suspension_type === "Administrative") {
-            options = ["Arrears", "Fraud / Bypass", "Sanction", "Maintenance", "Other"];
-        } else if (frm.doc.suspension_type === "By Request") {
-            options = ["Subscriber Request"];
-        }
-        frm.set_df_property("reason", "options", options);
-    },
-
-    handle_maintenance_lock: function(frm) {
-        /**
-         * Si es Mantenimiento, la fecha efectiva DEBE ser la fecha de hoy/posting.
-         * No permitimos mantenimiento retroactivo.
-         */
-        if (frm.doc.reason === "Maintenance") {
-            // Extraer solo la parte de la fecha de posting_date (que es Datetime)
-            let date_part = frm.doc.posting_date ? frm.doc.posting_date.split(" ")[0] : frappe.datetime.nowdate();
-            
-            frm.set_value("effective_date", date_part);
-            frm.set_df_property("effective_date", "read_only", 1);
-            
-            frappe.show_alert({
-                message: __("Maintenance mode: Effective Date locked to Posting Date."),
-                indicator: 'orange'
-            }, 3);
-        } else {
-            // Para otros motivos, dejamos que el usuario decida la fecha (ej. el caso de Enero)
-            frm.set_df_property("effective_date", "read_only", 0);
-        }
+    setup_service_fine: function(frm) {
+        const needs_fine = frm.doc.suspension_type === "By Fine";
+        frm.toggle_display("service_fine", needs_fine);
+        frm.toggle_reqd("service_fine", needs_fine);
+        frm.set_query("service_fine", () => {
+            return {
+                filters: {
+                    service_contract: frm.doc.service_contract || "",
+                    docstatus: 1,
+                    status: "Unpaid",
+                },
+            };
+        });
     },
 
     open_execution_dialog: function(frm) {

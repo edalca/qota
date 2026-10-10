@@ -205,9 +205,8 @@ class BillingCycle(Document):
                     "outstanding_amount": new_total,
                     "status": "Unpaid"
                 })
-
-            doc = frappe.get_doc("Monthly Bill", b.name)
-            doc.apply_advance_payments()
+                dle = frappe.get_doc("Debt Ledger Entry", dle_name)
+                dle.apply_advance_payments()
 
             count += 1
 

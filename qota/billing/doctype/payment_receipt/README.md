@@ -19,8 +19,8 @@ The **Payment Receipt** is the primary collection document. It records payments 
 
 #### 3. Business Logic (Server-Side: `payment_receipt.py`)
 
-* **Ledger Reconciliation**: Upon submission, it creates negative `Debt Ledger Entries` (Credits) to reduce the subscriber's balance. If specific months are paid, it records the `fiscal_month` and `fiscal_year` for accurate aging reports.
-* **Automatic Reconnection**: If the contract is "Suspended" and the payment covers the `reconnection_charge`, the system automatically reverts the contract status to "Active".
+* **Ledger Reconciliation**: Upon submission, it applies each line to the linked Debt Ledger Entry and reduces that debt's outstanding amount. A Monthly Fee line without a debt yet stays as an advance until the monthly bill is created. The receipt header `unallocated_amount` is recalculated when an advance is later applied.
+* **Reconnection**: Paying a receipt does not restore the service. Reconnection is a separate order. It can be executed only after its fee is paid, or immediately when the fee is zero.
 * **Lump Sum vs. Itemized**: Supports both global payments (Lump Sum) and detailed month-by-month selections via the child table.
 
 #### 4. UI Logic (Client-Side: `payment_receipt.js`)

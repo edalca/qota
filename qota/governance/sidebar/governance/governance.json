@@ -1,0 +1,34 @@
+{
+ "app": "qota",
+ "creation": "2026-10-08 04:54:17.496725",
+ "docstatus": 0,
+ "doctype": "Sidebar",
+ "header_icon": "subscribers-card-duotone",
+ "idx": 0,
+ "items": [
+  {
+   "added": 0,
+   "child": 0,
+   "collapsible": 1,
+   "hidden": 0,
+   "icon": "home",
+   "indent": 0,
+   "is_default_module": 0,
+   "keep_closed": 0,
+   "label": "Home",
+   "link_to": "Governance",
+   "link_type": "Workspace",
+   "open_in_new_tab": 1,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "merged_from": "[\"Governance\"]",
+ "modified": "2026-10-09 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Governance",
+ "name": "Governance",
+ "owner": "Administrator",
+ "standard": 1,
+ "title": "Governance"
+}

@@ -41,10 +41,10 @@
   },
   {
    "default": "0",
-   "description": "If checked, this amount will be included in the base calculation for percentage-based late fees.",
+   "description": "Overdue months are not surcharged. This option is not used.",
    "fieldname": "is_late_fee_applicable",
    "fieldtype": "Check",
-   "in_list_view": 1,
+   "hidden": 1,
    "label": "Subject to Late Fee?"
   }
  ],

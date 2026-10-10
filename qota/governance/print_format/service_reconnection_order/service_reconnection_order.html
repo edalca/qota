@@ -84,10 +84,8 @@
         </tr>
         {% if suspension %}
         <tr>
-            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Suspension Type") }}</td>
-            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(suspension.suspension_type) }}</td>
-            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Reason") }}</td>
-            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(suspension.reason) }}</td>
+            <td style="background: #e8f4fd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Suspension Reason") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;" colspan="3">{{ _(suspension.suspension_type) }}</td>
         </tr>
         {% endif %}
         <tr>

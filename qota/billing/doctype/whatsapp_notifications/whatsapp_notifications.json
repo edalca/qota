@@ -1,0 +1,90 @@
+{
+ "actions": [],
+ "creation": "2026-10-09 22:40:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "payment_section",
+  "notify_on_payment",
+  "payment_template",
+  "suspension_section",
+  "notify_on_suspension",
+  "suspension_template",
+  "test_section",
+  "test_phone"
+ ],
+ "fields": [
+  {
+   "description": "Fixed header: Confirmaci\u00f3n de Pago Recibido. Fixed footer: Junta Administradora de Agua \u00b7 Notificaciones. Body names: receipt, name, contract, date, detail, amount. Example: Hola {{name}}. La Junta Administradora de Agua te confirma que se ha registrado el pago identificado con el recibo {{receipt}}, correspondiente al contrato {{contract}}, con fecha {{date}}. Detalle del pago: {{detail}}. Total recibido: {{amount}}. Para consultas o aclaraciones sobre este pago, comun\u00edcate con nuestra administraci\u00f3n.",
+   "fieldname": "payment_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Notice"
+  },
+  {
+   "default": "1",
+   "fieldname": "notify_on_payment",
+   "fieldtype": "Check",
+   "label": "Notify on Payment"
+  },
+  {
+   "default": "qota_payment_received",
+   "fieldname": "payment_template",
+   "fieldtype": "Data",
+   "label": "Payment Template"
+  },
+  {
+   "description": "One template for both phases. Fixed header: Aviso de Suspensi\u00f3n del Servicio. Fixed footer: Junta Administradora de Agua \u00b7 Notificaciones. Body names: name, suspension, contract, message. Example: Hola {{name}}. La Junta Administradora de Agua te notifica que se ha emitido el aviso de suspensi\u00f3n {{suspension}}, correspondiente al contrato {{contract}}. Detalle de la notificaci\u00f3n: {{message}}. Para consultas o aclaraciones sobre este aviso, comun\u00edcate con nuestra administraci\u00f3n.",
+   "fieldname": "suspension_section",
+   "fieldtype": "Section Break",
+   "label": "Suspension Notice"
+  },
+  {
+   "default": "1",
+   "fieldname": "notify_on_suspension",
+   "fieldtype": "Check",
+   "label": "Notify on Suspension"
+  },
+  {
+   "default": "qota_service_suspension",
+   "fieldname": "suspension_template",
+   "fieldtype": "Data",
+   "label": "Suspension Template"
+  },
+  {
+   "fieldname": "test_section",
+   "fieldtype": "Section Break",
+   "label": "Test"
+  },
+  {
+   "description": "Sends the approved payment template to this number.",
+   "fieldname": "test_phone",
+   "fieldtype": "Data",
+   "label": "Test Phone"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-10-09 23:50:00.000000",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "WhatsApp Notifications",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

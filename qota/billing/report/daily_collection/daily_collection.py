@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import add_days, flt
+from frappe.utils import add_days, flt, format_datetime
 
 
 def execute(filters=None):
@@ -17,7 +17,7 @@ def execute(filters=None):
 
 def get_columns():
 	return [
-		{"label": _("Date"), "fieldname": "payment_date", "fieldtype": "Datetime", "width": 160},
+		{"label": _("Date"), "fieldname": "payment_date", "fieldtype": "Data", "width": 160},
 		{
 			"label": _("Receipt"),
 			"fieldname": "name",
@@ -58,6 +58,8 @@ def get_data(filters):
 
 	for row in rows:
 		row["mode_of_payment"] = TRANSLATIONS.get(row["mode_of_payment"], row["mode_of_payment"])
+		if row.get("payment_date"):
+			row["payment_date"] = format_datetime(row["payment_date"])
 
 	return rows
 

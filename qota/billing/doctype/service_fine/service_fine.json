@@ -1,0 +1,160 @@
+{
+ "actions": [],
+ "autoname": "SF-.YY.-.####",
+ "creation": "2026-10-08 00:00:00",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "posting_date",
+  "service_contract",
+  "subscriber",
+  "full_name",
+  "column_break_1",
+  "service_category",
+  "premises",
+  "amount",
+  "status",
+  "section_break_description",
+  "reason",
+  "description",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Posting Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "service_contract",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Service Contract",
+   "options": "Service Contract",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "service_contract.subscriber",
+   "fieldname": "subscriber",
+   "fieldtype": "Link",
+   "label": "Subscriber",
+   "options": "Subscriber",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Subscriber Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "service_contract.service_category",
+   "fieldname": "service_category",
+   "fieldtype": "Link",
+   "label": "Service Category",
+   "options": "Service Category",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "service_contract.premises",
+   "fieldname": "premises",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Premises",
+   "options": "Premises",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Unpaid",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Draft\nUnpaid\nPaid\nCancelled",
+   "read_only": 1
+  },
+  {
+   "description": "This document only charges the fine. The cut is done from Service Suspension in Governance.",
+   "fieldname": "section_break_description",
+   "fieldtype": "Section Break",
+   "label": "Misuse"
+  },
+  {
+   "default": "Misuse of Water",
+   "fieldname": "reason",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Reason",
+   "options": "Misuse of Water\nFraud / Bypass\nOther",
+   "reqd": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Service Fine",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-10-08 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Service Fine",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "service_contract,full_name",
+ "show_title_field_in_link": 1,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [
+  {"color": "Gray", "title": "Draft"},
+  {"color": "Red", "title": "Unpaid"},
+  {"color": "Green", "title": "Paid"},
+  {"color": "Gray", "title": "Cancelled"}
+ ],
+ "title_field": "full_name"
+}

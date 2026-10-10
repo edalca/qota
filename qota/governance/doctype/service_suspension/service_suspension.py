@@ -34,14 +34,12 @@ class ServiceSuspension(Document):
 		full_name: DF.Data | None
 		posting_date: DF.Datetime
 		premises: DF.Link | None
-		reason: DF.Literal[
-			"Arrears", "Subscriber Request", "Fraud / Bypass", "Sanction", "Maintenance", "Other"
-		]
 		remarks: DF.SmallText | None
 		service_contract: DF.Link
+		service_fine: DF.Link | None
 		status: DF.Literal["Draft", "Scheduled", "Executed"]
 		subscriber: DF.Link | None
-		suspension_type: DF.Literal["Administrative", "By Request"]
+		suspension_type: DF.Literal["Subscriber Request", "Arrears", "By Fine"]
 	# end: auto-generated types
 
 	def validate(self) -> None:
@@ -57,22 +55,19 @@ class ServiceSuspension(Document):
 		"""Populate remarks with a default message if not already set."""
 		if self.remarks:
 			return
-		if not self.suspension_type or not self.reason:
+		if not self.suspension_type:
 			return
 
-		if self.reason == "Arrears":
+		if self.suspension_type == "Arrears":
 			from qota.billing.doctype.debt_refinancing.debt_refinancing import get_contract_balance
+
 			outstanding = get_contract_balance(self.service_contract)
 			self.remarks = (
-				f"{_('Suspension Type')}: {_(self.suspension_type)} | "
-				f"{_('Reason')}: {_(self.reason)} | "
+				f"{_('Suspension Reason')}: {_(self.suspension_type)} | "
 				f"{_('Outstanding Debt')}: {frappe.utils.fmt_money(outstanding)}"
 			)
 		else:
-			self.remarks = (
-				f"{_('Suspension Type')}: {_(self.suspension_type)} | "
-				f"{_('Reason')}: {_(self.reason)}"
-			)
+			self.remarks = f"{_('Suspension Reason')}: {_(self.suspension_type)}"
 
 	def validate_contract_eligibility(self) -> None:
 		"""Checks if the contract is Active and ready for suspension."""
@@ -108,19 +103,24 @@ class ServiceSuspension(Document):
 
 	def validate_suspension_rules(self) -> None:
 		"""
-		Refined Business Rules:
-		1. By Request: No Monthly Bills must exist >= Effective Date.
-		2. Maintenance: No validation required.
-		3. Other Administrative: Validate debt threshold
-		relative to Effective Date.
+		One field classifies the cut.
+		1. Subscriber Request: no Monthly Bills on or after the effective date,
+		   and no earlier unpaid debts.
+		2. By Fine: link the unpaid Service Fine of this contract.
+		   Monthly fees may be current.
+		3. Arrears: expired Monthly Fee threshold.
 		"""
-		if self.suspension_type == "Administrative" and self.reason == "Maintenance":
+		if self.suspension_type != "By Fine":
+			self.service_fine = None
+
+		if self.suspension_type == "By Fine":
+			self.validate_service_fine()
 			return
 
 		settings = frappe.get_doc("Billing Settings")
 		eff_date = getdate(self.effective_date)
 
-		if self.suspension_type == "By Request":
+		if self.suspension_type == "Subscriber Request":
 			existing_bill = frappe.db.exists(
 				"Monthly Bill",
 				{
@@ -152,7 +152,7 @@ class ServiceSuspension(Document):
 			if previous_debts:
 				frappe.throw(_("Subscriber has unpaid debts prior to the requested suspension date."))
 
-		elif self.suspension_type == "Administrative":
+		elif self.suspension_type == "Arrears":
 			all_unpaid_debts = frappe.get_all(
 				"Debt Ledger Entry",
 				filters={
@@ -173,7 +173,9 @@ class ServiceSuspension(Document):
 			total_expired_sum = sum(flt(d.outstanding_amount) for d in expired_debts)
 
 			if total_expired_sum <= 0.01:
-				frappe.throw(_("Administrative suspension requires expired debts as of the Effective Date."))
+				frappe.throw(
+					_("Suspension for outstanding debt requires expired monthly fees as of the Effective Date.")
+				)
 
 			limit_months = int(settings.suspension_months_limit or 2)
 			if len(expired_debts) < limit_months:
@@ -190,6 +192,40 @@ class ServiceSuspension(Document):
 						fmt_money(total_expired_sum), fmt_money(min_debt)
 					)
 				)
+		else:
+			frappe.throw(_("Select a suspension reason."))
+
+	def validate_service_fine(self) -> None:
+		"""A sanction cut needs the unpaid fine of this same contract."""
+		if not self.service_fine:
+			frappe.throw(
+				_(
+					"Link the unpaid Service Fine. Monthly payments can be current. "
+					"The suspension order is what cuts the service."
+				)
+			)
+
+		fine = frappe.db.get_value(
+			"Service Fine",
+			self.service_fine,
+			["service_contract", "docstatus", "status"],
+			as_dict=True,
+		)
+		if not fine or fine.service_contract != self.service_contract or fine.docstatus != 1 or fine.status != "Unpaid":
+			frappe.throw(_("The Service Fine must be submitted, unpaid, and for this contract."))
+
+		already = frappe.db.exists(
+			"Service Suspension",
+			{
+				"service_fine": self.service_fine,
+				"docstatus": ["<", 2],
+				"name": ["!=", self.name],
+			},
+		)
+		if already:
+			frappe.throw(
+				_("Service Fine {0} is already linked to suspension {1}.").format(self.service_fine, already)
+			)
 
 	def validate_technical_execution(self) -> None:
 		"""Validates final readings if the service is metered."""
@@ -214,6 +250,38 @@ class ServiceSuspension(Document):
 	def on_submit(self) -> None:
 		if self.status == "Draft":
 			self.db_set("status", "Scheduled")
+
+	def before_cancel(self) -> None:
+		if self.status == "Executed" or self.executed_date:
+			frappe.throw(_("An executed suspension cannot be cancelled."))
+		self._throw_if_fine_has_payments()
+
+	def _throw_if_fine_has_payments(self) -> None:
+		"""A paid fine stays until its receipts are cancelled."""
+		if not self.service_fine:
+			return
+
+		paid_amount = frappe.db.get_value(
+			"Debt Ledger Entry",
+			{
+				"reference_doctype": "Service Fine",
+				"reference_name": self.service_fine,
+				"docstatus": 1,
+			},
+			"paid_amount",
+		)
+		if flt(paid_amount) <= 0:
+			return
+
+		frappe.throw(
+			_(
+				"Cannot cancel this suspension because Service Fine {0} has recorded payments ({1}). "
+				"Cancel the related Payment Receipts first."
+			).format(
+				self.service_fine,
+				frappe.format_value(paid_amount, {"fieldtype": "Currency"}),
+			)
+		)
 
 	def on_cancel(self) -> None:
 		update_contract_property(
@@ -281,7 +349,7 @@ class ServiceSuspension(Document):
 			update_type="Status",
 			data={
 				"new_status": "Suspended",
-				"suspension_reason": self.reason,
+				"suspension_reason": self.suspension_type,
 				"date": self.executed_date,
 				"description": _("Service suspended technically on {0}. Effective since {1}.").format(
 					formatdate(self.executed_date), formatdate(self.effective_date)
@@ -299,6 +367,9 @@ class ServiceSuspension(Document):
 			self.create_technical_reading()
 
 		self.save()
+		from qota.events.whatsapp_notices import enqueue_executed_suspension_notice
+
+		enqueue_executed_suspension_notice(self.name)
 
 	def create_technical_reading(self) -> None:
 		"""Generates a Meter Reading document to stop the billing cycle."""

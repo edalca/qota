@@ -119,6 +119,10 @@ msgstr "Agregar Facturas Faltantes"
 msgid "Add Monthly Advance"
 msgstr "Añadir Avances Mensuales"
 
+#: qota/billing/doctype/payment_receipt/payment_receipt.js
+msgid "Months already prepaid at a lower rate show only the difference."
+msgstr "Los meses ya adelantados a una tarifa menor muestran solo la diferencia."
+
 #: qota/billing/doctype/payment_receipt/payment_receipt.js:158
 msgid "Add to Receipt"
 msgstr "Añadir al Recibo"
@@ -194,6 +198,10 @@ msgstr "Meses Adelantados"
 #: qota/billing/doctype/payment_receipt/payment_receipt.py:338
 msgid "Advance Payment: {0}"
 msgstr "Pagos Anticipados: {0}"
+
+#: qota/billing/doctype/payment_receipt/payment_receipt.py
+msgid "Already prepaid"
+msgstr "Ya pagado por adelantado"
 
 #. Label of a Workspace Sidebar Item
 #: qota/workspace_sidebar/billing.json
@@ -363,6 +371,18 @@ msgstr "¿Está seguro que desea restablecer el estado? Hágalo sólo si el proc
 #: qota/governance/doctype/service_suspension/service_suspension.json
 msgid "Arrears"
 msgstr "Endeudamiento"
+
+msgid "By Fine"
+msgstr "Por multa"
+
+msgid "Select a suspension reason."
+msgstr "Seleccione un motivo de suspensión."
+
+msgid "Suspension for outstanding debt requires expired monthly fees as of the Effective Date."
+msgstr "La suspensión por deuda pendiente exige mensualidades vencidas a la fecha efectiva."
+
+msgid "Subscriber request, outstanding debt, or an unpaid service fine."
+msgstr "Solicitud del abonado, deuda pendiente o una multa sin pagar."
 
 #: qota/governance/doctype/service_contract_log/service_contract_log.py:29
 msgid "Audit logs cannot be modified once they are created."
@@ -2650,6 +2670,14 @@ msgstr "El RTN debe tener exactamente 14 dígitos."
 #: qota/billing/doctype/service_rate_consumption_range/service_rate_consumption_range.json
 msgid "Range Details"
 msgstr "Detalles del rango"
+
+#: qota/billing/doctype/payment_receipt/payment_receipt.js
+msgid "Rate adjustment"
+msgstr "Ajuste de tarifa"
+
+#: qota/billing/doctype/payment_receipt/payment_receipt.py
+msgid "Rate difference: {0}"
+msgstr "Diferencia de tarifa: {0}"
 
 #. Label of the rate_name (Data) field in DocType 'Service Rate'
 #: qota/billing/doctype/service_rate/service_rate.json

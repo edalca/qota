@@ -21,7 +21,7 @@ class DebtLedgerEntry(Document):
 		billing_period: DF.Data | None
 		description: DF.SmallText | None
 		due_date: DF.Date | None
-		entry_type: DF.Literal["Monthly Fee", "Connection Fee", "Late Fee", "Reconnection Fee", "Other Fee", "Refinancing Down Payment", "Refinancing Installment"]
+		entry_type: DF.Literal["Monthly Fee", "Connection Fee", "Late Fee", "Reconnection Fee", "Other Fee", "Service Fine", "Refinancing Down Payment", "Refinancing Installment"]
 		outstanding_amount: DF.Currency
 		paid_amount: DF.Currency
 		reference_doctype: DF.Link | None
@@ -51,58 +51,78 @@ class DebtLedgerEntry(Document):
 
 	def apply_advance_payments(self) -> None:
 		"""
-		Checks for available balances in Payment Receipts for the same period.
+		Apply remaining Payment Receipt balances for this period and concept.
 
-		If money is found, it is applied to this debt, updating both
-		the Ledger Entry and the source Receipt Item.
-
-		Args:
-		    None
-		Returns:
-		    None
+		A Monthly Fee advance settles only the Monthly Fee of that period.
+		Another charge in the same period, such as a reconnection or a
+		connection fee, does not consume it. More than one receipt can cover
+		the same month. Each matching item is consumed oldest-first until the
+		debt is settled or no balance remains.
 		"""
-		if not self.billing_period or not self.service_contract:
+		if not self.billing_period or not self.service_contract or not self.entry_type:
 			return
 
-		advance = frappe.db.sql(
+		advances = frappe.db.sql(
 			"""
-            SELECT item.name, item.balance, item.amount
-            FROM `tabPayment Receipt Item` item
-            INNER JOIN `tabPayment Receipt` parent ON parent.name = item.parent
-            WHERE parent.service_contract = %s
-              AND item.billing_period = %s
-              AND parent.docstatus = 1
-              AND item.balance > 0
-            LIMIT 1
-        """,
-			(self.service_contract, self.billing_period),
+			SELECT item.name, item.balance, item.amount, item.parent
+			FROM `tabPayment Receipt Item` item
+			INNER JOIN `tabPayment Receipt` parent ON parent.name = item.parent
+			WHERE parent.service_contract = %s
+			  AND item.billing_period = %s
+			  AND item.payment_concept = %s
+			  AND parent.docstatus = 1
+			  AND item.balance > 0.01
+			ORDER BY parent.payment_date ASC, item.idx ASC
+			""",
+			(self.service_contract, self.billing_period, self.entry_type),
 			as_dict=True,
 		)
 
-		if advance:
-			adv_item = advance[0]
-			available_money: float = flt(adv_item.balance)
-			needed_money: float = flt(self.outstanding_amount)
+		if not advances:
+			return
 
+		applied = False
+		touched_receipts = set()
+		for adv_item in advances:
+			needed_money: float = flt(self.outstanding_amount)
+			if needed_money <= 0.01:
+				break
+
+			available_money: float = flt(adv_item.balance)
 			amount_to_apply: float = min(available_money, needed_money)
+			if amount_to_apply <= 0:
+				continue
 
 			self.paid_amount = flt(self.paid_amount) + amount_to_apply
 			self.outstanding_amount = flt(self.amount) - self.paid_amount
-
-			if self.outstanding_amount <= 0.01:
-				self.status = "Paid"
-			elif self.paid_amount > 0:
-				self.status = "Partially Paid"
-
-			self.db_update()
-			self.sync_reference_document_status()
-			new_balance: float = available_money - amount_to_apply
+			applied = True
 
 			frappe.db.set_value(
 				"Payment Receipt Item",
 				adv_item.name,
-				{"balance": new_balance, "debt_ledger_entry": self.name},
+				{
+					"balance": available_money - amount_to_apply,
+					"debt_ledger_entry": self.name,
+				},
 			)
+			touched_receipts.add(adv_item.parent)
+
+		if not applied:
+			return
+
+		if self.outstanding_amount <= 0.01:
+			self.status = "Paid"
+		elif self.paid_amount > 0:
+			self.status = "Partially Paid"
+		else:
+			self.status = "Unpaid"
+
+		self.db_update()
+		self.sync_reference_document_status()
+		from qota.billing.doctype.payment_receipt.payment_receipt import refresh_receipt_unallocated
+
+		for receipt_name in touched_receipts:
+			refresh_receipt_unallocated(receipt_name)
 
 	def sync_reference_document_status(self) -> None:
 		"""
@@ -226,7 +246,7 @@ def make_debt_ledger_entry(
 		days_to_add: int = int(settings.connection_debt_deadline_days or 30)
 	elif entry_type == "Monthly Fee":
 		days_to_add = int(settings.days_until_due or 15)
-	elif entry_type in ("Late Fee", "Reconnection Fee", "Refinancing Down Payment", "Refinancing Installment"):
+	elif entry_type in ("Late Fee", "Reconnection Fee", "Service Fine", "Refinancing Down Payment", "Refinancing Installment"):
 		days_to_add = 0
 	else:
 		days_to_add = int(settings.grace_period or 0)

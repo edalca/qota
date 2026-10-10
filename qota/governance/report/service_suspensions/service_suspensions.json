@@ -13,11 +13,11 @@
  "modified": "2026-05-07 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Governance",
- "name": "Scheduled Suspensions",
+ "name": "Service Suspensions",
  "owner": "Administrator",
  "prepared_report": 0,
  "ref_doctype": "Service Suspension",
- "report_name": "Scheduled Suspensions",
+ "report_name": "Service Suspensions",
  "report_type": "Script Report",
  "roles": [
   {

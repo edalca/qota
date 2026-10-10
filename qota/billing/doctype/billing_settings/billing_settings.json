@@ -35,6 +35,7 @@
   "apply_isv",
   "isv_percent",
   "fees_sb",
+  "late_fee_policy",
   "apply_late_fee",
   "late_fee_type",
   "late_fee_value",
@@ -215,18 +216,26 @@
   {
    "fieldname": "fees_sb",
    "fieldtype": "Section Break",
-   "label": "Late Fees / Penalties"
+   "label": "Arrears and Fines"
+  },
+  {
+   "fieldname": "late_fee_policy",
+   "fieldtype": "Small Text",
+   "label": "Policy",
+   "read_only": 1
   },
   {
    "default": "0",
    "fieldname": "apply_late_fee",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Apply Late Fees automatically?"
   },
   {
    "depends_on": "eval:doc.apply_late_fee==1",
    "fieldname": "late_fee_type",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Late Fee Type",
    "options": "Fixed Amount\nPercentage"
   },
@@ -234,6 +243,7 @@
    "depends_on": "eval:doc.apply_late_fee==1",
    "fieldname": "late_fee_value",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Late Fee Value"
   },
   {

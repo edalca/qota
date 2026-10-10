@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-10-08 00:00:00",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "debt_ledger_entry",
+  "entry_type",
+  "billing_period",
+  "settled_amount",
+  "reference_doctype",
+  "reference_name"
+ ],
+ "fields": [
+  {
+   "fieldname": "debt_ledger_entry",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Debt Ledger Entry",
+   "options": "Debt Ledger Entry",
+   "reqd": 1
+  },
+  {
+   "fieldname": "entry_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Entry Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "billing_period",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Billing Period",
+   "read_only": 1
+  },
+  {
+   "fieldname": "settled_amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Settled Amount",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Data",
+   "label": "Reference Doctype",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Data",
+   "label": "Reference Name",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2026-10-08 00:00:00",
+ "modified_by": "Administrator",
+ "module": "Billing",
+ "name": "Refinancing Settled Debt",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -41,6 +41,10 @@ def get_data(filters):
 	report_map = {}
 
 	for dle in ledgers:
+		# Only the monthly fee belongs to the billing period. A reconnection,
+		# connection or service fine in the same month is a separate charge.
+		if dle.entry_type != "Monthly Fee" or not dle.billing_period:
+			continue
 		period = dle.billing_period
 		if period not in report_map:
 			report_map[period] = _create_empty_period(period)
@@ -48,6 +52,8 @@ def get_data(filters):
 		report_map[period]["ledger_dates"][dle.name] = dle.creation
 
 	for pay in payments:
+		if pay.payment_concept != "Monthly Fee" or not pay.billing_period:
+			continue
 		period = pay.billing_period
 		if period not in report_map:
 			report_map[period] = _create_empty_period(period)
@@ -93,7 +99,7 @@ def _get_ledger_entries(filters):
 	return frappe.get_all(
 		"Debt Ledger Entry",
 		filters=dle_filters,
-		fields=["name", "billing_period", "amount", "paid_amount", "outstanding_amount", "creation"],
+		fields=["name", "billing_period", "amount", "paid_amount", "outstanding_amount", "creation", "entry_type"],
 	)
 
 
@@ -116,7 +122,7 @@ def _get_payment_items(filters):
 	items = frappe.get_all(
 		"Payment Receipt Item",
 		filters={"parent": ["in", list(receipt_date)]},
-		fields=["parent", "amount", "debt_ledger_entry", "billing_period"],
+		fields=["parent", "amount", "debt_ledger_entry", "billing_period", "payment_concept"],
 	)
 	for item in items:
 		item["payment_date"] = receipt_date[item.parent]

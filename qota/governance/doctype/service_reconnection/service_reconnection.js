@@ -17,7 +17,7 @@ frappe.ui.form.on("Service Reconnection", {
                 status: "Executed",
                 docstatus: 1
             },
-            fields: ["name", "suspension_type", "reason"],
+            fields: ["name", "suspension_type"],
             order_by: "creation desc",
             limit: 1
         }).then(res => {
@@ -35,12 +35,12 @@ frappe.ui.form.on("Service Reconnection", {
     },
 
     apply_fee_logic(frm, suspension) {
-        let is_free = suspension.suspension_type === "By Request" || suspension.reason === "Maintenance";
+        let is_free = suspension.suspension_type === "Subscriber Request";
         if (is_free) {
             frm.set_value("reconnection_fee", 0);
             frm.set_df_property("reconnection_fee", "read_only", 1);
             frappe.show_alert({
-                message: __("Free reconnection ({0}). Field locked.", [__(suspension.reason)]),
+                message: __("Free reconnection ({0}). Field locked.", [__(suspension.suspension_type)]),
                 indicator: "green"
             });
         } else {

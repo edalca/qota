@@ -3,7 +3,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import flt
+from frappe.utils import add_days, flt, getdate, today
 
 
 def execute(filters=None):
@@ -98,6 +98,8 @@ def get_data(filters):
 	settings = frappe.get_single("Billing Settings")
 	suspension_threshold = int(settings.suspension_months_limit or 1)
 	min_debt = flt(settings.min_debt_for_suspension or 0)
+	grace_days = int(settings.grace_period or 0)
+	as_of = getdate(today())
 
 	contract_status_filter = filters.get("contract_status")
 	min_periods = int(filters.get("min_periods") or suspension_threshold)
@@ -179,34 +181,67 @@ def get_data(filters):
 				"total_outstanding": 0.0,
 				"advance_balance": flt(advance_map.get(cid, 0)),
 				"net_outstanding": 0.0,
-				"oldest_period": entry.billing_period or "",
-				"oldest_due_date": entry.due_date,
+				"oldest_period": "",
+				"due_entries": [],
 				"suspension_status": suspension_map.get(cid, ""),
 			}
 
-		grouped[cid]["overdue_periods"] += 1
+		if not _is_past_due(entry.due_date, as_of, grace_days):
+			continue
+
+		grouped[cid]["due_entries"].append(
+			{
+				"due_date": getdate(entry.due_date),
+				"billing_period": entry.billing_period or "",
+				"outstanding": flt(entry.outstanding_amount),
+			}
+		)
 		grouped[cid]["total_outstanding"] += flt(entry.outstanding_amount)
 
-		if entry.due_date and (
-			not grouped[cid]["oldest_due_date"] or entry.due_date < grouped[cid]["oldest_due_date"]
-		):
-			grouped[cid]["oldest_due_date"] = entry.due_date
-			grouped[cid]["oldest_period"] = entry.billing_period or ""
-
 	for row in grouped.values():
-		row["net_outstanding"] = max(row["total_outstanding"] - row["advance_balance"], 0)
+		_apply_advance_to_overdue_months(row)
 
 	rows = [
 		r
 		for r in grouped.values()
-		if r["overdue_periods"] >= min_periods and r["net_outstanding"] >= min_debt
+		if r["overdue_periods"] >= min_periods and r["net_outstanding"] > 0.01 and r["net_outstanding"] >= min_debt
 	]
-
-	for r in rows:
-		r.pop("oldest_due_date", None)
 
 	rows.sort(key=lambda r: (r["block"] or 0, r["house_number"] or 0))
 	return rows
+
+
+def _is_past_due(due_date, as_of, grace_days):
+	"""A monthly fee is overdue only after its due date plus the grace period."""
+	if not due_date:
+		return False
+	return as_of > getdate(add_days(due_date, grace_days))
+
+
+def _apply_advance_to_overdue_months(row):
+	"""Cover the oldest overdue months with the monthly-fee advance.
+
+	A prepaid year leaves open charges for the months already billed and a
+	credit for the months not billed yet. Those charges are not arrears while
+	the credit covers them. The net balance stays negative when the subscriber
+	has paid more than the overdue fees.
+	"""
+	credit = flt(row["advance_balance"])
+	uncovered = 0
+	oldest_period = ""
+	for entry in sorted(row.pop("due_entries"), key=lambda item: (item["due_date"], item["billing_period"])):
+		outstanding = flt(entry["outstanding"])
+		if credit >= outstanding - 0.01:
+			credit -= outstanding
+			continue
+		credit = 0
+		uncovered += 1
+		if not oldest_period:
+			oldest_period = entry["billing_period"]
+
+	row["overdue_periods"] = uncovered
+	row["oldest_period"] = oldest_period
+	row["net_outstanding"] = flt(row["total_outstanding"]) - flt(row["advance_balance"])
 
 
 def _get_advance_balance_map(contract_names):

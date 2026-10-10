@@ -65,10 +65,8 @@
     {# SUSPENSION DETAILS #}
     <table style="width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: 12px;">
         <tr>
-            <td style="width: 30%; background: #fff3cd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Suspension Type") }}</td>
-            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(doc.suspension_type) }}</td>
-            <td style="background: #fff3cd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Reason") }}</td>
-            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;">{{ _(doc.reason) }}</td>
+            <td style="width: 30%; background: #fff3cd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Suspension Reason") }}</td>
+            <td style="padding: 7px 10px; border: 1px solid #dfe6e9;" colspan="3">{{ _(doc.suspension_type) }}</td>
         </tr>
         <tr>
             <td style="background: #fff3cd; font-weight: 700; padding: 7px 10px; border: 1px solid #dfe6e9; text-transform: uppercase; font-size: 10px;">{{ _("Effective Date") }}</td>
@@ -95,7 +93,7 @@
         {% if doc.effective_date %}
             {{ _("effective {0}").format("<strong>" + frappe.utils.format_date(doc.effective_date, "dd/MM/yyyy") + "</strong>") }}
         {% endif %}
-        {{ _("due to {0}.").format("<strong>" + _(doc.reason) | lower + "</strong>") }}
+        {{ _("due to {0}.").format("<strong>" + _(doc.suspension_type) | lower + "</strong>") }}
         {{ _("To request reconnection, the account balance must be settled at the water board office.") }}
     </div>
 

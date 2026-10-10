@@ -253,7 +253,9 @@ function render_month_selection_table(d, months) {
                                 <input type="checkbox" class="month-check" data-index="${i}">
                             </td>
                             <td>
-                                <strong>${m.billing_period}</strong> <br>
+                                <strong>${m.billing_period}</strong>
+                                ${m.is_rate_adjustment ? `<span class="indicator-pill orange" style="margin-left:6px;">${__("Rate adjustment")}</span>` : ""}
+                                <br>
                                 <span class="text-muted small">${m.description}</span>
                             </td>
                             <td class="text-right" style="vertical-align: middle; white-space: nowrap;">
@@ -269,6 +271,7 @@ function render_month_selection_table(d, months) {
         </div>
         <p class="text-muted small text-center" style="margin-top: 10px;">
             <i class="fa fa-info-circle"></i> ${__("Months must be selected in sequential order.")}
+            ${months.some(m => m.is_rate_adjustment) ? `<br>${__("Months already prepaid at a lower rate show only the difference.")}` : ""}
         </p>
     `;
 

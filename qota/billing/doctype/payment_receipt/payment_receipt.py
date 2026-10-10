@@ -178,6 +178,27 @@ class PaymentReceipt(Document):
             if not cancel and flt(item.balance) == 0:
                 item.balance = item.amount
 
+            if (
+                not cancel
+                and not item.debt_ledger_entry
+                and item.billing_period
+                and item.payment_concept == "Monthly Fee"
+            ):
+                dle_name = frappe.db.get_value(
+                    "Debt Ledger Entry",
+                    {
+                        "service_contract": self.service_contract,
+                        "billing_period": item.billing_period,
+                        "entry_type": "Monthly Fee",
+                        "docstatus": ["!=", 2],
+                        "outstanding_amount": [">", 0.01],
+                    },
+                    "name",
+                )
+                if dle_name:
+                    item.debt_ledger_entry = dle_name
+                    item.db_set("debt_ledger_entry", dle_name)
+
             if item.debt_ledger_entry:
                 debt = frappe.get_doc("Debt Ledger Entry",
                                       item.debt_ledger_entry)
@@ -213,6 +234,8 @@ class PaymentReceipt(Document):
 
                 item.db_set("balance", item.balance)
 
+        refresh_receipt_unallocated(self.name)
+
     def calculate_totals(self):
         total_to_pay = 0.0
         unallocated_amount = 0.0
@@ -242,6 +265,12 @@ class PaymentReceipt(Document):
     ):
         """
         Calculate billing periods for advances or full cycle (Talonario).
+
+        Periods already billed are skipped (those debts load as pending).
+        Periods already prepaid are skipped unless the current tariff is
+        higher than the amount already paid; in that case only the
+        shortfall is offered so a rate increase can be collected without
+        generating future monthly bills.
         """
         from qota.billing.utils import get_monthly_billing_breakdown
 
@@ -261,25 +290,11 @@ class PaymentReceipt(Document):
                                 reactivation_dt > contract_start
                                 else contract_start)
 
-        existing_periods = set()
+        billed_periods = set()
+        prepaid_by_period = {}
         if not ignore_existing:
-            debts = frappe.get_all("Debt Ledger Entry", filters={
-                "service_contract": contract_name,
-                "entry_type": "Monthly Fee",
-                "docstatus": ["!=", 2]
-            }, pluck="billing_period")
-            existing_periods.update(debts)
-
-            paid = frappe.db.sql("""
-                SELECT pri.billing_period
-                FROM `tabPayment Receipt Item` pri
-                JOIN `tabPayment Receipt` pr ON pri.parent = pr.name
-                WHERE pr.service_contract = %s
-                AND pri.payment_concept = 'Monthly Fee'
-                AND pr.docstatus = 1 AND pri.billing_period IS NOT NULL
-            """, (contract_name,), as_dict=True)
-            for pa in paid:
-                existing_periods.add(pa.billing_period)
+            billed_periods = _get_monthly_fee_billed_periods(contract_name)
+            prepaid_by_period = _get_prepaid_monthly_fees(contract_name)
 
         open_years = frappe.get_all(
             "Billing Year",
@@ -292,6 +307,7 @@ class PaymentReceipt(Document):
             return []
 
         min_year = min(open_years_map.keys())
+        max_year = max(open_years_map.keys())
         if ignore_existing:
             current_date = date(min_year, 1, 1)
         else:
@@ -300,10 +316,8 @@ class PaymentReceipt(Document):
 
         advances = []
         today_date = nowdate()
-        iterations = 0
 
-        while len(advances) < int(qty) and iterations < (int(qty) * 2):
-            iterations += 1
+        while len(advances) < int(qty) and current_date.year <= max_year:
             y_num = current_date.year
             m_num = current_date.month
             period_id = current_date.strftime("%m-%Y")
@@ -313,36 +327,124 @@ class PaymentReceipt(Document):
                 current_date = add_months(current_date, 1)
                 continue
 
-            if ignore_existing or (period_id not in existing_periods):
-                month_str = month_names[m_num - 1]
-                p_start = date(y_num, m_num, start_day)
-                p_end = add_days(add_months(p_start, 1), -1)
+            if not ignore_existing and period_id in billed_periods:
+                current_date = add_months(current_date, 1)
+                continue
 
-                breakdown = get_monthly_billing_breakdown(
-                    contract_name=contract_name,
-                    billing_month=month_str,
-                    billing_year=fiscal_year_link,
-                    start_date=p_start,
-                    end_date=p_end
+            month_str = month_names[m_num - 1]
+            p_start = date(y_num, m_num, start_day)
+            p_end = add_days(add_months(p_start, 1), -1)
+
+            breakdown = get_monthly_billing_breakdown(
+                contract_name=contract_name,
+                billing_month=month_str,
+                billing_year=fiscal_year_link,
+                start_date=p_start,
+                end_date=p_end
+            )
+
+            current_rate = flt(breakdown.get("total_to_bill", 0))
+            prepaid = flt(prepaid_by_period.get(period_id, 0))
+            is_rate_adjustment = False
+            amount = current_rate
+            details = list(breakdown.get("detailed_items") or [])
+            description = _("Advance Payment: {0}").format(
+                format_date(current_date, "MMMM YYYY")
+            )
+
+            if not ignore_existing and prepaid > 0:
+                shortfall = flt(current_rate - prepaid)
+                if shortfall <= 0.01:
+                    current_date = add_months(current_date, 1)
+                    continue
+                is_rate_adjustment = True
+                amount = shortfall
+                details.append({
+                    "description": _("Already prepaid"),
+                    "amount": -prepaid,
+                })
+                description = _("Rate difference: {0}").format(
+                    format_date(current_date, "MMMM YYYY")
                 )
 
-                advances.append({
-                    "billing_period": period_id,
-                    "month_num": m_num,
-                    "month_label": f"{_(month_str)} {y_num}",
-                    "year": y_num,
-                    "due_date": today_date,
-                    "amount": flt(breakdown.get("total_to_bill", 0)),
-                    "discount_amount":
-                    flt(breakdown.get("discount_amount", 0)),
-                    "description": _("Advance Payment: {0}").format(
-                        format_date(current_date, 'MMMM YYYY')),
-                    "billing_details": breakdown.get("detailed_items", [])
-                })
+            advances.append({
+                "billing_period": period_id,
+                "month_num": m_num,
+                "month_label": f"{_(month_str)} {y_num}",
+                "year": y_num,
+                "due_date": today_date,
+                "amount": amount,
+                "discount_amount":
+                flt(breakdown.get("discount_amount", 0)),
+                "description": description,
+                "billing_details": details,
+                "is_rate_adjustment": is_rate_adjustment,
+            })
 
             current_date = add_months(current_date, 1)
 
         return advances
+
+
+def refresh_receipt_unallocated(receipt_name):
+    """Set the receipt header to the amount not yet linked to a debt.
+
+    Advances keep a balance until the monthly bill exists. Once that bill
+    consumes the line, the header must drop the same amount.
+    """
+    if not receipt_name:
+        return
+
+    unallocated = frappe.db.sql(
+        """
+        SELECT COALESCE(SUM(amount), 0)
+        FROM `tabPayment Receipt Item`
+        WHERE parent = %s
+          AND (debt_ledger_entry IS NULL OR debt_ledger_entry = '')
+        """,
+        receipt_name,
+    )[0][0]
+    frappe.db.set_value(
+        "Payment Receipt",
+        receipt_name,
+        "unallocated_amount",
+        flt(unallocated),
+        update_modified=False,
+    )
+
+
+def _get_monthly_fee_billed_periods(contract_name):
+    """Return billing periods that already have a Monthly Fee ledger entry."""
+    return set(
+        frappe.get_all(
+            "Debt Ledger Entry",
+            filters={
+                "service_contract": contract_name,
+                "entry_type": "Monthly Fee",
+                "docstatus": ["!=", 2],
+            },
+            pluck="billing_period",
+        )
+    )
+
+
+def _get_prepaid_monthly_fees(contract_name):
+    """Return {billing_period: total paid} from submitted Monthly Fee items."""
+    rows = frappe.db.sql(
+        """
+        SELECT pri.billing_period, SUM(pri.amount) AS total_prepaid
+        FROM `tabPayment Receipt Item` pri
+        JOIN `tabPayment Receipt` pr ON pri.parent = pr.name
+        WHERE pr.service_contract = %s
+          AND pri.payment_concept = 'Monthly Fee'
+          AND pr.docstatus = 1
+          AND pri.billing_period IS NOT NULL
+        GROUP BY pri.billing_period
+        """,
+        (contract_name,),
+        as_dict=True,
+    )
+    return {row.billing_period: flt(row.total_prepaid) for row in rows}
 
 
 @frappe.whitelist()

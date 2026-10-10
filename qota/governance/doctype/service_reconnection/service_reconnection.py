@@ -50,7 +50,7 @@ class ServiceReconnection(Document):
 		suspension = frappe.db.get_value(
 			"Service Suspension",
 			self.service_suspension,
-			["suspension_type", "reason", "effective_date"],
+			["suspension_type"],
 			as_dict=True,
 		)
 		if not suspension:
@@ -64,7 +64,7 @@ class ServiceReconnection(Document):
 
 		self.remarks = (
 			f"{_('Reconnection for contract')} {self.service_contract} | "
-			f"{_('Previous suspension')}: {_(suspension.suspension_type)} — {_(suspension.reason)} | "
+			f"{_('Previous suspension')}: {_(suspension.suspension_type)} | "
 			f"{fee_line}"
 		)
 
@@ -78,28 +78,25 @@ class ServiceReconnection(Document):
 
 	def enforce_fee_rules(self) -> None:
 		"""
-		Calculates the fee: 0 if the previous cut was Maintenance or
-		By Request.
-		Enforces zero even if manually changed in the UI.
+		The reconnection fee is 0 when the subscriber requested the cut.
+		A debt or fine suspension keeps the fee from Billing Settings.
 		"""
 		last_suspension = frappe.db.get_value(
 			"Service Suspension",
 			{"name": self.service_suspension, "status": "Executed", "docstatus": 1},
-			["suspension_type", "reason"],
+			["suspension_type"],
 			as_dict=True,
 			order_by="creation desc",
 		)
 
 		if last_suspension:
-			is_free = (
-				last_suspension.suspension_type == "By Request" or last_suspension.reason == "Maintenance"
-			)
+			is_free = last_suspension.suspension_type == "Subscriber Request"
 
 			if is_free:
 				self.reconnection_fee = 0
 				if not self.remarks:
 					self.remarks = _("Free Reconnection: Previous suspension was due to {0}.").format(
-						last_suspension.reason
+						_(last_suspension.suspension_type)
 					)
 			elif self.is_new() and not self.reconnection_fee:
 				# Not free and new document: load the default fee from settings

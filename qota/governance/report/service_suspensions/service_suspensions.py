@@ -5,6 +5,8 @@ import frappe
 from frappe import _
 from frappe.utils import flt
 
+OPERATIONAL_STATUSES = ("Scheduled", "Executed", "Cancelled")
+
 
 def execute(filters=None):
 	columns = get_columns()
@@ -27,6 +29,12 @@ def get_columns():
 			"fieldname": "full_name",
 			"fieldtype": "Data",
 			"width": 200,
+		},
+		{
+			"label": _("Status"),
+			"fieldname": "status",
+			"fieldtype": "Data",
+			"width": 110,
 		},
 		{
 			"label": _("Sector"),
@@ -54,20 +62,20 @@ def get_columns():
 			"width": 120,
 		},
 		{
-			"label": _("Suspension Type"),
+			"label": _("Suspension Reason"),
 			"fieldname": "suspension_type",
 			"fieldtype": "Data",
-			"width": 110,
-		},
-		{
-			"label": _("Reason"),
-			"fieldname": "reason",
-			"fieldtype": "Data",
-			"width": 110,
+			"width": 160,
 		},
 		{
 			"label": _("Effective Date"),
 			"fieldname": "effective_date",
+			"fieldtype": "Date",
+			"width": 110,
+		},
+		{
+			"label": _("Executed Date"),
+			"fieldname": "executed_date",
 			"fieldtype": "Date",
 			"width": 110,
 		},
@@ -87,19 +95,40 @@ def _to_int(value):
 		return None
 
 
+def row_status(suspension):
+	# Cancel writes the status back to Draft and sets docstatus to 2.
+	if suspension.docstatus == 2:
+		return "Cancelled"
+	return suspension.status
+
+
+def suspension_filters(status_filter, suspension_type_filter):
+	filters = {}
+	if suspension_type_filter:
+		filters["suspension_type"] = suspension_type_filter
+
+	if status_filter == "Cancelled":
+		filters["docstatus"] = 2
+	elif status_filter == "Draft":
+		filters["docstatus"] = 0
+		filters["status"] = "Draft"
+	elif status_filter in ("Scheduled", "Executed"):
+		filters["docstatus"] = 1
+		filters["status"] = status_filter
+	else:
+		filters["docstatus"] = ["in", [1, 2]]
+	return filters
+
+
 def get_data(filters):
 	filters = filters or {}
-	status_filter = filters.get("status") or "Scheduled"
-	reason_filter = filters.get("reason")
+	status_filter = filters.get("status") or "All"
+	suspension_type_filter = filters.get("suspension_type")
 	premises_filter = filters.get("premises")
-
-	sus_filters = {"status": status_filter, "docstatus": ["!=", 2]}
-	if reason_filter:
-		sus_filters["reason"] = reason_filter
 
 	suspensions = frappe.get_all(
 		"Service Suspension",
-		filters=sus_filters,
+		filters=suspension_filters(status_filter, suspension_type_filter),
 		fields=[
 			"name",
 			"full_name",
@@ -107,8 +136,10 @@ def get_data(filters):
 			"subscriber",
 			"premises",
 			"suspension_type",
-			"reason",
+			"status",
+			"docstatus",
 			"effective_date",
+			"executed_date",
 		],
 		order_by="effective_date asc",
 	)
@@ -149,18 +180,23 @@ def get_data(filters):
 		if premises_filter and s.premises != premises_filter:
 			continue
 
-		rows.append({
-			"suspension": s.name,
-			"full_name": s.full_name,
-			"sector": p.get("sector") or "-",
-			"block": _to_int(p.get("block")),
-			"house_number": _to_int(p.get("house_number")),
-			"service_contract": s.service_contract,
-			"suspension_type": _(s.suspension_type),
-			"reason": _(s.reason),
-			"effective_date": s.effective_date,
-			"outstanding": outstanding_map.get(s.service_contract, 0),
-		})
+		status = row_status(s)
+		rows.append(
+			{
+				"suspension": s.name,
+				"full_name": s.full_name,
+				"status": _(status),
+				"status_key": status,
+				"sector": p.get("sector") or "-",
+				"block": _to_int(p.get("block")),
+				"house_number": _to_int(p.get("house_number")),
+				"service_contract": s.service_contract,
+				"suspension_type": _(s.suspension_type) if s.suspension_type else "",
+				"effective_date": s.effective_date,
+				"executed_date": s.executed_date,
+				"outstanding": outstanding_map.get(s.service_contract, 0),
+			}
+		)
 
 	rows.sort(key=lambda r: (r["block"] or 0, r["house_number"] or 0))
 	return rows
@@ -170,12 +206,29 @@ def get_report_summary(data):
 	if not data:
 		return []
 
+	counts = {status: 0 for status in OPERATIONAL_STATUSES}
+	for row in data:
+		if row["status_key"] in counts:
+			counts[row["status_key"]] += 1
+
 	return [
 		{
-			"value": len(data),
-			"label": _("Scheduled Suspensions"),
+			"value": counts["Scheduled"],
+			"label": _("Scheduled"),
 			"datatype": "Int",
 			"indicator": "Orange",
+		},
+		{
+			"value": counts["Executed"],
+			"label": _("Executed"),
+			"datatype": "Int",
+			"indicator": "Blue",
+		},
+		{
+			"value": counts["Cancelled"],
+			"label": _("Cancelled"),
+			"datatype": "Int",
+			"indicator": "Gray",
 		},
 		{
 			"value": sum(r["outstanding"] for r in data),

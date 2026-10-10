@@ -13,11 +13,11 @@
  "modified": "2026-02-20 22:09:19.340940",
  "modified_by": "Administrator",
  "module": "Billing",
- "name": "Advance Payments Report",
+ "name": "Advance Payments",
  "owner": "Administrator",
  "prepared_report": 0,
  "ref_doctype": "Payment Receipt",
- "report_name": "Advance Payments Report",
+ "report_name": "Advance Payments",
  "report_type": "Script Report",
  "roles": [
   {

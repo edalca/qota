@@ -1,7 +1,7 @@
 // Copyright (c) 2026, Edwin Carrillo and contributors
 // For license information, please see license.txt
 
-frappe.query_reports["Advance Payments Report"] = {
+frappe.query_reports["Advance Payments"] = {
     "filters": [
         {
             "fieldname": "service_contract",

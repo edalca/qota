@@ -1,0 +1,56 @@
+{
+ "app": "qota",
+ "creation": "2026-10-09 01:08:40.146722",
+ "docstatus": 0,
+ "doctype": "Dock",
+ "idx": 0,
+ "items": [
+  {
+   "added": 1,
+   "hidden": 0,
+   "icon": "collection-cash-duotone",
+   "link_to": "Collection",
+   "link_type": "Sidebar",
+   "title": "Collection"
+  },
+  {
+   "added": 1,
+   "hidden": 0,
+   "icon": "billing-drop-duotone",
+   "link_to": "Billing",
+   "link_type": "Sidebar",
+   "title": "Billing"
+  },
+  {
+   "added": 1,
+   "hidden": 0,
+   "icon": "subscribers-card-duotone",
+   "link_to": "Subscribers",
+   "link_type": "Sidebar",
+   "title": "Subscribers"
+  },
+  {
+   "added": 1,
+   "hidden": 0,
+   "icon": "expenditures-coin-duotone",
+   "link_to": "Expenditures",
+   "link_type": "Sidebar",
+   "title": "Expenditures"
+  },
+  {
+   "added": 1,
+   "hidden": 0,
+   "icon": "whatsapp-chat-duotone",
+   "link_to": "WhatsApp",
+   "link_type": "Sidebar",
+   "title": "WhatsApp"
+  }
+ ],
+ "modified": "2026-10-09 01:42:58.155763",
+ "modified_by": "Administrator",
+ "mount_on": "",
+ "name": "qota",
+ "owner": "Administrator",
+ "standard": 1,
+ "user": ""
+}

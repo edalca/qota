@@ -88,8 +88,17 @@ class DebtRefinancing(Document):
                 "status": ["in", ["Unpaid", "Partially Paid"]],
                 "docstatus": ["!=", 2],
             },
-            fields=["name", "amount", "reference_doctype", "reference_name"],
+            fields=[
+                "name",
+                "amount",
+                "outstanding_amount",
+                "entry_type",
+                "billing_period",
+                "reference_doctype",
+                "reference_name",
+            ],
         )
+        _record_settled_debts(self.name, existing_dles)
         for dle in existing_dles:
             frappe.db.set_value(
                 "Debt Ledger Entry",
@@ -144,6 +153,31 @@ class DebtRefinancing(Document):
             )
 
         frappe.msgprint(_("Debt refinanced successfully. Down payment and installments are now active in the ledger."), indicator="green")
+
+
+def _record_settled_debts(refinancing_name, debts):
+    """Store each outstanding debt this refinancing cancels."""
+    idx = 1
+    for debt in debts:
+        settled = flt(debt.outstanding_amount)
+        if settled <= 0.01:
+            continue
+        row = frappe.new_doc("Refinancing Settled Debt")
+        row.parent = refinancing_name
+        row.parentfield = "settled_debts"
+        row.parenttype = "Debt Refinancing"
+        row.idx = idx
+        row.debt_ledger_entry = debt.name
+        row.entry_type = debt.entry_type
+        row.billing_period = debt.billing_period
+        row.settled_amount = settled
+        row.reference_doctype = debt.reference_doctype
+        row.reference_name = debt.reference_name
+        from frappe.model.naming import set_new_name
+
+        set_new_name(row)
+        row.db_insert()
+        idx += 1
 
 
 @frappe.whitelist()

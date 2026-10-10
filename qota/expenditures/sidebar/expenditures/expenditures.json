@@ -1,0 +1,50 @@
+{
+ "app": "qota",
+ "creation": "2026-10-08 04:54:17.489825",
+ "docstatus": 0,
+ "doctype": "Sidebar",
+ "header_icon": "expenditures-coin-duotone",
+ "idx": 0,
+ "items": [
+  {
+   "added": 0,
+   "child": 0,
+   "collapsible": 1,
+   "hidden": 0,
+   "icon": "banknote",
+   "indent": 0,
+   "is_default_module": 0,
+   "keep_closed": 0,
+   "label": "Expense Voucher",
+   "link_to": "Expense Voucher",
+   "link_type": "DocType",
+   "open_in_new_tab": 1,
+   "show_arrow": 0,
+   "type": "Link"
+  },
+  {
+   "added": 0,
+   "child": 0,
+   "collapsible": 1,
+   "hidden": 0,
+   "icon": "book-copy",
+   "indent": 0,
+   "is_default_module": 0,
+   "keep_closed": 0,
+   "label": "Expense Category",
+   "link_to": "Expense Category",
+   "link_type": "DocType",
+   "open_in_new_tab": 1,
+   "show_arrow": 0,
+   "type": "Link"
+  }
+ ],
+ "merged_from": "[\"Expenditures\"]",
+ "modified": "2026-10-08 05:13:21.603276",
+ "modified_by": "Administrator",
+ "module": "Expenditures",
+ "name": "Expenditures",
+ "owner": "Administrator",
+ "standard": 1,
+ "title": "Expenditures"
+}
