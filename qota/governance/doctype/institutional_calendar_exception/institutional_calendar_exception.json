@@ -1,0 +1,64 @@
+{
+ "doctype": "DocType",
+ "name": "Institutional Calendar Exception",
+ "module": "Governance",
+ "engine": "InnoDB",
+ "field_order": [
+  "exception_date",
+  "exception_type",
+  "day_status",
+  "internal_reason",
+  "public_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "exception_date",
+   "fieldtype": "Date",
+   "label": "Exception Date",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "exception_type",
+   "fieldtype": "Select",
+   "label": "Exception Type",
+   "options": "\nHoliday\nExceptional Hours\nExtraordinary Closure",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "day_status",
+   "fieldtype": "Select",
+   "label": "Day Status",
+   "options": "\nClosed\nOpen",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "internal_reason",
+   "fieldtype": "Small Text",
+   "label": "Internal Reason",
+   "description": "Administrative information. Never included in publishable office information."
+  },
+  {
+   "fieldname": "public_reason",
+   "fieldtype": "Small Text",
+   "label": "Authorized Public Reason",
+   "description": "Calendar exception reasons are internal only. This field must remain empty.",
+   "hidden": 1,
+   "read_only": 1
+  }
+ ],
+ "permissions": [],
+ "actions": [],
+ "links": [],
+ "states": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "istable": 1,
+ "editable_grid": 1,
+ "autoname": "hash"
+}

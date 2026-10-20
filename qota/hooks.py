@@ -11,7 +11,7 @@ app_logo_url = "/assets/qota/logo.svg"
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
@@ -27,7 +27,7 @@ add_to_apps_screen = [
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/qota/css/qota.css"
-app_include_js = ["qota.bundle.js", "/assets/qota/js/dock_labels.js"]
+app_include_js = ["qota.bundle.js", "/assets/qota/js/dock_labels.js", "/assets/qota/js/phone_capture.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/qota/css/qota.css"
@@ -45,7 +45,7 @@ app_include_js = ["qota.bundle.js", "/assets/qota/js/dock_labels.js"]
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
-doctype_list_js = {"WA Account": "public/js/wa_account_list.js"}
+# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
@@ -100,7 +100,7 @@ after_migrate = "qota.install.after_migrate"
 # Uninstallation
 # ------------
 
-before_uninstall = "qota.setup.before_uninstall"
+# before_uninstall = "qota.uninstall.before_uninstall"
 # after_uninstall = "qota.uninstall.after_uninstall"
 
 # Integration Setup
@@ -141,17 +141,13 @@ before_uninstall = "qota.setup.before_uninstall"
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-	"Payment Receipt": {
-		"on_submit": "qota.events.whatsapp_notices.enqueue_payment_notice",
-	},
-	"Service Suspension": {
-		"on_submit": "qota.events.whatsapp_notices.enqueue_suspension_notice",
-	},
-	"WA Account": {
-		"validate": "qota.setup.validate_wa_account",
-	},
-}
+# doc_events = {
+# 	"*": {
+# 		"on_update": "method",
+# 		"on_cancel": "method",
+# 		"on_trash": "method"
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------
@@ -253,3 +249,6 @@ fixtures = [
 # ------------
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
+
+# Financial ambiguity must stop migration even with --skip-failing.
+never_skip_patches = ['qota.patches.v16_9_0_collapse_suspension_reason', 'qota.patches.v16_7_0_fix_monthly_bill_status_from_debt_ledger', 'qota.patches.v16_9_0_backfill_reconnection_service_contract', 'qota.patches.v16_9_0_backfill_connection_bill_status', 'qota.patches.v16_9_0_backfill_service_reconnection_status', 'qota.patches.v16_9_0_release_monthly_advances_applied_to_other_charges', 'qota.patches.v16_9_0_record_refinanced_debts']

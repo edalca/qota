@@ -1,8 +1,14 @@
 // Copyright (c) 2026, Edwin Carrillo and contributors
 // For license information, please see license.txt
 
+const qota_subscriber_phone = { legacy: "primary_phone", region: "primary_phone_region", national: "primary_phone", e164: "primary_phone_e164" };
+
 frappe.ui.form.on("Subscriber", {
+	onload: (frm) => qota.phone_capture.setup(frm, qota_subscriber_phone),
+	primary_phone_region: (frm) => qota.phone_capture.preview(frm, qota_subscriber_phone),
+	primary_phone: (frm) => qota.phone_capture.preview(frm, qota_subscriber_phone),
 	refresh: function (frm) {
+		qota.phone_capture.warning(frm, qota_subscriber_phone);
 		frm.set_query("legal_representative", function () {
 			return { filters: { subscriber_type: "Natural Person" } };
 		});

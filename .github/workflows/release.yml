@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate tag and prepare metadata
+        id: metadata
+        run: |
+          set -euo pipefail
+          version=$(python3 -c "import re; m = re.search(r'__version__\s*=\s*[\"\\\']([^\"\\\']+)[\"\\\']', open('qota/__init__.py').read()); print(m.group(1))")
+          if [[ -z "$version" ]]; then
+            printf 'Failed to extract __version__ from qota/__init__.py\n' >&2
+            exit 1
+          fi
+          if [[ "v${version}" != "$GITHUB_REF_NAME" ]]; then
+            printf 'Tag %s does not match source version %s\n' "$GITHUB_REF_NAME" "$version" >&2
+            exit 1
+          fi
+          major="${version%%.*}"
+          build_date="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          printf 'version=%s\nmajor=%s\nbuild_date=%s\n' "$version" "$major" "$build_date" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          set -euo pipefail
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            printf 'Release %s already exists\n' "$GITHUB_REF_NAME" >&2
+            exit 1
+          fi
+          release_flags=()
+          version_without_build="${VERSION%%+*}"
+          if [[ "$version_without_build" == *-* ]]; then
+            release_flags+=(--prerelease)
+          fi
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            "${release_flags[@]}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME || secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            QOTA_PATH=https://github.com/edalca/qota.git
+            QOTA_BRANCH=${{ github.ref_name }}
+            QOTA_VERSION=${{ steps.metadata.outputs.version }}
+          tags: |
+            edalca/qota:${{ steps.metadata.outputs.version }}
+            edalca/qota:${{ steps.metadata.outputs.major }}
+            edalca/qota:latest

@@ -1,0 +1,57 @@
+{
+ "doctype": "DocType",
+ "name": "Institutional Weekly Hours",
+ "module": "Governance",
+ "engine": "InnoDB",
+ "field_order": [
+  "weekday",
+  "day_status",
+  "start_time",
+  "end_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "weekday",
+   "fieldtype": "Select",
+   "label": "Weekday",
+   "options": "\nMonday\nTuesday\nWednesday\nThursday\nFriday\nSaturday\nSunday",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "day_status",
+   "fieldtype": "Select",
+   "label": "Day Status",
+   "options": "\nOpen\nClosed",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "label": "Opening Time",
+   "in_list_view": 1,
+   "columns": 2,
+   "depends_on": "eval:doc.day_status==\"Open\""
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "label": "Closing Time",
+   "in_list_view": 1,
+   "columns": 2,
+   "depends_on": "eval:doc.day_status==\"Open\""
+  }
+ ],
+ "permissions": [],
+ "actions": [],
+ "links": [],
+ "states": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "istable": 1,
+ "editable_grid": 1,
+ "autoname": "hash"
+}

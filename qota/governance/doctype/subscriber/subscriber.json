@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "autoname": "SUB-.####",
- "creation": "2026-01-22 17:02:31.701918",
+ "creation": "2026-10-12 01:04:22.603704",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -30,6 +30,8 @@
   "legal_representative",
   "contact_details_sb",
   "primary_phone",
+  "primary_phone_region",
+  "primary_phone_e164",
   "email",
   "column_break_19",
   "tax_address"
@@ -159,7 +161,6 @@
    "default": "0",
    "fieldname": "eligible_for_board",
    "fieldtype": "Check",
-   "in_list_view": 1,
    "label": "Eligible for Board",
    "read_only": 1
   },
@@ -182,11 +183,11 @@
    "label": "Contact Information"
   },
   {
-   "allow_in_quick_entry": 1,
+   "description": "ASCII digits only; include the area code and significant zeros, without international or dialing prefixes.",
    "fieldname": "primary_phone",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Phone"
+   "label": "Phone Number"
   },
   {
    "allow_in_quick_entry": 1,
@@ -202,10 +203,24 @@
    "fieldname": "tax_address",
    "fieldtype": "Small Text",
    "label": "Address"
+  },
+  {
+   "fieldname": "primary_phone_region",
+   "fieldtype": "Select",
+   "label": "Country or Region",
+   "length": 2
+  },
+  {
+   "fieldname": "primary_phone_e164",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "International Telephone",
+   "length": 16,
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2026-01-30 09:14:06.025353",
+ "modified": "2026-10-18 06:03:20.440787",
  "modified_by": "Administrator",
  "module": "Governance",
  "name": "Subscriber",
@@ -230,5 +245,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "full_name"
+ "title_field": "full_name",
+ "track_changes": 1
 }

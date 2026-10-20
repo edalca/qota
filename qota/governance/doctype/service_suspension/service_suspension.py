@@ -71,7 +71,7 @@ class ServiceSuspension(Document):
 
 	def validate_contract_eligibility(self) -> None:
 		"""Checks if the contract is Active and ready for suspension."""
-		status = frappe.db.get_value("Service Contract", self.service_contract, "status")
+		status = frappe.db.get_value("Service Contract", self.service_contract, "status", for_update=True)
 		if status == "Suspended" and self.is_new():
 			frappe.throw(_("Contract {0} is already suspended.").format(self.service_contract))
 
@@ -301,7 +301,8 @@ class ServiceSuspension(Document):
 			"Service Contract", self.service_contract, {"suspended_since": None, "suspension_reason": ""}
 		)
 
-		self.cancel_linked_meter_readings()
+		# Scheduled orders have not produced a technical reading. Existing
+		# readings of the contract belong to independent billing operations.
 		self.db_set("status", "Draft")
 
 	def cancel_linked_meter_readings(self) -> None:
@@ -339,6 +340,18 @@ class ServiceSuspension(Document):
 		Updates the Service Contract status to 'Suspended' and mirrors
 		the specific reason for better administrative visibility.
 		"""
+		self.check_permission("write")
+		self.reload()
+		contract = frappe.db.get_value("Service Contract", self.service_contract, ["docstatus", "status"], as_dict=True, for_update=True)
+		current = frappe.db.get_value(self.doctype, self.name, ["docstatus", "status", "executed_date"], as_dict=True, for_update=True)
+		if not current or current.docstatus != 1 or current.status != "Scheduled" or current.executed_date:
+			frappe.throw(_("Only a submitted scheduled suspension can be executed."))
+		if not contract or contract.docstatus != 1 or contract.status != "Active":
+			frappe.throw(_("A formalized active contract is required for suspension execution."))
+		if not executed_date:
+			frappe.throw(_("An execution date is required."))
+		getdate(executed_date)
+		self.reload()
 		self.final_reading = flt(final_reading)
 		self.executed_date = executed_date
 		self.status = "Executed"
@@ -367,17 +380,14 @@ class ServiceSuspension(Document):
 			self.create_technical_reading()
 
 		self.save()
-		from qota.events.whatsapp_notices import enqueue_executed_suspension_notice
-
-		enqueue_executed_suspension_notice(self.name)
+		self.run_method("on_technical_execution")
 
 	def create_technical_reading(self) -> None:
 		"""Generates a Meter Reading document to stop the billing cycle."""
 		reading = frappe.new_doc("Meter Reading")
 		reading.service_contract = self.service_contract
-		reading.reading_date = self.reading_date
+		reading.reading_date = self.executed_date
 		reading.current_reading = self.final_reading
 		reading.remarks = _("Closure reading (Suspension {0})").format(self.name)
 		reading.insert(ignore_permissions=True)
-		reading.submit()
 		reading.submit()

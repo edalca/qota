@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt
+from frappe.utils import flt, getdate
 
 from qota.billing.doctype.debt_ledger_entry.debt_ledger_entry import (
 	clear_and_delete_debt,
@@ -70,11 +70,26 @@ class ServiceReconnection(Document):
 
 	def validate_contract_status(self) -> None:
 		"""Ensures the contract is actually suspended."""
-		status = frappe.db.get_value("Service Contract", self.service_contract, "status")
-		if status != "Suspended":
+		contract = frappe.db.get_value("Service Contract", self.service_contract,
+			["docstatus", "status", "suspended_since"], as_dict=True, for_update=True)
+		if not contract or contract.docstatus != 1 or contract.status != "Suspended":
 			frappe.throw(
 				_("Contract {0} is not suspended. Reconnection not applicable.").format(self.service_contract)
 			)
+		suspension = frappe.db.get_value("Service Suspension", self.service_suspension,
+			["docstatus", "status", "service_contract", "effective_date", "executed_date"], as_dict=True, for_update=True)
+		if (not suspension or suspension.docstatus != 1 or suspension.status != "Executed"
+			or suspension.service_contract != self.service_contract or not suspension.executed_date
+			or not suspension.effective_date or suspension.effective_date != contract.suspended_since):
+			frappe.throw(_("The reconnection must reference the current executed suspension of this contract."))
+		current = frappe.get_all("Service Suspension", filters={"service_contract": self.service_contract,
+			"docstatus": 1, "status": "Executed", "effective_date": contract.suspended_since}, pluck="name")
+		if current != [self.service_suspension]:
+			frappe.throw(_("The current suspension cannot be determined unambiguously."))
+		duplicate = frappe.db.exists(self.doctype, {"service_suspension": self.service_suspension,
+			"docstatus": ["<", 2], "name": ["!=", self.name]})
+		if duplicate:
+			frappe.throw(_("A reconnection order already exists for this suspension."))
 
 	def enforce_fee_rules(self) -> None:
 		"""
@@ -133,12 +148,30 @@ class ServiceReconnection(Document):
 		"""
 		Technically restores the water supply and reactivates the contract.
 		"""
-		if self.status not in ["Paid", "Scheduled"]:
+		self.check_permission("write")
+		self.reload()
+		self.validate_contract_status()
+		current = frappe.db.get_value(self.doctype, self.name,
+			["docstatus", "status", "execution_date"], as_dict=True, for_update=True)
+		if not current or current.docstatus != 1 or current.execution_date or current.status not in ["Paid", "Scheduled"]:
 			frappe.throw(_("Cannot execute. Payment is required for this reconnection."))
+		self.reload()
+		if not execution_date or getdate(execution_date) < getdate(frappe.db.get_value("Service Suspension", self.service_suspension, "executed_date")):
+			frappe.throw(_("The execution date cannot precede the technical suspension date."))
+		if flt(self.reconnection_fee) > 0:
+			debts = frappe.db.sql("""SELECT name, service_contract, entry_type, docstatus, status,
+				outstanding_amount, amount FROM `tabDebt Ledger Entry`
+				WHERE reference_doctype=%s AND reference_name=%s FOR UPDATE""", (self.doctype, self.name), as_dict=True)
+			if (len(debts) != 1 or debts[0].service_contract != self.service_contract
+				or debts[0].entry_type != "Reconnection Fee" or debts[0].docstatus == 2
+				or debts[0].status != "Paid" or flt(debts[0].outstanding_amount) > 0.01
+				or flt(debts[0].amount) != flt(self.reconnection_fee)):
+				frappe.throw(_("The current reconnection obligation must be settled before execution."))
 
 		self.initial_reading = flt(initial_reading)
 		self.execution_date = execution_date
 		self.status = "Executed"
+		self.save()
 		service_contract = frappe.get_doc("Service Suspension", self.service_suspension).service_contract
 		# Restore Contract Status
 		update_contract_property(
@@ -156,7 +189,7 @@ class ServiceReconnection(Document):
 		if self.billing_basis == "Metered":
 			self.create_start_reading()
 
-		self.save()
+		self.run_method("on_technical_execution")
 
 	def create_start_reading(self) -> None:
 		"""Starts the new billing cycle with a fresh reading."""

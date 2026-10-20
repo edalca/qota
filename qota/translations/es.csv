@@ -20,13 +20,13 @@ Previous debt cancelled by refinancing,Deuda anterior cancelada por refinanciami
 Opening Balance,Saldo inicial,
 Service Fine,Multa de servicio,
 The fine amount must be greater than zero.,El monto de la multa debe ser mayor a cero.,
-"A sanction or fraud suspension requires an unpaid service fine. Monthly payments can be current.","Una suspensión por sanción o fraude requiere una multa de servicio sin pagar. Las mensualidades pueden estar al día.",
-"Overdue months do not generate a surcharge. Arrears can suspend the service. A reconnection fee applies only after disconnection. Misuse of water is charged with a Service Fine. The cut is still done from Service Suspension.","Los meses atrasados no generan recargo. La mora sí puede suspender el servicio. El cargo de reconexión aplica solo si el servicio fue desconectado. El mal uso del agua se cobra con una multa. El corte se hace en Suspensión de servicio.",
-"Link the unpaid Service Fine. Monthly payments can be current. The suspension order is what cuts the service.","Enlace la multa de servicio sin pagar. Las mensualidades pueden estar al día. La orden de suspensión es la que corta el servicio.",
-The Service Fine must be submitted, unpaid, and for this contract.,La multa debe estar enviada, sin pagar y ser de este contrato.,
+A sanction or fraud suspension requires an unpaid service fine. Monthly payments can be current.,Una suspensión por sanción o fraude requiere una multa de servicio sin pagar. Las mensualidades pueden estar al día.,
+Overdue months do not generate a surcharge. Arrears can suspend the service. A reconnection fee applies only after disconnection. Misuse of water is charged with a Service Fine. The cut is still done from Service Suspension.,Los meses atrasados no generan recargo. La mora sí puede suspender el servicio. El cargo de reconexión aplica solo si el servicio fue desconectado. El mal uso del agua se cobra con una multa. El corte se hace en Suspensión de servicio.,
+Link the unpaid Service Fine. Monthly payments can be current. The suspension order is what cuts the service.,Enlace la multa de servicio sin pagar. Las mensualidades pueden estar al día. La orden de suspensión es la que corta el servicio.,
+"The Service Fine must be submitted, unpaid, and for this contract.","La multa debe estar enviada, sin pagar y ser de este contrato.",
 Service Fine {0} is already linked to suspension {1}.,La multa {0} ya está ligada a la suspensión {1}.,
 Cancel Service Suspension {0} before cancelling this fine.,Cancele la suspensión de servicio {0} antes de cancelar esta multa.,
-This document only charges the fine. The cut is done from Service Suspension in Governance.,Este documento solo cobra la multa. El corte se hace en Suspensión de servicio, en Gobernanza.,
+This document only charges the fine. The cut is done from Service Suspension in Governance.,"Este documento solo cobra la multa. El corte se hace en Suspensión de servicio, en Gobernanza.",
 Service fine {0}: misuse of water.,Multa de servicio {0}: mal uso del agua.,
 Paid,Pagado,
 Period,Período,
@@ -57,107 +57,21 @@ Sanction,Sanción,
 Maintenance,Mantenimiento,
 Other,Otro,
 Subscriber Request,Solicitud del Abonado,
-WhatsApp,WhatsApp,
-Conversations,Conversaciones,
-WhatsApp Settings,Ajustes de WhatsApp,
-WhatsApp Notifications,Notificaciones de WhatsApp,
-WhatsApp Conversation,Conversación de WhatsApp,
-WhatsApp Chat Message,Mensaje de chat de WhatsApp,
-Webhook,Webhook,
-Public URL,URL pública,
-"HTTPS address Meta can reach. For local tests this is the ngrok address, without a trailing slash.",Dirección HTTPS a la que Meta puede llegar. En pruebas locales es la dirección de ngrok, sin barra al final.,
-Callback URL,URL de respuesta,
-Paste this address in the Meta callback URL field.,Pegue esta dirección en el campo de URL de respuesta de Meta.,
-Webhook Verify Token,Token de verificación del webhook,
-Paste this same value in Meta as the verify token.,Pegue este mismo valor en Meta como token de verificación.,
-Contact Name,Nombre del contacto,
-Last Direction,Última dirección,
-Last Message On,Fecha del último mensaje,
-Unread,No leídos,
-Last Message,Último mensaje,
-Conversation,Conversación,
-Direction,Dirección,
-Occurred On,Ocurrió el,
-Message Type,Tipo de mensaje,
-WhatsApp Message ID,ID del mensaje de WhatsApp,
-Inbound,Entrante,
-Outbound,Saliente,
-Select a conversation,Seleccione una conversación,
 Today,Hoy,
-Yesterday,Ayer,
-"When someone writes to the number, the message shows up here.",Cuando alguien escriba al número, el mensaje aparece aquí.,
-Write a reply,Escriba una respuesta,
-No conversations yet.,Todavía no hay conversaciones.,
-No conversations match the search.,Ninguna conversación coincide con la búsqueda.,
-Write a message first.,Escriba un mensaje primero.,
-The conversation does not exist.,La conversación no existe.,
-The reply was not sent.,La respuesta no se envió.,
-WhatsApp Message,Mensaje de WhatsApp,
-WA Message,Mensaje de WhatsApp,
-WA Account,Cuenta de WhatsApp,
-WA Settings,Ajustes de WhatsApp,
-WA Profile,Contacto de WhatsApp,
-WA Template,Plantilla de WhatsApp,
-WA Log,Registro de WhatsApp,
-WhatsApp Records,Registros de WhatsApp,
-Last Seen,Visto por última vez,
-WhatsApp Connection,Conexión de WhatsApp,
-Send WhatsApp messages,Enviar mensajes de WhatsApp,
-"Messages go out only after this is enabled and Meta has approved the templates.",Los mensajes salen solo cuando esto está activo y Meta aprobó las plantillas.,
-Phone Number ID,ID del número de WhatsApp,
-"Phone number ID from Meta Business, not the phone number itself.",ID del número en Meta Business. No es el teléfono.,
-Access Token,Token de acceso,
-API Version,Versión del API,
-Template Language,Idioma de la plantilla,
-Payment Notice,Aviso de pago,
-"Fixed header: Confirmación de Pago Recibido. Fixed footer: Junta Administradora de Agua · Notificaciones. Body names: receipt, name, contract, date, detail, amount. Example: Hola {{name}}. La Junta Administradora de Agua te confirma que se ha registrado el pago identificado con el recibo {{receipt}}, correspondiente al contrato {{contract}}, con fecha {{date}}. Detalle del pago: {{detail}}. Total recibido: {{amount}}. Para consultas o aclaraciones sobre este pago, comunícate con nuestra administración.","Encabezado fijo: Confirmación de Pago Recibido. Pie fijo: Junta Administradora de Agua · Notificaciones. Nombres del cuerpo: receipt, name, contract, date, detail, amount. Ejemplo: Hola {{name}}. La Junta Administradora de Agua te confirma que se ha registrado el pago identificado con el recibo {{receipt}}, correspondiente al contrato {{contract}}, con fecha {{date}}. Detalle del pago: {{detail}}. Total recibido: {{amount}}. Para consultas o aclaraciones sobre este pago, comunícate con nuestra administración.",
-"Hello {0}. We received your payment of {1} for contract {2} on {3}. Detail: {4}.","Hola {0}. Recibimos su pago de {1} del contrato {2} con fecha {3}. Detalle: {4}.",
-Notify on Payment,Avisar al recibir un pago,
-Payment Template,Plantilla de pago,
-Suspension Notice,Aviso de suspensión,
-"One template for both phases. Fixed header: Aviso de Suspensión del Servicio. Fixed footer: Junta Administradora de Agua · Notificaciones. Body names: name, suspension, contract, message. Example: Hola {{name}}. La Junta Administradora de Agua te notifica que se ha emitido el aviso de suspensión {{suspension}}, correspondiente al contrato {{contract}}. Detalle de la notificación: {{message}}. Para consultas o aclaraciones sobre este aviso, comunícate con nuestra administración.","Una sola plantilla para las dos fases. Encabezado fijo: Aviso de Suspensión del Servicio. Pie fijo: Junta Administradora de Agua · Notificaciones. Nombres del cuerpo: name, suspension, contract, message. Ejemplo: Hola {{name}}. La Junta Administradora de Agua te notifica que se ha emitido el aviso de suspensión {{suspension}}, correspondiente al contrato {{contract}}. Detalle de la notificación: {{message}}. Para consultas o aclaraciones sobre este aviso, comunícate con nuestra administración.",
-"the suspension was scheduled","Se programó la suspensión",
-"the suspension cut was applied","Se aplicó el corte de la suspensión",
-"{0} with date {1}. Reason: {2}.","{0} con fecha {1}. Motivo: {2}.",
-"{0} ‖ Scheduled for {1}","{0} ‖ Programada para {1}",
-"[{0}] Hello {1}. Suspension {2} for contract {3}: {4}.","[{0}] Hola {1}. Suspensión {2} del contrato {3}: {4}.",
-Notify on Suspension,Avisar al generar una suspensión,
-Suspension Template,Plantilla de suspensión,
-Test Phone,Teléfono de prueba,
-"An 8-digit phone is sent as Honduras (504).",Un teléfono de 8 dígitos se envía como Honduras (504).,
-Send Test,Enviar prueba,
-The WhatsApp Phone Number ID is required.,El ID del número de WhatsApp es obligatorio.,
-The WhatsApp access token is required.,El token de acceso de WhatsApp es obligatorio.,
-The payment template name is required.,El nombre de la plantilla de pago es obligatorio.,
-The suspension template name is required.,El nombre de la plantilla de suspensión es obligatorio.,
-Enter a test phone and save the settings.,Escriba un teléfono de prueba y guarde los ajustes.,
-"Turn on WhatsApp messages and save the Phone Number ID and access token.",Active los mensajes de WhatsApp y guarde el ID del número y el token.,
-The test phone is not a valid number.,El teléfono de prueba no es un número válido.,
-"Test message sent to {0}.",Mensaje de prueba enviado a {0}.,
-The test message was not sent. Open WA Message to see the reason.,El mensaje de prueba no se envió. Abra Mensaje de WhatsApp para ver el motivo.,
-The WhatsApp account is not active.,La cuenta de WhatsApp no está activa.,
-"The WhatsApp template is bound to a DocType, so the notice was not sent.",La plantilla de WhatsApp está ligada a un DocType, así que el aviso no se envió.,
-The notice was not sent.,El aviso no se envió.,
-Sends the approved payment template to this number.,Envía la plantilla de pago aprobada a este número.,
-"Hello {0}. We received your payment of {1} on receipt {2} for contract {3}.","Hola {0}. Recibimos su pago de {1} en el recibo {2} del contrato {3}.",
-"Hello {0}. Suspension {1} was generated for contract {2} due to {3}, effective {4}.","Hola {0}. Se generó la suspensión {1} del contrato {2} por {3}, con fecha efectiva {4}.",
-The receipt has no amount to confirm.,El recibo no tiene un monto para confirmar.,
-The subscriber has no valid phone.,El abonado no tiene un teléfono válido.,
-"WhatsApp is missing the Phone Number ID, access token, or template.",Falta el ID del número, el token o la plantilla de WhatsApp.,
 By Fine,Por multa,
 Select a suspension reason.,Seleccione un motivo de suspensión.,
-"Suspension for outstanding debt requires expired monthly fees as of the Effective Date.","La suspensión por deuda pendiente exige mensualidades vencidas a la fecha efectiva.",
+Suspension for outstanding debt requires expired monthly fees as of the Effective Date.,La suspensión por deuda pendiente exige mensualidades vencidas a la fecha efectiva.,
 "Subscriber request, outstanding debt, or an unpaid service fine.","Solicitud del abonado, deuda pendiente o una multa sin pagar.",
 Reconnection Fee,Tarifa de Reconexión,
 Free Reconnection,Reconexión Gratuita,
 Reconnection for contract,Reconexión del contrato,
 Previous suspension,Suspensión anterior,
-"Cannot pay the Reconnection Fee while there are outstanding debts not included in this receipt: {0}. Include all pending debts in this payment or create a Debt Refinancing first.","No se puede pagar la Tarifa de Reconexión mientras existan deudas pendientes no incluidas en este recibo: {0}. Incluya todas las deudas pendientes en este pago o cree un Refinanciamiento de Deuda primero.",
+Cannot pay the Reconnection Fee while there are outstanding debts not included in this receipt: {0}. Include all pending debts in this payment or create a Debt Refinancing first.,No se puede pagar la Tarifa de Reconexión mientras existan deudas pendientes no incluidas en este recibo: {0}. Incluya todas las deudas pendientes en este pago o cree un Refinanciamiento de Deuda primero.,
 Transactions,Transacciones,
 Auto Billing,Facturación Automática,
-"Auto Billing: Billing Year Not Found",Auto Facturación: Año de Facturación No Encontrado,
-"No open Billing Year found for {0}. Create an open Billing Year for this period or disable Auto Billing in Billing Settings.","No se encontró un Año de Facturación abierto para {0}. Cree un Año de Facturación abierto para este período o desactive la Facturación Automática en Configuración de Facturación.",
-"Auto Billing: Cycle Creation Failed",Auto Facturación: Error al Crear Ciclo,
+Auto Billing: Billing Year Not Found,Auto Facturación: Año de Facturación No Encontrado,
+No open Billing Year found for {0}. Create an open Billing Year for this period or disable Auto Billing in Billing Settings.,No se encontró un Año de Facturación abierto para {0}. Cree un Año de Facturación abierto para este período o desactive la Facturación Automática en Configuración de Facturación.,
+Auto Billing: Cycle Creation Failed,Auto Facturación: Error al Crear Ciclo,
 "If enabled, the system will automatically create and process the billing cycle for the previous month. Runs weekly to ensure timely execution even if the scheduler fires late.","Si está habilitado, el sistema creará y procesará automáticamente el ciclo de facturación del mes anterior. Se ejecuta semanalmente para asegurar la ejecución oportuna.",
 DEBT REFINANCING AGREEMENT,ACUERDO DE REFINANCIAMIENTO DE DEUDA,
 Original Debt,Deuda Original,
@@ -191,7 +105,7 @@ Generated on,Generado el,
 Thank you for your payment.,Gracias por su pago.,
 Customer Signature,Firma del Cliente,
 Accepted,Aceptado,
-Customer Details,Datos del Cliente,
+Customer Details,Datos del abonado,
 Payment Details,Datos del Pago,
 SERVICE RECONNECTION ORDER,ORDEN DE RECONEXIÓN DEL SERVICIO,
 Reconnection Details,Detalles de Reconexión,
@@ -216,10 +130,160 @@ Collection,Cobro,
 Subscribers,Abonados,
 Service Suspensions,Suspensiones de Servicio,
 An executed suspension cannot be cancelled.,Una suspensión ejecutada no se puede cancelar.,
-"Cannot cancel this suspension because Service Fine {0} has recorded payments ({1}). Cancel the related Payment Receipts first.","No se puede cancelar esta suspensión porque la multa {0} tiene pagos registrados ({1}). Cancele primero los recibos de pago relacionados.",
-Junta Name,Nombre de la junta,
-Abbreviation,Abreviatura,
+Cannot cancel this suspension because Service Fine {0} has recorded payments ({1}). Cancel the related Payment Receipts first.,No se puede cancelar esta suspensión porque la multa {0} tiene pagos registrados ({1}). Cancele primero los recibos de pago relacionados.,
 Phone Number,Número de teléfono,
-Up to 10 letters.,Hasta 10 letras.,
-The telephone number of this line. Phone ID is the Meta identifier.,El número telefónico de esta línea. Phone ID es el identificador de Meta.,
-The abbreviation must be at most {0} letters.,La abreviatura debe tener como máximo {0} letras.,
+Button,Botón,
+Cancelled,Cancelada,
+Closed,Cerrada,
+Completed,Completada,
+Executed,Ejecutada,
+Notice,Aviso,
+Open,Abierta,
+Scheduled,Programada,
+Service Contract,Contrato de servicio,
+Unknown,Desconocido,
+Invalid,Inválido,
+Institutional Settings,Configuración de Gobernanza
+Institutional Weekly Hours,Horario Semanal Institucional
+Institutional Calendar Exception,Excepción del Calendario Institucional
+Institutional Exception Hours,Horario Excepcional Institucional
+Institutional Office Location,Ubicación de Oficina Institucional
+Weekday,Día de la semana
+Day Status,Estado del día
+Opening Time,Hora de apertura
+Closing Time,Hora de cierre
+Exception Date,Fecha de excepción
+Exception Type,Tipo de excepción
+Internal Reason,Motivo interno
+Authorized Public Reason,Motivo autorizado para publicación
+Effective From,Vigente desde
+Official Office Address,Dirección oficial de la oficina
+Official Location References,Referencias oficiales de ubicación
+Location Approved for Publication,Ubicación aprobada para publicación
+Google Maps Link,Enlace de Google Maps
+Google Maps Link Verified,Enlace de Google Maps verificado
+Weekly Hours,Horario semanal
+Calendar Exceptions,Excepciones del calendario
+Exceptional Office Intervals,Intervalos excepcionales de oficina
+Office Locations and Moves,Ubicaciones de oficina y traslados
+Holiday,Feriado
+Extraordinary Closure,Cierre extraordinario
+Exceptional Hours,Horario extraordinario
+Administrative information. Never included in publishable office information.,Información administrativa. Nunca se incluye en la información publicable de la oficina.
+Confirm the official address and references. Unapproved effective locations are unavailable to publishable readers.,Confirma la dirección y referencias oficiales. Las ubicaciones vigentes sin aprobar no están disponibles para los lectores de información publicable.
+Optional HTTPS Google Maps link. No external lookup is performed.,Enlace HTTPS opcional de Google Maps. No se realizan consultas externas.
+Confirm the destination manually before authorizing publication of the link.,Confirma manualmente el destino antes de autorizar la publicación del enlace.
+"One office, with locations ordered by effective date. Changes take effect at local midnight in America/Tegucigalpa. Leave empty when unknown. The first location cannot be exclusively in the future.","Una oficina, con ubicaciones ordenadas por fecha de vigencia. Los cambios entran en vigor a medianoche local en America/Tegucigalpa. Déjalo vacío si se desconoce. La primera ubicación no puede ser exclusivamente futura."
+Only System Manager can administer institutional settings.,Solo el administrador del sistema puede administrar la configuración institucional.
+Institutional dates must be valid dates in YYYY-MM-DD format.,Las fechas institucionales deben ser válidas y utilizar el formato YYYY-MM-DD.
+Office times must be valid local times in H:MM or H:MM:SS format (one or two hour digits).,Las horas de oficina deben ser horas locales válidas en formato H:MM o H:MM:SS (con uno o dos dígitos para la hora).
+Opening time must precede closing time. Overnight intervals are not supported.,La hora de apertura debe preceder a la de cierre. No se admiten intervalos que crucen medianoche.
+"Office intervals must be chronological, without duplicates or overlaps.","Los intervalos de oficina deben estar en orden cronológico, sin duplicados ni superposiciones."
+Every weekly row requires a valid weekday and an explicit Open or Closed status.,Cada fila semanal requiere un día válido y un estado explícito abierto o cerrado.
+Weekly days must be ordered from Monday to Sunday.,Los días de la semana deben ordenarse de lunes a domingo.
+A closed weekday must have exactly one row and cannot also be open.,Un día cerrado debe tener exactamente una fila y no puede estar también abierto.
+Closed days must not contain office intervals.,Los días cerrados no deben contener intervalos de oficina.
+A configured weekly schedule must explicitly include all seven weekdays.,Un horario semanal configurado debe incluir explícitamente los siete días de la semana.
+Calendar exceptions must have unique dates in chronological order.,Las excepciones del calendario deben tener fechas únicas en orden cronológico.
+Every calendar exception requires a valid type and an explicit Open or Closed status.,Cada excepción del calendario requiere un tipo válido y un estado explícito abierto o cerrado.
+Exceptional intervals must be ordered by date and opening time.,Los intervalos excepcionales deben ordenarse por fecha y hora de apertura.
+Exceptional intervals require an Open calendar exception on the same date.,Los intervalos excepcionales requieren una excepción abierta del calendario en la misma fecha.
+Institutional publication confirmations must be explicit check values.,Las confirmaciones de publicación institucional deben ser valores explícitos de casilla de verificación.
+"Use an HTTPS Google Maps link without credentials, custom ports or other destinations.","Utiliza un enlace HTTPS de Google Maps sin credenciales, puertos personalizados ni otros destinos."
+Every office location requires an official address and an effective date.,Cada ubicación de oficina requiere una dirección oficial y una fecha de vigencia.
+Office locations must have unique effective dates in chronological order.,Las ubicaciones de oficina deben tener fechas de vigencia únicas en orden cronológico.
+Office locations must not duplicate an address.,Las ubicaciones de oficina no deben duplicar una dirección.
+A verified Google Maps link requires a configured link.,Un enlace verificado de Google Maps requiere un enlace configurado.
+Record a current office location before scheduling a future move.,Registra una ubicación actual de oficina antes de programar un traslado futuro.
+Monday,Lunes
+Tuesday,Martes
+Wednesday,Miércoles
+Thursday,Jueves
+Friday,Viernes
+Saturday,Sábado
+Sunday,Domingo
+Blocked,Bloqueado
+Only a submitted scheduled suspension can be executed.,Solo puede ejecutarse una suspensión programada y sometida.,
+A formalized active contract is required for suspension execution.,Se requiere un contrato activo y formalizado para ejecutar la suspensión.,
+An execution date is required.,Se requiere una fecha de ejecución.,
+The reconnection must reference the current executed suspension of this contract.,La reconexión debe referenciar la suspensión ejecutada vigente de este contrato.,
+The current suspension cannot be determined unambiguously.,No puede determinarse inequívocamente la suspensión vigente.,
+A reconnection order already exists for this suspension.,Ya existe una orden de reconexión para esta suspensión.,
+The execution date cannot precede the technical suspension date.,La fecha de ejecución no puede preceder la fecha del corte técnico.,
+The current reconnection obligation must be settled before execution.,La obligación vigente de reconexión debe estar liquidada antes de ejecutarla.,
+January,enero,
+February,febrero,
+March,marzo,
+April,abril,
+May,mayo,
+June,junio,
+July,julio,
+August,agosto,
+September,septiembre,
+October,octubre,
+November,noviembre,
+December,diciembre,
+Governance Settings,Configuración de Gobernanza
+Governance,Gobernanza
+Telephone Capture,Captura telefónica
+Default Telephone Region,Región telefónica predeterminada
+Country or Region,País o región
+International Telephone,Teléfono internacional
+"ASCII digits only; include the area code and significant zeros, without international or dialing prefixes.","Solo dígitos ASCII; incluye el código de área y los ceros significativos, sin prefijos internacionales ni de marcación."
+The default region applies only to new captures. Historical region assignment is a separate confirmed administrative action.,La región predeterminada se aplica solo a capturas nuevas. La asignación histórica de región es una acción administrativa independiente y confirmada.
+The telephone number is not valid for the selected country. Correct the number or leave the field empty to continue.,El número telefónico no es válido para el país seleccionado. Corrige el número o deja el campo vacío para continuar
+"This historical telephone has no country or region. Select a region and correct the number, or clear the telephone before saving.","Este teléfono histórico no tiene país o región. Selecciona una región y corrige el número, o vacía el teléfono antes de guardar."
+Use ASCII digits only in the national number.,Utiliza solo dígitos ASCII en el número nacional.
+International preview: {0},Vista previa internacional: {0}
+Clear Telephone,Vaciar teléfono
+Review Historical Telephones,Revisar teléfonos históricos
+Save the configuration before reviewing historical telephones.,Guarda la configuración antes de revisar teléfonos históricos.
+Region: {0}. Pending: {1}. Valid: {2}. Invalid: {3}.,Región: {0}. Pendientes: {1}. Válidos: {2}. Inválidos: {3}.
+Assign this region to the reviewed historical records?,¿Asignar esta región a los registros históricos revisados?
+Assigned: {0}. Pending: {1}. Original telephone values were preserved.,Asignados: {0}. Pendientes: {1}. Se conservaron los teléfonos originales.
+"Assigning a region does not prove ownership, actual location or activity of a telephone line. Original telephone values, including invalid numbers, will be preserved.","Asignar una región no demuestra titularidad, ubicación real ni actividad de una línea telefónica. Se conservarán los valores originales, incluidos los números inválidos."
+Save a supported default telephone region before reviewing historical numbers.,Guarda una región telefónica predeterminada admitida antes de revisar números históricos.
+Explicit confirmation of the historical region assignment is required.,Se requiere confirmación explícita para asignar la región histórica.
+The review has expired. Review the historical numbers again.,La revisión caducó. Revisa nuevamente los números históricos.
+The configuration or eligible records changed. Review the historical numbers again.,La configuración o los registros elegibles cambiaron. Revisa nuevamente los números históricos.
+Historical region assignment verification failed.,Falló la verificación de asignación histórica de región.
+Choose a supported telephone region.,Elige una región telefónica admitida.
+From Date,Desde la fecha,
+Authentication required.,Se requiere autenticación.,
+Draft,Borrador,
+Missing,Falta,
+No,No,
+Notes,Notas,
+Name,Nombre,
+Phone,Teléfono,
+Location,Ubicación,
+All,Todas
+Details,Detalles
+Balance,Saldo
+Calendar exceptions,Excepciones del calendario
+Register exception,Registrar excepción
+Register holiday,Registrar feriado
+Holiday Date,Fecha del feriado
+Exception Reason,Motivo
+Hours,Horario
+Calendar dates use America/Tegucigalpa. Save the form to apply changes.,Las fechas corresponden a Honduras (America/Tegucigalpa). Guarda el formulario para aplicar los cambios.
+Changes pending save,Cambios pendientes de guardar
+Loading calendar exceptions…,Cargando excepciones del calendario…
+Unable to load the institutional calendar date. Reload the form.,No se pudo cargar la fecha del calendario institucional. Recarga el formulario.
+Edit {0},Editar {0}
+Apply changes,Aplicar cambios
+Add exception,Agregar excepción
+Delete the calendar exception on {0}?,¿Eliminar la excepción del calendario del {0}?
+Internal administrative information. Never published.,Información administrativa interna. Nunca se publica.
+The form changed. Close this dialog and reopen the exception.,El formulario cambió. Cierra este diálogo y vuelve a abrir la excepción.
+Only one calendar exception is allowed per date.,Solo se permite una excepción del calendario por fecha.
+Choose an approved calendar exception type.,Selecciona un tipo de excepción del calendario aprobado.
+Holidays and extraordinary closures must be Closed.,Los feriados y cierres extraordinarios deben estar cerrados.
+Exceptional hours must be Open with one replacement interval.,El horario extraordinario debe estar abierto con un intervalo sustituto.
+Exceptional hours and extraordinary closures require an internal reason.,El horario extraordinario y el cierre extraordinario requieren un motivo interno.
+Calendar exception reasons are internal only. Public reason must be empty.,Los motivos de las excepciones son exclusivamente internos. El motivo público debe estar vacío.
+Exceptional hours require exactly one replacement interval.,El horario extraordinario requiere exactamente un intervalo sustituto.
+Calendar exception reasons are internal only. This field must remain empty.,Los motivos de las excepciones son exclusivamente internos. Este campo debe permanecer vacío.
+Save calendar exceptions through Governance Settings.,Guarda las excepciones del calendario desde Configuración de Gobernanza.
+Closed all day,Cerrado
+"One institutional calendar for office hours. Leave empty when unknown. Otherwise record all seven days in order, explicitly Open or Closed. Opening is inclusive; closing is exclusive. Overnight intervals are not supported.","Un único calendario institucional para el horario de oficina. Déjalo vacío si se desconoce. De lo contrario, registra los siete días en orden, expresamente abiertos o cerrados. La apertura es inclusiva y el cierre exclusivo. No se admiten intervalos que crucen medianoche."

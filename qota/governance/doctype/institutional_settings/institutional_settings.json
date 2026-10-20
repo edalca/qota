@@ -1,0 +1,108 @@
+{
+ "actions": [],
+ "creation": "2026-10-14 02:44:18.460869",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "office_hours_tab",
+  "weekly_section",
+  "weekly_hours",
+  "exceptions_section",
+  "calendar_exceptions_html",
+  "calendar_exceptions",
+  "exception_hours",
+  "telephone_section",
+  "default_phone_region",
+  "tab_2_tab",
+  "location_section",
+  "office_locations"
+ ],
+ "fields": [
+  {
+   "description": "One institutional calendar for office hours. Leave empty when unknown. Otherwise record all seven days in order, explicitly Open or Closed. Opening is inclusive; closing is exclusive. Overnight intervals are not supported.",
+   "fieldname": "weekly_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "weekly_hours",
+   "fieldtype": "Table",
+   "label": "Weekly Hours",
+   "options": "Institutional Weekly Hours"
+  },
+  {
+   "fieldname": "exceptions_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "calendar_exceptions_html",
+   "fieldtype": "HTML"
+  },
+  {
+   "fieldname": "calendar_exceptions",
+   "fieldtype": "Table",
+   "label": "Calendar Exceptions",
+   "options": "Institutional Calendar Exception",
+   "hidden": 1
+  },
+  {
+   "fieldname": "exception_hours",
+   "fieldtype": "Table",
+   "label": "Exceptional Office Intervals",
+   "options": "Institutional Exception Hours",
+   "hidden": 1
+  },
+  {
+   "description": "One office, with locations ordered by effective date. Changes take effect at local midnight in America/Tegucigalpa. Leave empty when unknown. The first location cannot be exclusively in the future.",
+   "fieldname": "location_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "office_locations",
+   "fieldtype": "Table",
+   "label": "Office Locations and Moves",
+   "options": "Institutional Office Location"
+  },
+  {
+   "description": "The default region applies only to new captures. Historical region assignment is a separate confirmed administrative action.",
+   "fieldname": "telephone_section",
+   "fieldtype": "Section Break",
+   "label": "Telephone Capture"
+  },
+  {
+   "fieldname": "default_phone_region",
+   "fieldtype": "Select",
+   "label": "Default Telephone Region",
+   "length": 2
+  },
+  {
+   "fieldname": "tab_2_tab",
+   "fieldtype": "Tab Break",
+   "label": "Office Location"
+  },
+  {
+   "fieldname": "office_hours_tab",
+   "fieldtype": "Tab Break",
+   "label": "Office Hours"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-10-18 05:47:58.558370",
+ "modified_by": "Administrator",
+ "module": "Governance",
+ "name": "Institutional Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

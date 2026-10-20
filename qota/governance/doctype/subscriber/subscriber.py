@@ -32,10 +32,18 @@ class Subscriber(Document):
         issuing_country: DF.Link | None
         legal_representative: DF.Link | None
         primary_phone: DF.Data | None
+        primary_phone_e164: DF.Data | None
+        primary_phone_region: DF.Literal[None]
         status: DF.Literal["Active", "Inactive", "Blocked"]
         subscriber_type: DF.Literal["Natural Person", "Juridical Person"]
         tax_address: DF.SmallText | None
     # end: auto-generated types
+
+    def before_validate(self):
+        from qota.governance.phone_capture import validate_document_phone
+
+        validate_document_phone(self, "primary_phone", "primary_phone_region",
+                                "primary_phone", "primary_phone_e164")
 
     def validate(self):
         self.calculate_age()

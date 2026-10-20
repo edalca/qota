@@ -24,6 +24,11 @@ owns the framework; this repository is only the Qota app. Select field values
 and DocType names stay English. Spanish is translation, in
 `qota/translations/es.csv` and `qota/locale/es.po`.
 
+Qota owns only the business, administrative, and operational domain of the
+water board. Messaging, conversations, channels, notifications, and chatbot
+automation belong to an independent platform and are not dependencies or
+modules of Qota.
+
 Production is a separate site. This tree is not deployed there by editing
 files here.
 
@@ -31,16 +36,13 @@ files here.
 
 `qota/modules.txt` lists three modules, in this order:
 
-- `Governance` holds subscribers, premises, contracts, suspensions, and
-  reconnections.
-- `Billing` holds charges, receipts, refinancing, rates, billing setup, and
-  the WhatsApp notice settings.
+- `Governance` holds subscribers, premises, contracts, suspensions,
+  reconnections, and institutional settings.
+- `Billing` holds charges, receipts, refinancing, rates, and billing setup.
 - `Expenditures` holds expense vouchers and categories.
 
-The WhatsApp protocol module belongs to the official Frappe app
-`whatsapp`, not to Qota. A DocType stays in the module that owns its files
-under `qota/<module>/doctype/`. Menu changes do not move DocTypes between
-modules.
+A DocType stays in the module that owns its files under
+`qota/<module>/doctype/`. Menu changes do not move DocTypes between modules.
 
 ## Desk navigation
 
@@ -51,7 +53,7 @@ Frappe 16.50 and later splits navigation into three steps:
    `qota`. A display title such as `Qota` does not attach the dock.
 2. The dock is the narrow column of sidebar icons. The shipped dock is
    `qota/dock/qota/qota.json`, in this order: Collection, Billing,
-   Subscribers, Expenditures, WhatsApp. Opening the app lands on Collection.
+   Governance, Expenditures. Opening the app lands on Collection.
 3. A module keeps the sidebar titled with its name, because that is the
    sidebar the desk uses for the module. A module may also own extra
    sidebars. Each sidebar has its own desk URL, so a refresh stays on that
@@ -61,7 +63,12 @@ The apps screen hides the dock. The dock appears after the app icon is
 opened. `Desktop Settings` → `Desktop Page` = `Apps` is the new home. `Desktop
 Icons` is the old grid.
 
-The four dock sidebars, with the icon from `qota/public/icons/icons.svg`:
+The four operational sidebars use the icons in `qota/public/icons/icons.svg`.
+The drawings stay the ones Qota authored. They paint like the Framework soft
+module icons: `currentColor` strokes, a 10% body and one 50% accent, through
+Frappe's `soft-icon` classes, so a tile's ink carries hover, active and dark
+mode. Hover motion and `prefers-reduced-motion` stay. Symbol ids stay. The
+app mark remains the teal drop in `logo.svg` and `favicon.svg`.
 
 - `Collection` (Cobro), module Billing, icon `collection-cash-duotone`.
   The glyph is an old cash register: a square body and a small display.
@@ -69,11 +76,11 @@ The four dock sidebars, with the icon from `qota/public/icons/icons.svg`:
   Reports (Daily Collection, Customer Statement, Advance Payments,
   Advances and Surplus). File:
   `qota/billing/sidebar/collection/collection.json`.
-- `Subscribers` (Abonados), module Governance, icon
+- `Governance` (Gobernanza), destination sidebar `Subscribers`, module Governance, icon
   `subscribers-card-duotone`. Opens on Subscriber. Items: Subscriber,
   Premises, Service Contract, then Operations (Service Suspension, Service
   Reconnection), then Reports (Delinquent Subscribers, Service
-  Suspensions). File:
+  Suspensions), then a final root Governance Settings link to Institutional Settings. File:
   `qota/governance/sidebar/subscribers/subscribers.json`.
 - `Billing` (Facturación), icon `billing-drop-duotone`. Opens on Monthly
   Bill. Items: Monthly Bill, Connection Bill, Meter Reading, Service Fine,
@@ -82,12 +89,6 @@ The four dock sidebars, with the icon from `qota/public/icons/icons.svg`:
   Settings (Billing Cycle, Billing Settings).
 - `Expenditures` (Gastos), icon `expenditures-coin-duotone`. Opens on
   Expense Voucher. Items: Expense Voucher, Expense Category.
-- `WhatsApp`, icon `whatsapp-chat-duotone`. Opens on Conversations.
-  The shell is the official WhatsApp module. Qota writes that sidebar from
-  `qota.whatsapp_desk.ensure_whatsapp_desk` because the official app
-  ships no desk menu and its files are not edited. Items: Conversations,
-  WhatsApp Notifications, then the official WA Account, WA Settings,
-  WA Message, WA Profile, WA Template, and WA Log.
 
 `qota/governance/sidebar/governance/governance.json` stays titled
 Governance and is not on the dock. It keeps one Home link to the Governance
@@ -107,8 +108,8 @@ The app mark and favicon are the flat drop in `qota/public/logo.svg` and
 tree. A browser can keep the previous SVG for hours. A hard reload picks up
 a new sprite. `bench build` is not required for these files.
 
-`qota/workspace_sidebar/` is the old sidebar format. Frappe 16.50 does not
-read it. Do not treat it as the current menu.
+The legacy `qota/workspace_sidebar/` format was removed; Frappe 16.50 sidebars
+live in `<module>/sidebar/<name>/<name>.json`.
 
 A pinned dock stays visible. A floating dock stays off-screen until the
 pointer touches the left edge.
@@ -121,6 +122,15 @@ one credit per submitted Debt Refinancing equal to its current total debt.
 The running balance is debits minus credits. A prepaid position can be
 negative while some ledger rows still show an outstanding amount.
 
+Payment Receipt derives `current_debt` in backend validation from
+`get_pending_balances`: outstanding ledger debt before the receipt is applied.
+`total_pending` snapshots the remaining debt after the receipt's projected,
+bounded applications, using the same amount rule as ledger processing. Draft
+save and Submit refresh both values; frontend values are only a preview.
+Advances and unused surplus do not reduce this pending-debt summary. These
+informational snapshots are not the reconciled net balance from `read_balance`
+and are not recomputed on historical submitted receipts.
+
 A Monthly Fee advance covers a monthly charge only when the receipt item
 concept is Monthly Fee and the billing period matches. Apply unused advance
 to the oldest matching period first. The item `balance` is the unused
@@ -130,12 +140,39 @@ Service Fine, on submit, creates only a Service Fine ledger entry. It does
 not create a Service Suspension.
 
 Do not reintroduce Refinancing Credit ledger entries. Debt Refinancing is
-recorded by `qota.patches.record_refinanced_debts`.
+recorded by `qota.patches.v16_9_0_record_refinanced_debts`.
 
 Delinquent Subscribers counts a month only when its due date plus grace is
 before today and unused Monthly Fee advance does not cover it, oldest first.
 Net outstanding may be negative. Rows with net at or under 0.01, or with
 fewer uncovered periods than the minimum, are excluded.
+
+### Balance summary reader
+
+`qota.billing.balance_summary` is an internal read-only reader without
+whitelist. It requires System Manager, ordinary read permissions, and a
+submitted `Active` or `Suspended` contract. It reuses the ledger, submitted
+receipts, unapplied balances, `settled_debts`, refinancing schedules, and
+Customer Statement readers for reconciliation. It never invokes generators,
+advance applications, receipt processors, submit/cancel, or synchronizers. It
+uses `Decimal` and SQL text casts before driver conversion; MariaDB preserves
+nine decimals and Billing settles to `0.01`. It verifies `HNL` in `Billing
+Settings`.
+
+The typed `Verified` / `Unavailable` / `TechnicalFailure` result retains the
+Honduras cutoff date, totals for monthly fees, fines, surcharges, and
+additional charges, ledger references, aggregated evidence, and reading
+digest. It never exposes amounts on an unverified result. Unapplied `Monthly
+Fee` advances cover only that concept and period, oldest first, without
+double-subtracting payments already reflected in `outstanding_amount`. Due
+dates and source documents determine which monthly fees, fines, and surcharges
+are current; grace days do not exclude debt.
+
+`Connection Fee`, `Reconnection Fee`, `Other Fee`, `Refinancing Down Payment`,
+and `Refinancing Installment` are included when `due_date` is on or before the
+cutoff date; future charges are excluded. Sources, schedules, and settlements
+are reconciled without double-counting settled originals or fabricating
+`Refinancing Credit`. Any unknown concept fails closed with `Unavailable`.
 
 ## Governance
 
@@ -166,114 +203,99 @@ orders. Cancelled means the document was cancelled (`docstatus` 2): the
 order had been programmed and was then withdrawn, which sets `status` back
 to Draft. The desk name is Service Suspensions (Suspensiones de Servicio).
 
-## WhatsApp
+### Contract status summary reader
 
-The official Frappe app `whatsapp` (branch `develop`) owns the Cloud API:
-WA Account, WA Settings, WA Template, WA Message, WA Profile, and WA Log.
-Its webhook is `whatsapp.whatsapp.webhook.handler`. Qota does not edit that
-app. Document events live in `qota/events` (`whatsapp_notices`). Desk
-methods live in `qota/apis` (`whatsapp_inbox`). The sidebar builder is
-`qota/whatsapp_desk`, called from `after_migrate`. `qota/overrides` is only
-for replacing the Python controller of a DocType that belongs to another
-app. Qota keeps the dock, the Conversations page, and the two junta notices.
-The notice settings single stays in Billing.
+`qota.governance.contract_status_summary.read_status` is an internal read-only
+reader without whitelist. It requires System Manager and ordinary document
+permissions; child tables are authorized through their parents. A submitted
+`Service Contract` in `Active` or `Suspended` status retains authority. It
+never mutates contracts, orders, obligations, receipts, or meter readings. The
+documentary cutoff uses `America/Tegucigalpa`.
 
-Notices are outbound utility templates. A failed send is logged on WA
-Message and does not undo the document. The connection lives on WA Account
-and WA Settings. Which notices go out, and the template names, live on the
-Qota single WhatsApp Notifications in Billing.
+`StatusResult` and `OrderStage` separate canonical contract status from each
+`Verified`, `Unavailable`, or `TechnicalFailure` stage. A scheduled suspension
+requires a submitted `Scheduled` order with `effective_date` and no execution,
+cancellation, invalid amendment, or conflicting order. Reconnection checks the
+link to the executed suspension and `suspended_since`, documentary uniqueness,
+the `Reconnection Fee` obligation, and active receipt applications. Pending
+reconnection synchronization returns to `Unpaid` when payments are reversed
+and preserves `Executed` / `execution_date` once executed. Metered cuts use
+`executed_date`, allow saving `final_reading` after submit, and submit a
+single reading. Cancelling a `Scheduled` suspension preserves independent
+meter readings.
 
-WA Account is extended from `qota/setup.py`. `qota.install.after_migrate`
-runs that setup on `bench migrate`, including a production migrate.
-`after_install` runs it on a new site. `before_uninstall` removes the
-fields and the list settings. The official DocType is not edited.
-`qota_abbreviation` is required and holds at most 10 letters.
-`qota_phone_number` is the telephone number. `phone_id` stays the Meta phone
-number id. The account list shows the junta name, the abbreviation, the
-phone number, and the status.
+## Institutional Settings and telephone capture
 
-The junta templates are composed in code. `send_template` cannot fill them,
-because that API reads every variable from one reference document. Qota
-inserts a WA Message with `template_body_parameters` already set and submits
-it. The local WA Template rows for `qota_payment_received` and
-`qota_service_suspension` stay without a reference DocType, so submit does
-not replace those parameters. Header and footer stay fixed.
+`Institutional Settings`, presented in desk as Governance Settings /
+Configuración de Gobernanza, is the administrative Single of Governance,
+restricted to System Manager with native `Version` change tracking. Its four
+child tables manage weekly hours (`weekly_hours`), date exceptions
+(`calendar_exceptions`), exceptional intervals (`exception_hours`), and
+effective office locations (`office_locations`). No default schedule or
+location is preloaded on install. A configured weekly schedule declares all
+seven days; intervals are `[start, end)` without crossing midnight.
 
-Inbound messages arrive through the official webhook. A person does not
-have to be a subscriber. The thread is the WA Profile for that phone. A
-matching subscriber phone is linked on the profile. The desk page is
-Conversations, under Billing, and it reads WA Profile and WA Message.
+Below the weekly schedule table, the HTML calendar exceptions section manages
+the hidden `calendar_exceptions` and `exception_hours` tables through three
+native dialogs: Holiday (date only, `Closed`), Exceptional Hours (date, one
+replacement interval, and mandatory `internal_reason`, `Open`), and
+Extraordinary Closure (date and mandatory `internal_reason`, `Closed`).
+`public_reason` stays empty and any public exception reason is rejected.
+Dialogs mark the document dirty and refresh the section; only saving the
+Single persists changes. `qota.governance.institutional` exposes internal
+readers `office_information` and `is_within_office_hours` using
+`America/Tegucigalpa`.
 
-`qota/hooks.py` enqueues a payment notice on Payment Receipt submit and a
-scheduled suspension notice on Service Suspension submit. The executed
-notice is not a hook. `execute_suspension_logic` enqueues it after save.
-The same WA Message row is the conversation entry for that phone.
+`qota/phones.py` provides the ISO region catalog (`phonenumbers` / `pycountry`
+with `Babel` localized names), ASCII national number validation, per-region
+validity, E.164 formatting, and round-trip verification. It accepts fixed and
+mobile numbers and preserves significant leading zeros.
 
-One suspension template covers both phases. The stored body names are
-`name`, `suspension`, `contract`, and `message`. The scheduled message uses
-the effective date. The executed message uses `executed_date`. When those
-dates differ, the message appends the programmed date. Idempotency is per
-phase, using the preview prefix `[Scheduled]` or `[Executed]`.
+`Subscriber` uses `primary_phone` as its single editable national number and
+stores `primary_phone_region` (length 2) and `primary_phone_e164` (`Data`,
+length 16, `read_only`). There is no second national field in its metadata.
+The original number is never rewritten on validation, form load, or region
+assignment; only explicit editing changes it. `before_validate` validates any
+present telephone on every ordinary save, including unchanged historical
+records. Without a region or with an invalid number, save is rejected until
+corrected or explicitly cleared; an empty telephone remains optional. E.164 is
+always recalculated server-side. Quick Entry is disabled on `Subscriber` so
+every creation uses the full form and backend validation.
 
-The payment template body names are `receipt`, `name`, `contract`, `date`,
-`detail`, and `amount`. Detail lines are joined with ` ‖ ` (U+2016). Header
-and footer are fixed text. Qota does not send header or footer parameters.
-Template variables must stay in named mode. A body must not start or end on
-a variable, and a parameter cannot contain a line break. The names above stay
-as they are.
+`default_phone_region` on `Institutional Settings` starts empty and only
+preloads the region on new captures via `qota/public/js/phone_capture.js`. The
+controlled historical region assignment in
+`qota/governance/phone_region_assignment.py` requires System Manager, read and
+write permissions on `Institutional Settings` and `Subscriber`, a saved
+default region, a 10-minute preview token, and explicit confirmation. It
+assigns only missing regions without invoking `Subscriber.save` or altering
+phone numbers, preserves invalid historical numbers for later correction, and
+records counts, actor, date, and region in `Version`.
 
-Every notice uses the same order, tone, spacing, bold, and closing. A notice
-includes only the data that belongs to it.
+`qota/setup.py` (`ensure_navigation` and `_save_navigation`) ensures the
+Governance Settings link on the `Subscribers` sidebar and the `Governance`
+dock title on install and migrate without exporting site layouts to source.
 
-1. The header names the kind of notice.
-2. The greeting is `Hola *{{name}}*.`
-3. The introduction names the Junta Administradora de Agua and states the event.
-4. The reference puts identifiers and dates in that first paragraph.
-5. The detail is a bold title with a colon, then the dynamic text.
-6. The result adds an amount or another outcome when the notice has one.
-7. The closing points the person to the administration. Only the subject changes.
-8. The footer is always `Junta Administradora de Agua · Notificaciones`.
-
-`qota_payment_received`. Header: `Confirmación de Pago Recibido`.
-
-```text
-Hola *{{name}}*.
-
-La Junta Administradora de Agua te confirma que se ha registrado el pago identificado con el recibo {{receipt}}, correspondiente al contrato {{contract}}, con fecha {{date}}.
-
-*Detalle del pago:*
-{{detail}}
-
-Total recibido: {{amount}}
-
-Para consultas o aclaraciones sobre este pago, comunícate con nuestra administración.
-```
-
-`qota_service_suspension`. Header: `Aviso de Suspensión del Servicio`.
-
-```text
-Hola *{{name}}*.
-
-La Junta Administradora de Agua te notifica que se ha emitido el aviso de suspensión {{suspension}}, correspondiente al contrato {{contract}}.
-
-*Detalle de la notificación:*
-{{message}}
-
-Para consultas o aclaraciones sobre este aviso, comunícate con nuestra administración.
-```
-
-Do not print or store access tokens in this file, in notes, or in chat.
-
-## Data fixes
+## Data fixes and historical migrations
 
 A correction that changes billing or contract data is a Frappe patch in
 `qota/patches/` and `qota/patches.txt`. Do not apply that correction by a
 one-off SQL update. Do not run `bench migrate` unless the task is the
 migration.
 
-## Not built
+`qota/patches.txt` lists seven versioned business migrations:
+- `v16_9_0_collapse_suspension_reason` in `[pre_model_sync]`
+- `v16_7_0_fix_monthly_bill_status_from_debt_ledger` in `[post_model_sync]`
+- `v16_9_0_backfill_reconnection_service_contract` in `[post_model_sync]`
+- `v16_9_0_backfill_connection_bill_status` in `[post_model_sync]`
+- `v16_9_0_backfill_service_reconnection_status` in `[post_model_sync]`
+- `v16_9_0_release_monthly_advances_applied_to_other_charges` in `[post_model_sync]`
+- `v16_9_0_record_refinanced_debts` in `[post_model_sync]`
 
-Production is not updated by this checkout. The official WhatsApp app is
-installed on the local site only. The webhook on production is reached only
-after that app and this checkout are deployed there and the callback URL on
-that site is a public address Meta can call.
+Each patch checks its original unversioned identity first through
+`qota.migration_identity.historical_completion`. A clean historical completion
+recorded by Frappe skips re-executing the body; a skipped failure without a
+later clean retry, an inconsistent traceback, duplicate completions, or an
+incomplete log stops migration with `PatchError`. `never_skip_patches` in
+`qota/hooks.py` prevents financial migrations from being skipped with
+`--skip-failing`.

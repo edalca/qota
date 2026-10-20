@@ -128,7 +128,8 @@ class DebtLedgerEntry(Document):
 		"""
 		Directly pushes the current status to the source document.
 		For submittable documents, only pushes "Paid" to avoid overwriting
-		workflow-managed statuses (e.g. "Pending Payment", "Executed").
+		workflow-managed statuses. Reconnection uses reversible Unpaid/Paid
+		only before a recorded execution; its execution markers are preserved.
 		"""
 		if not self.reference_doctype or not self.reference_name:
 			return
@@ -141,6 +142,13 @@ class DebtLedgerEntry(Document):
 			return
 
 		if meta.is_submittable:
+			if self.reference_doctype == "Service Reconnection":
+				current = frappe.db.get_value(self.reference_doctype, self.reference_name,
+					["docstatus", "status", "execution_date"], as_dict=True, for_update=True)
+				if current and current.docstatus == 1 and not current.execution_date and current.status != "Executed":
+					frappe.db.set_value(self.reference_doctype, self.reference_name,
+						"status", "Paid" if self.status == "Paid" else "Unpaid", update_modified=False)
+				return
 			if self.status == "Paid":
 				frappe.db.set_value(
 					self.reference_doctype, self.reference_name, "status", "Paid", update_modified=False

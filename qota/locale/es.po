@@ -965,7 +965,10 @@ msgstr "La facturación actual correrá desde el día {0} al día {1} del mes si
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:210
 msgid "Customer Details"
-msgstr "Detalles del Cliente"
+msgstr "Datos del abonado"
+
+msgid "Conversation details"
+msgstr "Detalles de la conversación"
 
 #: qota/billing/print_format/payment_receipt/payment_receipt.html:337
 msgid "Customer Signature"
@@ -1620,7 +1623,7 @@ msgstr "Desde (m3)"
 #: qota/billing/report/customer_statement/customer_statement.js:15
 #: qota/billing/report/daily_collection/daily_collection.js:8
 msgid "From Date"
-msgstr "Desde Fecha"
+msgstr "Desde la fecha"
 
 #: qota/billing/utils.py:511
 msgid "From date must be before To date."
@@ -3739,3 +3742,171 @@ msgstr "{} Este Mes"
 msgid "{} Unpaid"
 msgstr "{} No Pagado"
 
+msgid "Institutional Settings"
+msgstr "Configuración de Gobernanza"
+
+msgid "Governance Settings"
+msgstr "Configuración de Gobernanza"
+
+msgid "Telephone Capture"
+msgstr "Captura telefónica"
+
+msgid "Default Telephone Region"
+msgstr "Región telefónica predeterminada"
+
+msgid "Country or Region"
+msgstr "País o región"
+
+msgid "International Telephone"
+msgstr "Teléfono internacional"
+
+msgid "ASCII digits only; include the area code and significant zeros, without international or dialing prefixes."
+msgstr "Solo dígitos ASCII; incluye el código de área y los ceros significativos, sin prefijos internacionales ni de marcación."
+
+msgid "The default region applies only to new captures. Historical region assignment is a separate confirmed administrative action."
+msgstr "La región predeterminada se aplica solo a capturas nuevas. La asignación histórica de región es una acción administrativa independiente y confirmada."
+
+msgid "The telephone number is not valid for the selected country. Correct the number or leave the field empty to continue."
+msgstr "El número telefónico no es válido para el país seleccionado. Corrige el número o deja el campo vacío para continuar"
+
+msgid "This historical telephone has no country or region. Select a region and correct the number, or clear the telephone before saving."
+msgstr "Este teléfono histórico no tiene país o región. Selecciona una región y corrige el número, o vacía el teléfono antes de guardar."
+
+msgid "Use ASCII digits only in the national number."
+msgstr "Utiliza solo dígitos ASCII en el número nacional."
+
+msgid "International preview: {0}"
+msgstr "Vista previa internacional: {0}"
+
+msgid "Clear Telephone"
+msgstr "Vaciar teléfono"
+
+msgid "Review Historical Telephones"
+msgstr "Revisar teléfonos históricos"
+
+msgid "Save the configuration before reviewing historical telephones."
+msgstr "Guarda la configuración antes de revisar teléfonos históricos."
+
+msgid "Region: {0}. Pending: {1}. Valid: {2}. Invalid: {3}."
+msgstr "Región: {0}. Pendientes: {1}. Válidos: {2}. Inválidos: {3}."
+
+msgid "Assign this region to the reviewed historical records?"
+msgstr "¿Asignar esta región a los registros históricos revisados?"
+
+msgid "Assigned: {0}. Pending: {1}. Original telephone values were preserved."
+msgstr "Asignados: {0}. Pendientes: {1}. Se conservaron los teléfonos originales."
+
+msgid "Assigning a region does not prove ownership, actual location or activity of a telephone line. Original telephone values, including invalid numbers, will be preserved."
+msgstr "Asignar una región no demuestra titularidad, ubicación real ni actividad de una línea telefónica. Se conservarán los valores originales, incluidos los números inválidos."
+
+msgid "Save a supported default telephone region before reviewing historical numbers."
+msgstr "Guarda una región telefónica predeterminada admitida antes de revisar números históricos."
+
+msgid "Explicit confirmation of the historical region assignment is required."
+msgstr "Se requiere confirmación explícita para asignar la región histórica."
+
+msgid "The review has expired. Review the historical numbers again."
+msgstr "La revisión caducó. Revisa nuevamente los números históricos."
+
+msgid "The configuration or eligible records changed. Review the historical numbers again."
+msgstr "La configuración o los registros elegibles cambiaron. Revisa nuevamente los números históricos."
+
+msgid "Historical region assignment verification failed."
+msgstr "Falló la verificación de asignación histórica de región."
+
+msgid "Choose a supported telephone region."
+msgstr "Elige una región telefónica admitida."
+
+msgid "Today"
+msgstr "Hoy"
+
+msgid "Authentication required."
+msgstr "Se requiere autenticación."
+
+msgid "Missing"
+msgstr "Falta"
+
+msgid "Exceptional Hours"
+msgstr "Horario extraordinario"
+
+msgid "Calendar exceptions"
+msgstr "Excepciones del calendario"
+
+msgid "Register exception"
+msgstr "Registrar excepción"
+
+msgid "Register holiday"
+msgstr "Registrar feriado"
+
+msgid "Holiday Date"
+msgstr "Fecha del feriado"
+
+msgid "Exception Reason"
+msgstr "Motivo"
+
+msgid "Hours"
+msgstr "Horario"
+
+msgid "Calendar dates use America/Tegucigalpa. Save the form to apply changes."
+msgstr "Las fechas corresponden a Honduras (America/Tegucigalpa). Guarda el formulario para aplicar los cambios."
+
+msgid "Changes pending save"
+msgstr "Cambios pendientes de guardar"
+
+msgid "Loading calendar exceptions…"
+msgstr "Cargando excepciones del calendario…"
+
+msgid "Unable to load the institutional calendar date. Reload the form."
+msgstr "No se pudo cargar la fecha del calendario institucional. Recarga el formulario."
+
+msgid "Edit {0}"
+msgstr "Editar {0}"
+
+msgid "Apply changes"
+msgstr "Aplicar cambios"
+
+msgid "Add exception"
+msgstr "Agregar excepción"
+
+msgid "Delete the calendar exception on {0}?"
+msgstr "¿Eliminar la excepción del calendario del {0}?"
+
+msgid "Internal administrative information. Never published."
+msgstr "Información administrativa interna. Nunca se publica."
+
+msgid "The form changed. Close this dialog and reopen the exception."
+msgstr "El formulario cambió. Cierra este diálogo y vuelve a abrir la excepción."
+
+msgid "Only one calendar exception is allowed per date."
+msgstr "Solo se permite una excepción del calendario por fecha."
+
+msgid "Choose an approved calendar exception type."
+msgstr "Selecciona un tipo de excepción del calendario aprobado."
+
+msgid "Holidays and extraordinary closures must be Closed."
+msgstr "Los feriados y cierres extraordinarios deben estar cerrados."
+
+msgid "Exceptional hours must be Open with one replacement interval."
+msgstr "El horario extraordinario debe estar abierto con un intervalo sustituto."
+
+msgid "Exceptional hours and extraordinary closures require an internal reason."
+msgstr "El horario extraordinario y el cierre extraordinario requieren un motivo interno."
+
+msgid "Calendar exception reasons are internal only. Public reason must be empty."
+msgstr "Los motivos de las excepciones son exclusivamente internos. El motivo público debe estar vacío."
+
+msgid "Exceptional hours require exactly one replacement interval."
+msgstr "El horario extraordinario requiere exactamente un intervalo sustituto."
+
+msgid "Calendar exception reasons are internal only. This field must remain empty."
+msgstr "Los motivos de las excepciones son exclusivamente internos. Este campo debe permanecer vacío."
+
+msgid "Save calendar exceptions through Governance Settings."
+msgstr "Guarda las excepciones del calendario desde Configuración de Gobernanza."
+
+msgid "Closed all day"
+msgstr "Cerrado"
+
+#: qota/governance/doctype/institutional_settings/institutional_settings.json
+msgid "One institutional calendar for office hours. Leave empty when unknown. Otherwise record all seven days in order, explicitly Open or Closed. Opening is inclusive; closing is exclusive. Overnight intervals are not supported."
+msgstr "Un único calendario institucional para el horario de oficina. Déjalo vacío si se desconoce. De lo contrario, registra los siete días en orden, expresamente abiertos o cerrados. La apertura es inclusiva y el cierre exclusivo. No se admiten intervalos que crucen medianoche."

@@ -178,35 +178,17 @@ class PaymentReceipt(Document):
             if not cancel and flt(item.balance) == 0:
                 item.balance = item.amount
 
-            if (
-                not cancel
-                and not item.debt_ledger_entry
-                and item.billing_period
-                and item.payment_concept == "Monthly Fee"
-            ):
-                dle_name = frappe.db.get_value(
-                    "Debt Ledger Entry",
-                    {
-                        "service_contract": self.service_contract,
-                        "billing_period": item.billing_period,
-                        "entry_type": "Monthly Fee",
-                        "docstatus": ["!=", 2],
-                        "outstanding_amount": [">", 0.01],
-                    },
-                    "name",
-                )
-                if dle_name:
-                    item.debt_ledger_entry = dle_name
-                    item.db_set("debt_ledger_entry", dle_name)
+            if not cancel:
+                previous_debt = item.debt_ledger_entry
+                self.resolve_item_debt(item)
+                if item.debt_ledger_entry != previous_debt:
+                    item.db_set("debt_ledger_entry", item.debt_ledger_entry)
 
             if item.debt_ledger_entry:
                 debt = frappe.get_doc("Debt Ledger Entry",
                                       item.debt_ledger_entry)
 
-                amount_to_apply = (
-                    min(flt(item.balance),
-                        flt(debt.outstanding_amount))
-                )
+                amount_to_apply = payment_application(item.balance, debt.outstanding_amount)
 
                 if cancel:
                     applied_in_this_item = flt(item.amount) - flt(item.balance)
@@ -236,24 +218,47 @@ class PaymentReceipt(Document):
 
         refresh_receipt_unallocated(self.name)
 
+    def resolve_item_debt(self, item):
+        """Use the monthly-period fallback before summarizing or applying."""
+        if (not item.debt_ledger_entry and item.billing_period
+                and item.payment_concept == "Monthly Fee"):
+            item.debt_ledger_entry = frappe.db.get_value(
+                "Debt Ledger Entry",
+                {
+                    "service_contract": self.service_contract,
+                    "billing_period": item.billing_period,
+                    "entry_type": "Monthly Fee",
+                    "docstatus": ["!=", 2],
+                    "outstanding_amount": [">", 0.01],
+                },
+                "name",
+            )
+
     def calculate_totals(self):
-        total_to_pay = 0.0
-        unallocated_amount = 0.0
+        """Snapshot pending ledger debt before this receipt's accounting effects.
 
-        if self.get("payment_items"):
-            for item in self.payment_items:
-                total_to_pay += flt(item.amount)
-
-                if not item.debt_ledger_entry:
-                    unallocated_amount += flt(item.amount)
+        Browser totals are a preview only. Re-read at draft validation and submit;
+        submitted summaries are not live contract balances. Project only what
+        the ledger processor can consume. Advances do not reduce pending debt.
+        """
+        pending = get_pending_balances(self.service_contract)
+        self.current_debt = pending["current_debt"]
+        remaining = {d["debt_id"]: flt(d["amount"]) for d in pending["debts"]}
+        total_to_pay = unallocated_amount = applied_amount = 0.0
+        for item in self.payment_items or []:
+            self.resolve_item_debt(item)
+            total_to_pay += flt(item.amount)
+            if not item.debt_ledger_entry:
+                unallocated_amount += flt(item.amount)
+            else:
+                outstanding = remaining.get(item.debt_ledger_entry, 0.0)
+                applied = payment_application(item.amount, outstanding)
+                remaining[item.debt_ledger_entry] = outstanding - applied
+                applied_amount += applied
 
         self.total_to_pay = total_to_pay
         self.unallocated_amount = unallocated_amount
-
-        self.total_pending = (
-            flt(self.current_debt) - total_to_pay
-            + unallocated_amount
-        )
+        self.total_pending = flt(self.current_debt) - applied_amount
 
     @frappe.whitelist()
     @staticmethod
@@ -384,6 +389,11 @@ class PaymentReceipt(Document):
             current_date = add_months(current_date, 1)
 
         return advances
+
+
+def payment_application(amount, outstanding):
+    """Return the amount this receipt item can apply to a pending debt."""
+    return max(0.0, min(flt(amount), flt(outstanding)))
 
 
 def refresh_receipt_unallocated(receipt_name):

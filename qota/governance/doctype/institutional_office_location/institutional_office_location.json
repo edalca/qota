@@ -1,0 +1,66 @@
+{
+ "doctype": "DocType",
+ "name": "Institutional Office Location",
+ "module": "Governance",
+ "engine": "InnoDB",
+ "field_order": [
+  "effective_from",
+  "address",
+  "references",
+  "publication_approved",
+  "google_maps_url",
+  "maps_verified"
+ ],
+ "fields": [
+  {
+   "fieldname": "effective_from",
+   "fieldtype": "Date",
+   "label": "Effective From",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Official Office Address",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 5
+  },
+  {
+   "fieldname": "references",
+   "fieldtype": "Small Text",
+   "label": "Official Location References"
+  },
+  {
+   "fieldname": "publication_approved",
+   "fieldtype": "Check",
+   "label": "Location Approved for Publication",
+   "default": "0",
+   "description": "Confirm the official address and references. Unapproved effective locations are unavailable to publishable readers."
+  },
+  {
+   "fieldname": "google_maps_url",
+   "fieldtype": "Data",
+   "label": "Google Maps Link",
+   "description": "Optional HTTPS Google Maps link. No external lookup is performed."
+  },
+  {
+   "fieldname": "maps_verified",
+   "fieldtype": "Check",
+   "label": "Google Maps Link Verified",
+   "default": "0",
+   "description": "Confirm the destination manually before authorizing publication of the link."
+  }
+ ],
+ "permissions": [],
+ "actions": [],
+ "links": [],
+ "states": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "istable": 1,
+ "editable_grid": 1,
+ "autoname": "hash"
+}

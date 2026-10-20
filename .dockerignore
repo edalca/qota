@@ -1,0 +1,10 @@
+.git
+.github
+node_modules
+*.pyc
+__pycache__
+.env
+AGENTS.local.md
+CONTINUACION.md
+.outputs
+.agents

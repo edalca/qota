@@ -147,6 +147,17 @@
    "open_in_new_tab": 1,
    "show_arrow": 0,
    "type": "Link"
+  },
+  {
+   "type": "Link",
+   "label": "Governance Settings",
+   "link_type": "DocType",
+   "link_to": "Institutional Settings",
+   "child": 0,
+   "indent": 0,
+   "icon": "settings",
+   "hidden": 0,
+   "open_in_new_tab": 1
   }
  ],
  "modified": "2026-10-09 12:00:00",

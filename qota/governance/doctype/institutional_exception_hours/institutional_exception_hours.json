@@ -1,0 +1,46 @@
+{
+ "doctype": "DocType",
+ "name": "Institutional Exception Hours",
+ "module": "Governance",
+ "engine": "InnoDB",
+ "field_order": [
+  "exception_date",
+  "start_time",
+  "end_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "exception_date",
+   "fieldtype": "Date",
+   "label": "Exception Date",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 4
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "label": "Opening Time",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 3
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "label": "Closing Time",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 3
+  }
+ ],
+ "permissions": [],
+ "actions": [],
+ "links": [],
+ "states": [],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "istable": 1,
+ "editable_grid": 1,
+ "autoname": "hash"
+}

@@ -1,5 +1,8 @@
-<!-- Dual-tone dock icons. Tones come from the duotone-light and duotone-dark
-     variables the desk sets on a dock tile. Hover motion uses icon-motion-opacity. -->
+<!-- Module glyphs for the dock and sidebar headers. The drawings are Qota's.
+     Paint matches the Framework soft icons: the symbol is a soft-icon, so the
+     stroke is currentColor, soft-body is the 10% tint and soft-accent is the
+     one 50% mark. Frappe's icons.scss supplies those classes. Hover motion
+     uses icon-motion-opacity. The app mark stays logo.svg. -->
 <svg id="qota-symbols" aria-hidden="true" style="display: none;" class="icon" xmlns="http://www.w3.org/2000/svg">
 <style>
 @media (prefers-reduced-motion: no-preference) {
@@ -7,7 +10,6 @@
 .qota-house-roof,
 .qota-coin-front,
 .qota-register-drawer,
-.qota-chat-front,
 .qota-subscriber-card {
 transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
@@ -26,66 +28,49 @@ transform: translateY(calc(var(--icon-motion-opacity, 0) * 4.2px));
 .qota-subscriber-card {
 transform: translateY(calc(var(--icon-motion-opacity, 0) * -1.6px));
 }
-.qota-chat-front {
-transform: translateY(calc(var(--icon-motion-opacity, 0) * -2.2px));
-}
 }
 </style>
 
-<symbol id="icon-billing-drop-duotone" viewBox="0 0 24 24" stroke="none" style="overflow: visible">
-<path d="M3.2 5.6h12.2c.9 0 1.6.7 1.6 1.6v11.4c0 .9-.7 1.6-1.6 1.6H3.2c-.9 0-1.6-.7-1.6-1.6V7.2c0-.9.7-1.6 1.6-1.6z" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<path d="M3.2 5.6h12.2c.9 0 1.6.7 1.6 1.6v2.2H1.6V7.2c0-.9.7-1.6 1.6-1.6z" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<rect x="3.6" y="11.5" width="7.4" height="1.35" rx="0.67" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<rect x="3.6" y="14.15" width="5.2" height="1.35" rx="0.67" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<rect x="3.6" y="16.8" width="6.4" height="1.35" rx="0.67" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
+<symbol id="icon-billing-drop-duotone" viewBox="0 0 24 24" class="soft-icon" style="overflow: visible">
+<rect x="2.25" y="4.75" width="14.2" height="14.5" rx="2" class="soft-body"/>
+<path d="M2.25 8.35h14.2"/>
+<path d="M4.6 11.1h6.4M4.6 13.6h4.6M4.6 16.1h5.5"/>
 <g class="qota-bill-drop">
-<path d="M18.15 8.15c.28 0 3.55 3.85 3.55 6.05a3.55 3.55 0 0 1-7.1 0c0-2.2 3.27-6.05 3.55-6.05z" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
+<path d="M19.1 8.7c.26 0 3.05 3.35 3.05 5.25a3.05 3.05 0 0 1-6.1 0c0-1.9 2.8-5.25 3.05-5.25z" class="soft-accent"/>
 </g>
 </symbol>
 
-<symbol id="icon-governance-house-duotone" viewBox="0 0 24 24" stroke="none" style="overflow: visible">
-<rect x="4.6" y="11.5" width="14.8" height="8.7" rx="1.5" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<rect x="10.35" y="14.35" width="3.3" height="5.85" rx="0.7" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
+<symbol id="icon-governance-house-duotone" viewBox="0 0 24 24" class="soft-icon" style="overflow: visible">
+<rect x="5" y="11.8" width="14" height="8.4" rx="1.6" class="soft-body"/>
+<path d="M9.8 20.15V16.2Q12 13.9 14.2 16.2V20.15"/>
 <g class="qota-house-roof">
-<path d="M2.7 12.15 12 3.7l9.3 8.45v1.35H2.7z" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
+<path d="M4.8 12.2 12 4.5l7.2 7.7"/>
 </g>
 </symbol>
 
-<symbol id="icon-expenditures-coin-duotone" viewBox="0 0 24 24" stroke="none" style="overflow: visible">
-<circle cx="8.3" cy="14.6" r="5.15" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<circle cx="15.5" cy="10.6" r="5.15" style="fill: var(--duotone-light, var(--ink-gray-3))" />
+<symbol id="icon-expenditures-coin-duotone" viewBox="0 0 24 24" class="soft-icon" style="overflow: visible">
+<circle cx="8.1" cy="14.8" r="4.5"/>
+<circle cx="15.9" cy="10" r="4.5"/>
 <g class="qota-coin-front">
-<circle cx="12" cy="12.7" r="5.15" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<circle cx="12" cy="12.7" r="2.15" style="fill: var(--duotone-light, var(--ink-gray-3))" />
+<circle cx="12" cy="12.4" r="4.5" class="soft-body"/>
+<circle cx="12" cy="12.4" r="1.65" class="soft-accent"/>
 </g>
 </symbol>
 
-<symbol id="icon-collection-cash-duotone" viewBox="0 0 24 24" stroke="none" style="overflow: visible">
-<rect x="6.7" y="2.55" width="10.6" height="5.35" rx="1.25" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<rect x="8.05" y="3.65" width="7.9" height="2.5" rx="0.45" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<rect x="9.55" y="4.15" width="1.05" height="1.5" rx="0.3" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<rect x="11.47" y="4.15" width="1.05" height="1.5" rx="0.3" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<rect x="13.4" y="4.15" width="1.05" height="1.5" rx="0.3" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<rect x="3.4" y="7.15" width="17.2" height="13.3" rx="1.8" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<rect x="5.15" y="15.15" width="13.7" height="3.7" rx="0.55" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
+<symbol id="icon-collection-cash-duotone" viewBox="0 0 24 24" class="soft-icon" style="overflow: visible">
+<path d="M7 7.15V3.8A1.25 1.25 0 0 1 8.25 2.55h7.5A1.25 1.25 0 0 1 17 3.8v3.35h1.6A1.8 1.8 0 0 1 20.4 8.95v9.7a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8v-9.7a1.8 1.8 0 0 1 1.8-1.8H7z" class="soft-body"/>
+<path d="M9.35 5.05h1.15M11.42 5.05h1.15M13.5 5.05h1.15"/>
 <g class="qota-register-drawer">
-<rect x="4.15" y="15.05" width="15.7" height="4.85" rx="1.05" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<rect x="10.35" y="16.85" width="3.3" height="1.15" rx="0.55" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
+<path d="M6.3 15.7h11.4"/>
+<rect x="10.7" y="16.75" width="2.6" height="1.05" rx="0.5" class="soft-accent"/>
 </g>
 </symbol>
 
-<symbol id="icon-whatsapp-chat-duotone" viewBox="0 0 24 24" stroke="none" style="overflow: visible">
-<path d="M3.2 5.2h9.2c1.2 0 2.2 1 2.2 2.2v4.4c0 1.2-1 2.2-2.2 2.2H8.2L5.4 16.4V14H3.2c-1.2 0-2.2-1-2.2-2.2V7.4c0-1.2 1-2.2 2.2-2.2z" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<g class="qota-chat-front">
-<path d="M11.2 8.4h9.4c1.15 0 2.1.95 2.1 2.1v4.2c0 1.15-.95 2.1-2.1 2.1h-1.6v2.3l-2.7-2.3h-5.1c-1.15 0-2.1-.95-2.1-2.1v-4.2c0-1.15.95-2.1 2.1-2.1z" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-</g>
-</symbol>
-
-<symbol id="icon-subscribers-card-duotone" viewBox="0 0 24 24" stroke="none" style="overflow: visible">
+<symbol id="icon-subscribers-card-duotone" viewBox="0 0 24 24" class="soft-icon" style="overflow: visible">
 <g class="qota-subscriber-card">
-<rect x="4.2" y="3.2" width="15.6" height="17.6" rx="2.2" style="fill: var(--duotone-light, var(--ink-gray-3))" />
-<circle cx="12" cy="9" r="2.35" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
-<path d="M7.3 17.6a4.7 4.7 0 0 1 9.4 0v.8H7.3z" style="fill: var(--duotone-dark, light-dark(var(--ink-gray-5), var(--ink-gray-6)))" />
+<rect x="4.2" y="3.2" width="15.6" height="17.6" rx="2.2" class="soft-body"/>
+<circle cx="12" cy="9" r="2.35" class="soft-accent"/>
+<path d="M7.3 17.6a4.7 4.7 0 0 1 9.4 0"/>
 </g>
 </symbol>
 </svg>
