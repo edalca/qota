@@ -19,9 +19,8 @@ Agua). It bills the service, keeps the debt ledger, records payments, and
 suspends and reconnects service.
 
 The app name is `qota`. The version constant is `__version__` in
-`qota/__init__.py` (16.9.0 at the time this contract was written). Frappe
-owns the framework; this repository is only the Qota app. Select field values
-and DocType names stay English. Spanish is translation, in
+`qota/__init__.py`. Frappe owns the framework. This repository contains the
+Qota app. Select field values and DocType names stay English. Spanish translations are in
 `qota/translations/es.csv` and `qota/locale/es.po`.
 
 Qota owns only the business, administrative, and operational domain of the
@@ -178,7 +177,7 @@ Service Fine, on submit, creates only a Service Fine ledger entry. It does
 not create a Service Suspension.
 
 Do not reintroduce Refinancing Credit ledger entries. Debt Refinancing is
-recorded by `qota.patches.v16_9_0_record_refinanced_debts`.
+recorded by `qota.patches.v16_10_0_record_refinanced_debts`.
 
 Delinquent Subscribers counts a month only when its due date plus grace is
 before today and unused Monthly Fee advance does not cover it, oldest first.
@@ -275,13 +274,13 @@ one-off SQL update. Do not run `bench migrate` unless the task is the
 migration.
 
 `qota/patches.txt` lists seven versioned business migrations:
-- `v16_9_0_collapse_suspension_reason` in `[pre_model_sync]`
+- `v16_10_0_collapse_suspension_reason` in `[pre_model_sync]`
 - `v16_7_0_fix_monthly_bill_status_from_debt_ledger` in `[post_model_sync]`
 - `v16_9_0_backfill_reconnection_service_contract` in `[post_model_sync]`
 - `v16_9_0_backfill_connection_bill_status` in `[post_model_sync]`
 - `v16_9_0_backfill_service_reconnection_status` in `[post_model_sync]`
-- `v16_9_0_release_monthly_advances_applied_to_other_charges` in `[post_model_sync]`
-- `v16_9_0_record_refinanced_debts` in `[post_model_sync]`
+- `v16_10_0_release_monthly_advances_applied_to_other_charges` in `[post_model_sync]`
+- `v16_10_0_record_refinanced_debts` in `[post_model_sync]`
 
 Each patch checks its original unversioned identity first through
 `qota.migration_identity.historical_completion`. A clean historical completion

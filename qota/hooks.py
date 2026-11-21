@@ -251,4 +251,4 @@ fixtures = [
 # ignore_translatable_strings_from = []
 
 # Financial ambiguity must stop migration even with --skip-failing.
-never_skip_patches = ['qota.patches.v16_9_0_collapse_suspension_reason', 'qota.patches.v16_7_0_fix_monthly_bill_status_from_debt_ledger', 'qota.patches.v16_9_0_backfill_reconnection_service_contract', 'qota.patches.v16_9_0_backfill_connection_bill_status', 'qota.patches.v16_9_0_backfill_service_reconnection_status', 'qota.patches.v16_9_0_release_monthly_advances_applied_to_other_charges', 'qota.patches.v16_9_0_record_refinanced_debts']
+never_skip_patches = ['qota.patches.v16_10_0_collapse_suspension_reason', 'qota.patches.v16_7_0_fix_monthly_bill_status_from_debt_ledger', 'qota.patches.v16_9_0_backfill_reconnection_service_contract', 'qota.patches.v16_9_0_backfill_connection_bill_status', 'qota.patches.v16_9_0_backfill_service_reconnection_status', 'qota.patches.v16_10_0_release_monthly_advances_applied_to_other_charges', 'qota.patches.v16_10_0_record_refinanced_debts']

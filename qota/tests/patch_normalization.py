@@ -11,6 +11,11 @@ from qota import migration_identity
 
 ROOT = Path(__file__).resolve().parents[1]
 PATCHES = [line for line in (ROOT / 'patches.txt').read_text().splitlines() if line.startswith('qota.')]
+RELEASE_16_10_0_PATCHES = {
+    'collapse_suspension_reason',
+    'record_refinanced_debts',
+    'release_monthly_advances_applied_to_other_charges',
+}
 
 
 class PatchIdentityTests(unittest.TestCase):
@@ -55,10 +60,16 @@ class PatchIdentityTests(unittest.TestCase):
         with patch.object(frappe,'get_all',return_value=[skipped,clean]),patch.object(migration_identity,'executed',return_value='success'):
             with self.assertRaises(PatchError):migration_identity.historical_completion('qota.patches.example')
 
-    def test_history_versions_match_git_creation(self):
+    def test_release_versions_and_historical_git_creation(self):
         import subprocess
+        self.assertEqual(
+            {name.split('v16_10_0_', 1)[1] for name in PATCHES if '.v16_10_0_' in name},
+            RELEASE_16_10_0_PATCHES,
+        )
         for name in PATCHES:
             stem=name.rsplit('.',1)[1];original=stem.split('_',3)[3]
+            if original in RELEASE_16_10_0_PATCHES:
+                continue
             commit=subprocess.check_output(['git','log','--diff-filter=A','--format=%H','--',f'qota/patches/{original}.py'],cwd=ROOT.parent,text=True).strip()
             version=subprocess.check_output(['git','show',commit+':qota/__init__.py'],cwd=ROOT.parent,text=True)
             self.assertIn('"'+'.'.join(stem.split('_')[0:3]).removeprefix('v')+'"',version)

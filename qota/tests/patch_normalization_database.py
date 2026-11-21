@@ -11,12 +11,14 @@ from unittest.mock import patch
 import frappe
 from frappe.modules.patch_handler import PatchError
 from qota import setup
+from qota.tests.patch_normalization import RELEASE_16_10_0_PATCHES
 
 PREFIX = 'qota.patches.'
 
 
 def migration(name):
-    return importlib.import_module(PREFIX + 'v16_9_0_' + name)
+    version = 'v16_10_0' if name in RELEASE_16_10_0_PATCHES else 'v16_9_0'
+    return importlib.import_module(f'{PREFIX}{version}_{name}')
 
 
 class MigrationDatabaseTests(unittest.TestCase):

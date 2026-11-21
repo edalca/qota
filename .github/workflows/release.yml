@@ -8,6 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
     permissions:
       contents: write
     defaults:
@@ -22,51 +25,71 @@ jobs:
         id: metadata
         run: |
           set -euo pipefail
-          version=$(python3 -c "import re; m = re.search(r'__version__\s*=\s*[\"\\\']([^\"\\\']+)[\"\\\']', open('qota/__init__.py').read()); print(m.group(1))")
-          if [[ -z "$version" ]]; then
-            printf 'Failed to extract __version__ from qota/__init__.py\n' >&2
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            printf 'Expected a stable vX.Y.Z tag, got %s\n' "$GITHUB_REF_NAME" >&2
             exit 1
           fi
+          version=$(python3 -c 'from qota import __version__; print(__version__)')
           if [[ "v${version}" != "$GITHUB_REF_NAME" ]]; then
             printf 'Tag %s does not match source version %s\n' "$GITHUB_REF_NAME" "$version" >&2
             exit 1
           fi
           major="${version%%.*}"
-          build_date="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-          printf 'version=%s\nmajor=%s\nbuild_date=%s\n' "$version" "$major" "$build_date" >> "$GITHUB_OUTPUT"
+          commit=$(git rev-parse HEAD)
+          printf 'version=%s\nmajor=%s\ncommit=%s\n' "$version" "$major" "$commit" >> "$GITHUB_OUTPUT"
 
-      - name: Publish GitHub Release
+      - name: Check tag and existing GitHub Release
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.metadata.outputs.version }}
+          COMMIT: ${{ steps.metadata.outputs.commit }}
         run: |
           set -euo pipefail
-          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            printf 'Release %s already exists\n' "$GITHUB_REF_NAME" >&2
+          tag_ref="refs/tags/$GITHUB_REF_NAME"
+          remote_commit=$(git ls-remote --exit-code origin "$tag_ref" "$tag_ref^{}" |
+            awk -v tag="$tag_ref" '$2 == tag { object = $1 } $2 == tag "^{}" { peeled = $1 }
+              END { print (peeled == "" ? object : peeled) }')
+          if [[ "$remote_commit" != "$COMMIT" ]]; then
+            printf 'Remote tag %s does not point to %s\n' "$GITHUB_REF_NAME" "$COMMIT" >&2
             exit 1
           fi
-          release_flags=()
-          version_without_build="${VERSION%%+*}"
-          if [[ "$version_without_build" == *-* ]]; then
-            release_flags+=(--prerelease)
-          fi
-          gh release create "$GITHUB_REF_NAME" \
-            --repo "$GITHUB_REPOSITORY" \
-            --verify-tag \
-            --title "$GITHUB_REF_NAME" \
-            --generate-notes \
-            "${release_flags[@]}"
+
+          response=$(mktemp)
+          status=$(curl --silent --show-error --output "$response" --write-out '%{http_code}' \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/releases/tags/$GITHUB_REF_NAME")
+          case "$status" in
+            200)
+              if ! jq -e --arg tag "$GITHUB_REF_NAME" \
+                '.tag_name == $tag and .draft == false and .prerelease == false' "$response" > /dev/null; then
+                printf 'Existing Release %s does not match the stable tag\n' "$GITHUB_REF_NAME" >&2
+                exit 1
+              fi
+              printf 'Release %s already exists for commit %s\n' "$GITHUB_REF_NAME" "$COMMIT"
+              printf 'exists=true\n' >> "$GITHUB_OUTPUT"
+              ;;
+            404)
+              printf 'exists=false\n' >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              printf 'GitHub Release lookup failed with HTTP %s\n' "$status" >&2
+              exit 1
+              ;;
+          esac
 
       - name: Set up Docker Buildx
+        if: steps.release.outputs.exists == 'false'
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Docker Hub
+        if: steps.release.outputs.exists == 'false'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME || secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN || secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
+        if: steps.release.outputs.exists == 'false'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -80,3 +103,23 @@ jobs:
             edalca/qota:${{ steps.metadata.outputs.version }}
             edalca/qota:${{ steps.metadata.outputs.major }}
             edalca/qota:latest
+
+      - name: Publish GitHub Release
+        if: steps.release.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+          COMMIT: ${{ steps.metadata.outputs.commit }}
+        run: |
+          set -euo pipefail
+          notes_file=".github/release-notes/$VERSION.md"
+          notes=(--generate-notes)
+          if [[ -f "$notes_file" ]]; then
+            notes=(--notes-file "$notes_file")
+          fi
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --target "$COMMIT" \
+            --title "QOTA $VERSION" \
+            "${notes[@]}"
