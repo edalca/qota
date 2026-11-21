@@ -10,7 +10,6 @@ from unittest.mock import patch
 import frappe
 
 from qota.billing.doctype.payment_receipt.payment_receipt import get_pending_balances
-from qota.billing.balance_summary import read_balance
 
 
 class PaymentReceiptSummaryTests(unittest.TestCase):
@@ -69,8 +68,6 @@ class PaymentReceiptSummaryTests(unittest.TestCase):
             self.assertEqual((row.paid_amount, row.outstanding_amount), (paid, pending))
         self.assertEqual(frappe.db.get_value('Service Contract', self.contract, 'status'), 'Active')
         self.assertEqual(sum(i.amount - i.balance for i in doc.payment_items), before - after)
-        balance = read_balance(self.contract, cutoff='2026-12-31')
-        self.assertEqual((balance.status, balance.total), ('Verified', after), balance.reason)
 
     def test_backend_full_payment_multiple_periods_without_browser_totals(self):
         first, second = self.debt('08-2026'), self.debt('09-2026')

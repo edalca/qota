@@ -40,66 +40,7 @@ Una tabla vacía significa información pendiente, no apertura ni cierre permane
 
 ## Lectores y reloj
 
-`qota.governance.institutional.office_information(value=None)` devuelve `date`,
-`timezone`, `hours` y `location`; nunca devuelve el documento administrativo.
-Acepta fecha, datetime o cadena ISO. Un datetime sin zona representa hora local
-institucional; uno con zona se convierte a `America/Tegucigalpa`. Sin argumento
-usa `frappe.utils.get_datetime_in_timezone`. `hours.ordinary_week` proporciona los siete días oficiales para la futura respuesta
-principal de horarios; los intervalos del día consultado ya incorporan excepciones.
-Una fecha sin hora no determina apertura
-instantánea (`within_hours=None`).
-
-`is_within_office_hours(value=None)` es el lector común de horario de oficina.
-Requiere un datetime explícito cuando se proporciona argumento. Devuelve
-`status`, `reason_code`, `source`, `date`, `timezone` y `within_hours`. Una jornada
-no disponible devuelve `within_hours=False`, con `status=Unavailable`; el consumidor
-puede distinguirla de un cierre configurado. Esto no autoriza sesiones ni acciones
-administrativas por sí mismo.
-
-La apertura es inclusiva y el cierre exclusivo: `[start, end)`. El modelo inicial
-rechaza intervalos que crucen medianoche y `24:00`; admite apertura a `00:00`.
-Las excepciones sustituyen todo el día y pueden definir un día aislado aunque el
-horario semanal todavía no esté disponible. Cualquier contradicción en el calendario
-produce `Unavailable/invalid_configuration`, nunca una jornada autorizada.
-
-La ubicación se resuelve por la última fecha de vigencia menor o igual a la fecha
-local consultada. Cada traslado entra en vigor a las 00:00 de Honduras; no necesita
-scheduler. Si la ubicación ya vigente carece de aprobación, se devuelve
-`Unavailable/not_approved`, sin reutilizar la anterior. No se publican ubicaciones
-futuras. Un calendario inválido no invalida automáticamente una ubicación válida,
-y viceversa.
-
-Los lectores cargan el Single con `frappe.get_doc`, sin caché adicional. Cada llamada
-ve los cambios guardados visibles en su transacción. Ambas decisiones se construyen
-con el mismo snapshot documental; no se mantiene una dirección resuelta en caché.
-
-Como vista previa administrativa, desde `bench --site qota.localhost console`:
-
-```python
-from qota.governance.institutional import office_information, is_within_office_hours
-from datetime import date, datetime
-information = office_information(date(2026, 10, 12))
-working = is_within_office_hours(datetime(2026, 10, 12, 8, 0))
-```
-
-Estas fechas son argumentos de consulta, no datos institucionales cargados. La
-consulta administrativa GET `calendar_context` entrega solo la fecha del servidor y
-la zona institucional, con lectura ordinaria y rol System Manager. No hay endpoints
-nuevos de escritura; los motivos internos nunca se exponen en proyecciones públicas.
-
-
-## Governance Settings and telephone capture
-
-The technical Single remains `Institutional Settings`; its employee-facing name is
-`Governance Settings` (`Configuración de Gobernanza`). Existing routes and the four
-institutional tables remain unchanged. `default_phone_region` is optional and initially
-empty on both upgrades and new installations. It only initializes new captures.
-
-The reviewed historical region assignment is a separate, confirmed System Manager
-operation with Subscriber read/write permissions. It records counts, actor, date and
-region in native Version, assigns only missing regions and never rewrites original
-numbers or invokes Subscriber.save. Invalid historical values survive assignment, but
-every later ordinary Subscriber save must correct or explicitly clear them.
-
-Telephone validity is provided by `qota.phones`, independent of office readers. It does
-not authorize public disclosure, identify a subscriber or confirm line ownership.
+Las proyecciones públicas de horario y ubicación están en la aplicación puente.
+QOTA conserva los validadores que utiliza este formulario, sus reglas de privacidad,
+la zona America/Tegucigalpa y las operaciones administrativas nativas. No depende
+de Messaging ni ofrece wrappers de lectura usados únicamente por sus Processes.

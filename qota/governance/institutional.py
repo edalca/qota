@@ -1,12 +1,12 @@
 # Copyright (c) 2026, Edwin Carrillo and contributors
 # For license information, please see license.txt
 
-"""Institutional office calendar and publishable information, without transport.
+"""Institutional office calendar validation, without transport.
 
 Naive explicit datetimes mean institutional local time, never server time. Aware
 values are converted to Honduras. Intervals include opening and exclude closing;
 overnight intervals are rejected. Locations become effective at local midnight.
-All readers use a fresh Single document, without an additional settings cache.
+The native settings controller uses these validators without integration dependencies.
 """
 
 import re
@@ -209,74 +209,3 @@ def validate_configuration(doc, *, today=None):
 	current = _date(today) if today is not None else local_datetime().date()
 	if locations and locations[0]["effective_from"] > current:
 		raise ConfigurationError("Record a current office location before scheduling a future move.")
-
-
-def information_from_document(doc, value):
-	"""Pure publishable projection; no internal notes, drafts or future addresses."""
-	if isinstance(value, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
-		value = _date(value)
-	instant = None if isinstance(value, date) and not isinstance(value, datetime) else local_datetime(value)
-	day = value if instant is None else instant.date()
-	hours = {"status": "Unavailable", "reason_code": "not_configured", "source": None,
-		"intervals": [], "ordinary_week": None, "closed": None, "within_hours": None, "public_reason": None}
-	try:
-		weekly, exceptions = _weekly(doc), _exceptions(doc)
-		if day in exceptions:
-			intervals = exceptions[day]["intervals"]
-			source, reason = "Exception", exceptions[day]["public_reason"]
-		elif weekly is not None:
-			intervals = weekly[WEEKDAYS[day.weekday()]]
-			source, reason = "Weekly", None
-		else:
-			intervals = None
-		if weekly is not None:
-			hours["ordinary_week"] = [{"weekday": weekday, "closed": not slots,
-				"intervals": [{"start": start.isoformat(), "end": end.isoformat()} for start, end in slots]}
-				for weekday, slots in weekly.items()]
-		if intervals is not None:
-			hours.update(status="Available", reason_code=None, source=source, closed=not intervals, public_reason=reason,
-				intervals=[{"start": start.isoformat(), "end": end.isoformat()} for start, end in intervals],
-				within_hours=any(start <= instant.time() < end for start, end in intervals) if instant else None)
-	except ConfigurationError:
-		hours["reason_code"] = "invalid_configuration"
-	location = {"status": "Unavailable", "reason_code": "not_configured", "effective_from": None,
-		"address": None, "references": None, "google_maps_url": None}
-	try:
-		locations = _locations(doc)
-		current = next((row for row in reversed(locations) if row["effective_from"] <= day), None)
-		if current and current["publication_approved"]:
-			location.update(status="Available", reason_code=None, effective_from=current["effective_from"].isoformat(),
-				address=current["address"], references=current["references"], google_maps_url=current["google_maps_url"])
-		elif current:
-			location["reason_code"] = "not_approved"
-		elif locations:
-			location["reason_code"] = "no_effective_location"
-	except ConfigurationError:
-		location["reason_code"] = "invalid_configuration"
-	return {"date": day.isoformat(), "timezone": TIMEZONE, "hours": hours, "location": location}
-
-
-def office_information(value=None):
-	"""Internal publishable reader; never returns the administrative document."""
-	import frappe
-	return information_from_document(frappe.get_doc(SETTINGS), local_datetime() if value is None else value)
-
-
-def is_within_office_hours(value=None, *, lock=False):
-	"""Common office hours reader; unavailable always denies hours.
-
-	Consumers must inspect status to distinguish unavailable from configured closure.
-	"""
-	information = information_from_document(_calendar_document(), local_datetime(value)) if lock else office_information(local_datetime(value))
-	hours = information["hours"]
-	return {"date": information["date"], "timezone": TIMEZONE, "status": hours["status"],
-		"reason_code": hours["reason_code"], "source": hours["source"], "within_hours": hours["within_hours"] is True}
-
-
-def _calendar_document():
-	"""Current reads under shared locks, serialized with native Single saves."""
-	import frappe
-	doc = dict(frappe.db.sql("SELECT field,value FROM `tabSingles` WHERE doctype=%s ORDER BY field LOCK IN SHARE MODE", (SETTINGS,)))
-	for field, table in (("weekly_hours", "Institutional Weekly Hours"), ("calendar_exceptions", "Institutional Calendar Exception"), ("exception_hours", "Institutional Exception Hours")):
-		doc[field] = frappe.db.sql("SELECT * FROM `tab" + table + "` WHERE parent=%s ORDER BY idx LOCK IN SHARE MODE", (SETTINGS,), as_dict=True)
-	return doc

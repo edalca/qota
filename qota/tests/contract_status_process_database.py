@@ -1,6 +1,6 @@
 """Real business lifecycle probes on isolated synthetic records."""
 
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack
 from datetime import datetime, timedelta
 import os
 import sys
@@ -9,8 +9,6 @@ import uuid
 from unittest.mock import patch
 
 import frappe
-
-from qota.governance import contract_status_summary as governance
 
 
 def connect_local():
@@ -78,12 +76,6 @@ class ContractProcessTests(unittest.TestCase):
 			frappe.db.count("Meter Reading", {"service_contract": self.contract}),
 		)
 
-	@contextmanager
-	def read_only(self):
-		before = self.fingerprint()
-		yield
-		self.assertEqual(self.fingerprint(), before)
-
 	def suspension(self, metered=False, execute=False):
 		if metered:
 			frappe.db.set_value("Service Contract", self.contract, "billing_basis", "Metered")
@@ -113,10 +105,6 @@ class ContractProcessTests(unittest.TestCase):
 		doc.insert(); self.fx.rows.append((doc.doctype, doc.name)); doc.submit()
 		return doc, debt
 
-	def read(self, cutoff=None):
-		with self.read_only():
-			return governance.read_status(self.contract, cutoff or self.day)
-
 	def test_formal_contract_submit_and_suspension_execute_flat(self):
 		self.assertEqual(frappe.db.get_value("Service Contract", self.contract, ["docstatus", "status"]), (1, "Active"))
 		doc = self.suspension()
@@ -131,7 +119,10 @@ class ContractProcessTests(unittest.TestCase):
 	def test_scheduled_cancel_and_real_amendment(self):
 		doc = self.suspension(); doc.cancel()
 		self.assertEqual((doc.docstatus, doc.status), (2, "Draft"))
-		new = frappe.copy_doc(doc); new.amended_from = doc.name; new.effective_date = self.day + timedelta(days=3)
+		new = frappe.copy_doc(doc)
+		new.docstatus = 0
+		new.amended_from = doc.name
+		new.effective_date = self.day + timedelta(days=3)
 		new.insert(); new.submit()
 		self.assertEqual((new.docstatus, new.status, new.amended_from), (1, "Scheduled", doc.name))
 
@@ -215,7 +206,10 @@ class ContractProcessTests(unittest.TestCase):
 		self.assertEqual(frappe.db.count("Debt Ledger Entry", {"reference_name": doc.name}), 1)
 		doc.cancel()
 		self.assertEqual(doc.status, "Cancelled")
-		new = frappe.copy_doc(doc); new.amended_from = doc.name
+		new = frappe.copy_doc(doc)
+		new.docstatus = 0
+		new.status = "Draft"
+		new.amended_from = doc.name
 		new.insert(); new.submit()
 		self.assertEqual(new.status, "Unpaid")
 
@@ -227,32 +221,39 @@ class ContractProcessTests(unittest.TestCase):
 		doc.execute_reconnection_logic(0, str(self.day))
 		self.assertEqual(doc.status, "Executed")
 
-	def test_real_reader_submission_payment_partial_full_execution_and_cancel(self):
+	def test_submission_payment_partial_full_execution_and_receipt_cancel(self):
 		s = self.suspension()
-		self.assertEqual(self.read().suspension.stage, "Scheduled")
+		self.assertEqual(frappe.db.get_value(s.doctype, s.name, "status"), "Scheduled")
+		self.assertEqual(frappe.db.get_value("Service Contract", self.contract, "status"), "Active")
 		s.execute_suspension_logic(0, str(self.day))
-		self.assertEqual(self.read().suspension.stage, "Executed")
+		self.assertEqual(frappe.db.get_value(s.doctype, s.name, "status"), "Executed")
+		self.assertEqual(frappe.db.get_value("Service Contract", self.contract, "status"), "Suspended")
 		r = self.reconnection(s, 100)
-		self.assertEqual(self.read().reconnection.stage, "PaymentPending")
-		partial, _ = self.pay(r, 35)
-		self.assertEqual(self.read().reconnection.stage, "PaymentPending")
+		self.assertEqual(frappe.db.get_value(r.doctype, r.name, "status"), "Unpaid")
+		partial, debt = self.pay(r, 35)
+		self.assertEqual(frappe.db.get_value("Debt Ledger Entry", debt, "status"), "Partially Paid")
+		self.assertEqual(frappe.db.get_value(r.doctype, r.name, "status"), "Unpaid")
 		full, _ = self.pay(r, 65)
-		self.assertEqual(self.read().reconnection.stage, "ExecutionPending")
-		r.reload(); r.execute_reconnection_logic(0, str(self.day))
-		self.assertEqual((self.read().canonical_status, self.read().reconnection.stage), ("Active", "Executed"))
+		self.assertEqual(frappe.db.get_value(r.doctype, r.name, "status"), "Paid")
+		r.reload()
+		r.execute_reconnection_logic(0, str(self.day))
+		self.assertEqual(frappe.db.get_value("Service Contract", self.contract, "status"), "Active")
+		self.assertEqual(frappe.db.get_value(r.doctype, r.name, ["status", "execution_date"]), ("Executed", self.day))
 		full.cancel()
-		self.assertEqual(self.read().canonical_status, "Active")
-		self.assertEqual(self.read().reconnection.availability, "Unavailable")
+		self.assertEqual(frappe.db.get_value("Debt Ledger Entry", debt, ["paid_amount", "outstanding_amount", "status"]), (35, 65, "Partially Paid"))
+		self.assertEqual(frappe.db.get_value(r.doctype, r.name, ["status", "execution_date"]), ("Executed", self.day))
+		self.assertEqual(frappe.db.get_value("Service Contract", self.contract, "status"), "Active")
+		self.assertEqual(partial.docstatus, 1)
 
-	def test_real_metered_reconnection_creates_one_reading_and_rollback(self):
+	def test_metered_reconnection_creates_one_reading_and_rollback(self):
 		s = self.suspension(metered=True, execute=True)
-		self.assertEqual(self.read().suspension.stage, "Executed")
+		self.assertEqual(frappe.db.get_value(s.doctype, s.name, "status"), "Executed")
 		r = self.reconnection(s)
 		execution = self.day + timedelta(days=10)
 		frappe.db.savepoint("metered_reconnect")
 		r.execute_reconnection_logic(10, str(execution))
 		self.assertEqual(frappe.db.count("Meter Reading", {"service_contract": self.contract}), 2)
-		self.assertEqual(self.read(execution).reconnection.stage, "Executed")
+		self.assertEqual(frappe.db.get_value(r.doctype, r.name, ["status", "execution_date"]), ("Executed", execution))
 		with self.assertRaises(frappe.ValidationError):
 			r.execute_reconnection_logic(10, str(execution))
 		frappe.db.rollback(save_point="metered_reconnect")

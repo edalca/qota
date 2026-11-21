@@ -287,3 +287,20 @@ Calendar exception reasons are internal only. This field must remain empty.,Los 
 Save calendar exceptions through Governance Settings.,Guarda las excepciones del calendario desde Configuración de Gobernanza.
 Closed all day,Cerrado
 "One institutional calendar for office hours. Leave empty when unknown. Otherwise record all seven days in order, explicitly Open or Closed. Opening is inclusive; closing is exclusive. Overnight intervals are not supported.","Un único calendario institucional para el horario de oficina. Déjalo vacío si se desconoce. De lo contrario, registra los siete días en orden, expresamente abiertos o cerrados. La apertura es inclusiva y el cierre exclusivo. No se admiten intervalos que crucen medianoche."
+Water Issue Report,Reporte de problema de agua,
+Problem Description,Descripción del problema,
+Reported Contracts,Contratos indicados,
+Seen,Visto,
+Seen By,Visto por,
+Seen At,Fecha de lectura,
+Conversation References,Referencias conversacionales,
+Conversation Session,Sesión conversacional,
+Conversation Turn,Turno conversacional,
+Process Execution,Ejecución del proceso,
+Bot Flow,Flujo del bot,
+A water report must start as Pending without an acknowledgment.,Un reporte de agua debe iniciar como Pendiente y sin acuse.,
+"Conversation session, conversation turn, process execution, and bot flow are required.","La sesión conversacional, el turno conversacional, la ejecución del proceso y el flujo del bot son obligatorios.",
+The water report name must match its process execution.,El nombre del reporte de agua debe coincidir con la ejecución del proceso.,
+A textual description and a localizable location are required.,Se requieren una descripción textual y una ubicación localizable.,
+Water report content and references are immutable.,El contenido y las referencias del reporte de agua son inmutables.,
+A water report can only be marked as Seen.,Un reporte de agua solo puede marcarse como Visto.,

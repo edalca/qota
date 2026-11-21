@@ -102,6 +102,17 @@
    "type": "Link"
   },
   {
+   "type": "Link",
+   "label": "Water Issue Report",
+   "link_type": "DocType",
+   "link_to": "Water Issue Report",
+   "child": 1,
+   "indent": 0,
+   "icon": "clipboard",
+   "hidden": 0,
+   "open_in_new_tab": 1
+  },
+  {
    "added": 0,
    "child": 0,
    "collapsible": 1,

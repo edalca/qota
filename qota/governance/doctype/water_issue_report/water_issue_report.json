@@ -1,0 +1,115 @@
+{
+ "doctype": "DocType",
+ "name": "Water Issue Report",
+ "module": "Governance",
+ "engine": "InnoDB",
+ "autoname": "field:process_execution",
+ "allow_rename": 0,
+ "track_changes": 1,
+ "fields": [
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending\nSeen",
+   "default": "Pending",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Small Text",
+   "label": "Location",
+   "read_only": 1,
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Long Text",
+   "label": "Problem Description",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "contracts_json",
+   "fieldtype": "Small Text",
+   "label": "Reported Contracts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "seen_by",
+   "fieldtype": "Link",
+   "options": "User",
+   "label": "Seen By",
+   "read_only": 1
+  },
+  {
+   "fieldname": "seen_at",
+   "fieldtype": "Datetime",
+   "label": "Seen At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "references_section",
+   "fieldtype": "Section Break",
+   "label": "Conversation References",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "conversation_session",
+   "fieldtype": "Data",
+   "label": "Conversation Session",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "conversation_turn",
+   "fieldtype": "Data",
+   "label": "Conversation Turn",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "process_execution",
+   "fieldtype": "Data",
+   "label": "Process Execution",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "bot_flow",
+   "fieldtype": "Data",
+   "label": "Bot Flow",
+   "read_only": 1,
+   "reqd": 1
+  }
+ ],
+ "field_order": [
+  "status",
+  "location",
+  "description",
+  "contracts_json",
+  "seen_by",
+  "seen_at",
+  "references_section",
+  "conversation_session",
+  "conversation_turn",
+  "process_execution",
+  "bot_flow"
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "report": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "title_field": "location",
+ "search_fields": "status,location",
+ "states": []
+}

@@ -11,7 +11,7 @@ from contextlib import ExitStack
 import os
 import unittest
 import uuid
-from datetime import date
+from datetime import date, time
 from unittest.mock import patch
 
 import frappe
@@ -71,7 +71,11 @@ class InstitutionalDatabaseTests(unittest.TestCase):
 		self.assertTrue(meta.issingle)
 		self.assertTrue(meta.track_changes)
 		self.assertEqual(meta.module, "Governance")
-		self.assertEqual([(p.role, p.read, p.write, p.create) for p in meta.permissions], [("System Manager", 1, 1, 1)])
+		source = frappe.get_file_json(frappe.get_app_path(
+			"qota", "governance", "doctype", "institutional_settings", "institutional_settings.json"))
+		self.assertEqual([(row["role"], row["read"], row["write"], row["create"]) for row in source["permissions"]],
+			[("System Manager", 1, 1, 1)])
+		self.assertIn(("System Manager", 1, 1, 1), {(p.role, p.read, p.write, p.create) for p in meta.permissions})
 		for field, doctype in CHILDREN.items():
 			self.assertEqual(meta.get_field(field).options, doctype)
 			self.assertTrue(frappe.get_meta(doctype).istable)
@@ -81,7 +85,7 @@ class InstitutionalDatabaseTests(unittest.TestCase):
 			self.assertEqual(engine, (("InnoDB",),))
 		self.assertEqual(frappe.db.get_single_value("System Settings", "time_zone"), office.TIMEZONE)
 
-	def test_save_read_intervals_exceptions_and_private_projection(self):
+	def test_save_intervals_exceptions_and_private_reason(self):
 		data = configuration()
 		exception(data, date(2026, 10, 12), internal_reason="PRIVATE-INSTITUTIONAL-TEST")
 		self.save(data)
@@ -92,23 +96,22 @@ class InstitutionalDatabaseTests(unittest.TestCase):
 				self.assertEqual((row.parent, row.parenttype, row.parentfield), (office.SETTINGS, office.SETTINGS, key))
 				self.assertEqual(row.doctype, doctype)
 		self.assertEqual(doc.calendar_exceptions[0].internal_reason, "PRIVATE-INSTITUTIONAL-TEST")
-		result = office.office_information("2026-10-12T08:00")
-		self.assertFalse(result["hours"]["within_hours"])
-		self.assertIsNone(result["hours"]["public_reason"])
-		self.assertNotIn("PRIVATE-INSTITUTIONAL-TEST", str(result))
-		self.assertFalse(office.is_within_office_hours("2026-10-12T08:00")["within_hours"])
+		self.assertTrue(doc.calendar_exceptions[0].public_reason in (None, ""))
 
 	def test_open_exception_single_interval_persists(self):
 		data = configuration()
 		exception(data, date(2026, 10, 17), kind="Exceptional Hours", status="Open")
 		data["exception_hours"] = [dict(exception_date="2026-10-17", start_time="08:00", end_time="10:00")]
 		self.save(data)
-		self.assertTrue(office.is_within_office_hours("2026-10-17T08:00")["within_hours"])
-		self.assertFalse(office.is_within_office_hours("2026-10-17T10:00")["within_hours"])
-		self.assertEqual(len(frappe.get_doc(office.SETTINGS).exception_hours), 1)
+		saved = frappe.get_doc(office.SETTINGS)
+		self.assertEqual(len(saved.exception_hours), 1)
+		self.assertEqual(str(saved.exception_hours[0].exception_date), "2026-10-17")
+		self.assertEqual(str(saved.calendar_exceptions[0].exception_date), "2026-10-17")
+		self.assertEqual(office._time(saved.exception_hours[0].start_time), time(8, 0))
+		self.assertEqual(office._time(saved.exception_hours[0].end_time), time(10, 0))
 		data["exception_hours"][0]["start_time"] = "00:00"
 		self.save(data)
-		self.assertTrue(office.is_within_office_hours("2026-10-17T00:00")["within_hours"])
+		self.assertEqual(office._time(frappe.get_doc(office.SETTINGS).exception_hours[0].start_time), time(0, 0))
 		frappe.get_doc(office.SETTINGS).save()
 
 	def test_model_rejects_contradictions_and_preserves_saved_data(self):
@@ -152,36 +155,42 @@ class InstitutionalDatabaseTests(unittest.TestCase):
 
 	def test_empty_configuration_is_saved_without_invented_defaults(self):
 		self.save({key: [] for key in CHILDREN})
-		result = office.office_information("2026-10-12T08:00")
-		self.assertEqual(result["hours"]["status"], "Unavailable")
-		self.assertEqual(result["location"]["status"], "Unavailable")
-		self.assertFalse(office.is_within_office_hours("2026-10-12T08:00")["within_hours"])
+		doc = frappe.get_doc(office.SETTINGS)
+		for key in CHILDREN:
+			self.assertEqual(doc.get(key), [])
 
-	def test_locations_and_scheduled_move_persist_without_scheduler_or_stale_cache(self):
+	def test_locations_and_scheduled_move_persist(self):
 		data = configuration()
 		data["office_locations"] = [location(date(2026, 10, 1), address="Synthetic current office", references="Synthetic reference"),
 			location(date(2026, 10, 14), address="Synthetic future office", google_maps_url="https://www.google.com/maps", maps_verified=0)]
 		self.save(data)
-		self.assertEqual(office.office_information("2026-10-14T05:59:59+00:00")["location"]["address"], "Synthetic current office")
-		self.assertEqual(office.office_information("2026-10-14T06:00:00+00:00")["location"]["address"], "Synthetic future office")
-		self.assertIsNone(office.office_information(date(2026, 10, 14))["location"]["google_maps_url"])
+		saved = frappe.get_doc(office.SETTINGS).office_locations
+		self.assertEqual([row.address for row in saved], ["Synthetic current office", "Synthetic future office"])
+		self.assertEqual(str(saved[0].effective_from), "2026-10-01")
+		self.assertEqual(str(saved[1].effective_from), "2026-10-14")
+		self.assertEqual(saved[0].references, "Synthetic reference")
+		self.assertEqual(saved[1].maps_verified, 0)
+		self.assertEqual(saved[1].google_maps_url, "https://www.google.com/maps")
 		data["office_locations"][1]["maps_verified"] = 1
 		self.save(data)
-		self.assertEqual(office.office_information(date(2026, 10, 14))["location"]["google_maps_url"], "https://www.google.com/maps")
+		verified = frappe.get_doc(office.SETTINGS).office_locations[1]
+		self.assertEqual(verified.maps_verified, 1)
+		self.assertEqual(verified.google_maps_url, "https://www.google.com/maps")
 		data["office_locations"][1]["publication_approved"] = 0
 		self.save(data)
-		self.assertEqual(office.office_information(date(2026, 10, 14))["location"]["reason_code"], "not_approved")
+		unpublished = frappe.get_doc(office.SETTINGS).office_locations[1]
+		self.assertEqual(unpublished.publication_approved, 0)
+		self.assertEqual(unpublished.address, "Synthetic future office")
 
-	def test_changes_visible_immediately_in_both_hours_readers(self):
+	def test_saved_exception_replaces_the_previous_calendar(self):
 		self.save()
-		self.assertTrue(office.is_within_office_hours("2026-10-12T08:00")["within_hours"])
+		self.assertEqual(frappe.get_doc(office.SETTINGS).calendar_exceptions, [])
 		data = configuration()
 		exception(data)
 		self.save(data)
-		self.assertFalse(office.is_within_office_hours("2026-10-12T08:00")["within_hours"])
-		self.assertTrue(office.office_information("2026-10-12T08:00")["hours"]["closed"])
+		self.assertEqual(len(frappe.get_doc(office.SETTINGS).calendar_exceptions), 1)
 		self.save()
-		self.assertTrue(office.is_within_office_hours("2026-10-12T08:00")["within_hours"])
+		self.assertEqual(frappe.get_doc(office.SETTINGS).calendar_exceptions, [])
 
 	def test_edit_move_and_delete_exception_keep_unrelated_data(self):
 		data = configuration()
@@ -200,8 +209,8 @@ class InstitutionalDatabaseTests(unittest.TestCase):
 		loaded = frappe.get_doc(office.SETTINGS)
 		self.assertEqual(str(loaded.exception_hours[0].exception_date), "2026-10-17")
 		self.assertEqual(loaded.calendar_exceptions[0].internal_reason, "Updated private reason")
-		self.assertTrue(office.is_within_office_hours("2026-10-12T08:00")["within_hours"])
-		self.assertTrue(office.is_within_office_hours("2026-10-17T10:00")["within_hours"])
+		self.assertEqual(office._time(loaded.exception_hours[0].start_time), time(10, 0))
+		self.assertEqual(office._time(loaded.exception_hours[0].end_time), time(11, 0))
 		loaded.remove(loaded.calendar_exceptions[0]); loaded.set("exception_hours", []); loaded.save()
 		loaded = frappe.get_doc(office.SETTINGS)
 		self.assertEqual(len(loaded.calendar_exceptions), 1)

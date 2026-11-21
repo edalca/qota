@@ -29,15 +29,52 @@ water board. Messaging, conversations, channels, notifications, and chatbot
 automation belong to an independent platform and are not dependencies or
 modules of Qota.
 
-Production is a separate site. This tree is not deployed there by editing
-files here.
+### Frontera de integración empresarial
+
+QOTA no importa Messaging ni la aplicación puente, no registra Processes y no
+implementa Schema v1, pruebas administrativas, autorizaciones del ejecutor ni
+preparación de plantillas. `required_apps=[]`. Sus hooks de instalación y
+migración solo mantienen sus responsabilidades propias.
+
+Los adaptadores y proyecciones creados exclusivamente para Processes residen en
+`qota_preset`, incluidos reconciliación de lectura de saldo,
+proyección documental de estado y presentación institucional. No se mantienen
+aliases, rutas anteriores ni wrappers sin consumidores de producción en QOTA.
+Las reglas y operaciones de facturación siguen en los controladores, ledger,
+recibos, refinanciaciones y reportes empresariales nativos de esta aplicación.
+
+`qota.governance.institutional` conserva `validate_configuration`, `local_datetime`
+y los validadores de semana, excepciones y ubicaciones que utiliza el formulario
+Institutional Settings. Las proyecciones públicas de lectura pertenecen al
+consumidor; no se inventan horarios, ubicaciones ni información de abonados.
+
+Water Issue Report conserva sus invariantes empresariales: contenido y referencias
+inmutables, estado inicial Pending y transición administrativa única a Seen con
+actor/fecha del servidor. `report_text` y `_validate_new` se utilizan localmente en
+su controlador. Todo alta, incluida `db_insert` cuando el marco omite su validación,
+rechaza un reporte que no esté en `Pending`, que traiga `seen_by` o `seen_at`, o que
+omita `description`, `location`, `conversation_session`, `conversation_turn`,
+`process_execution` o `bot_flow`. El nombre del documento sigue siendo
+`process_execution`. System Manager no tiene permiso de creación. Un escritor interno
+que activa `ignore_permissions` sigue sujeto a esas reglas de integridad. La
+aplicación puente añade mediante el hook nativo extend_doctype_class la comprobación
+de su ejecución autorizada y la persistencia idempotente. En el sitio de referencia
+esa clase extendida rechaza el alta sin su contexto de proceso; la transición a
+`Seen` de un reporte ya guardado ejecuta la validación de QOTA. QOTA puede leer y
+reconocer reportes existentes sin ese consumidor. No importa clases del ejecutor ni
+concede permisos técnicos de Messaging.
+
+La aplicación puente es propietaria de sus roles y permisos nativos de lectura,
+concedidos administrativamente al servicio técnico. El rol `Qota Business Reader`
+conserva el alcance de solo lectura preexistente. QOTA no conoce ni provisiona la
+identidad técnica, sus capacidades, plantillas, proveedores o transporte.
 
 ## Modules
 
 `qota/modules.txt` lists three modules, in this order:
 
 - `Governance` holds subscribers, premises, contracts, suspensions,
-  reconnections, and institutional settings.
+  reconnections, water issue reports, and institutional settings.
 - `Billing` holds charges, receipts, refinancing, rates, and billing setup.
 - `Expenditures` holds expense vouchers and categories.
 
@@ -79,7 +116,7 @@ app mark remains the teal drop in `logo.svg` and `favicon.svg`.
 - `Governance` (Gobernanza), destination sidebar `Subscribers`, module Governance, icon
   `subscribers-card-duotone`. Opens on Subscriber. Items: Subscriber,
   Premises, Service Contract, then Operations (Service Suspension, Service
-  Reconnection), then Reports (Delinquent Subscribers, Service
+  Reconnection, Water Issue Report), then Reports (Delinquent Subscribers, Service
   Suspensions), then a final root Governance Settings link to Institutional Settings. File:
   `qota/governance/sidebar/subscribers/subscribers.json`.
 - `Billing` (Facturación), icon `billing-drop-duotone`. Opens on Monthly
@@ -94,8 +131,9 @@ app mark remains the teal drop in `logo.svg` and `favicon.svg`.
 Governance and is not on the dock. It keeps one Home link to the Governance
 workspace, so the shell is not empty and the desk does not recompute it
 from the whole module. Subscriber, Premises, the contract, the cut, the
-reconnection, and the two reports are listed on Subscribers, which is where
-those screens open. Its header icon is `subscribers-card-duotone`. The
+reconnection, the water issue report, and the two reports are listed on
+Subscribers, which is where those screens open. Its header icon is
+`subscribers-card-duotone`. The
 house symbol `governance-house-duotone` remains in the sprite and is unused.
 
 Sidebar item labels and dock titles are stored in English. The desk
@@ -128,7 +166,7 @@ Payment Receipt derives `current_debt` in backend validation from
 bounded applications, using the same amount rule as ledger processing. Draft
 save and Submit refresh both values; frontend values are only a preview.
 Advances and unused surplus do not reduce this pending-debt summary. These
-informational snapshots are not the reconciled net balance from `read_balance`
+informational snapshots are not the reconciled net balance of the customer statement
 and are not recomputed on historical submitted receipts.
 
 A Monthly Fee advance covers a monthly charge only when the receipt item
@@ -146,33 +184,6 @@ Delinquent Subscribers counts a month only when its due date plus grace is
 before today and unused Monthly Fee advance does not cover it, oldest first.
 Net outstanding may be negative. Rows with net at or under 0.01, or with
 fewer uncovered periods than the minimum, are excluded.
-
-### Balance summary reader
-
-`qota.billing.balance_summary` is an internal read-only reader without
-whitelist. It requires System Manager, ordinary read permissions, and a
-submitted `Active` or `Suspended` contract. It reuses the ledger, submitted
-receipts, unapplied balances, `settled_debts`, refinancing schedules, and
-Customer Statement readers for reconciliation. It never invokes generators,
-advance applications, receipt processors, submit/cancel, or synchronizers. It
-uses `Decimal` and SQL text casts before driver conversion; MariaDB preserves
-nine decimals and Billing settles to `0.01`. It verifies `HNL` in `Billing
-Settings`.
-
-The typed `Verified` / `Unavailable` / `TechnicalFailure` result retains the
-Honduras cutoff date, totals for monthly fees, fines, surcharges, and
-additional charges, ledger references, aggregated evidence, and reading
-digest. It never exposes amounts on an unverified result. Unapplied `Monthly
-Fee` advances cover only that concept and period, oldest first, without
-double-subtracting payments already reflected in `outstanding_amount`. Due
-dates and source documents determine which monthly fees, fines, and surcharges
-are current; grace days do not exclude debt.
-
-`Connection Fee`, `Reconnection Fee`, `Other Fee`, `Refinancing Down Payment`,
-and `Refinancing Installment` are included when `due_date` is on or before the
-cutoff date; future charges are excluded. Sources, schedules, and settlements
-are reconciled without double-counting settled originals or fabricating
-`Refinancing Credit`. Any unknown concept fails closed with `Unavailable`.
 
 ## Governance
 
@@ -203,27 +214,6 @@ orders. Cancelled means the document was cancelled (`docstatus` 2): the
 order had been programmed and was then withdrawn, which sets `status` back
 to Draft. The desk name is Service Suspensions (Suspensiones de Servicio).
 
-### Contract status summary reader
-
-`qota.governance.contract_status_summary.read_status` is an internal read-only
-reader without whitelist. It requires System Manager and ordinary document
-permissions; child tables are authorized through their parents. A submitted
-`Service Contract` in `Active` or `Suspended` status retains authority. It
-never mutates contracts, orders, obligations, receipts, or meter readings. The
-documentary cutoff uses `America/Tegucigalpa`.
-
-`StatusResult` and `OrderStage` separate canonical contract status from each
-`Verified`, `Unavailable`, or `TechnicalFailure` stage. A scheduled suspension
-requires a submitted `Scheduled` order with `effective_date` and no execution,
-cancellation, invalid amendment, or conflicting order. Reconnection checks the
-link to the executed suspension and `suspended_since`, documentary uniqueness,
-the `Reconnection Fee` obligation, and active receipt applications. Pending
-reconnection synchronization returns to `Unpaid` when payments are reversed
-and preserves `Executed` / `execution_date` once executed. Metered cuts use
-`executed_date`, allow saving `final_reading` after submit, and submit a
-single reading. Cancelling a `Scheduled` suspension preserves independent
-meter readings.
-
 ## Institutional Settings and telephone capture
 
 `Institutional Settings`, presented in desk as Governance Settings /
@@ -242,9 +232,8 @@ replacement interval, and mandatory `internal_reason`, `Open`), and
 Extraordinary Closure (date and mandatory `internal_reason`, `Closed`).
 `public_reason` stays empty and any public exception reason is rejected.
 Dialogs mark the document dirty and refresh the section; only saving the
-Single persists changes. `qota.governance.institutional` exposes internal
-readers `office_information` and `is_within_office_hours` using
-`America/Tegucigalpa`.
+Single persists changes. `qota.governance.institutional` validates the native settings using
+`America/Tegucigalpa`; external publishable projections live in the bridge.
 
 `qota/phones.py` provides the ISO region catalog (`phonenumbers` / `pycountry`
 with `Babel` localized names), ASCII national number validation, per-region
@@ -273,8 +262,10 @@ phone numbers, preserves invalid historical numbers for later correction, and
 records counts, actor, date, and region in `Version`.
 
 `qota/setup.py` (`ensure_navigation` and `_save_navigation`) ensures the
-Governance Settings link on the `Subscribers` sidebar and the `Governance`
-dock title on install and migrate without exporting site layouts to source.
+Water Issue Report link inside Operations on the `Subscribers` sidebar, with
+the same properties as `subscribers.json`, plus the Governance Settings link
+and the `Governance` dock title. A later run leaves an already correct
+sidebar unchanged. Install and migrate do not export site layouts to source.
 
 ## Data fixes and historical migrations
 
@@ -299,3 +290,9 @@ later clean retry, an inconsistent traceback, duplicate completions, or an
 incomplete log stops migration with `PatchError`. `never_skip_patches` in
 `qota/hooks.py` prevents financial migrations from being skipped with
 `--skip-failing`.
+
+## Local development environment
+
+Bench operation for a checkout is documented in `AGENTS.local.md` when that
+local file is present. A published clone does not include that file or the
+local tooling it describes, and the application does not depend on them.
