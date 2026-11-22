@@ -96,9 +96,11 @@ jobs:
           file: ./Dockerfile
           push: true
           build-args: |
-            QOTA_PATH=https://github.com/edalca/qota.git
-            QOTA_BRANCH=${{ github.ref_name }}
+            FRAPPE_PATH=https://github.com/frappe/frappe
+            FRAPPE_REF=version-16
+            FRAPPE_REF_KIND=branch
             QOTA_VERSION=${{ steps.metadata.outputs.version }}
+            QOTA_REVISION=${{ steps.metadata.outputs.commit }}
           tags: |
             edalca/qota:${{ steps.metadata.outputs.version }}
             edalca/qota:${{ steps.metadata.outputs.major }}
