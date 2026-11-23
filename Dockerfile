@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# Qota runtime: Debian bookworm, official Frappe v16, then this Qota checkout.
-# A derived image can add another app, run bench build, then qota-bake-assets.
-# The entrypoint only links compiled assets. It does not migrate or create sites.
+# Qota runtime: Debian bookworm, official Frappe v16, and Qota.
 
 ARG PYTHON_VERSION=3.14.3
 ARG DEBIAN_VERSION=bookworm
@@ -57,6 +55,7 @@ RUN apt-get update \
         passwd \
         pkg-config \
         postgresql-client \
+        redis-tools \
         shared-mime-info \
         xfonts-75dpi \
         xfonts-base \
@@ -81,7 +80,7 @@ RUN apt-get update \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
     && mkdir -p /etc/nginx/snippets /etc/nginx/conf.d /var/lib/nginx /var/cache/nginx \
     && chown -R frappe:frappe /var/lib/nginx /var/log/nginx /var/cache/nginx /etc/nginx/conf.d \
-    && python3 -m pip install --no-cache-dir \
+    && pip3 install --no-cache-dir \
          "frappe-bench==${BENCH_VERSION}" \
          "uv==${UV_VERSION}"
 
@@ -127,7 +126,6 @@ RUN apt-get update \
         libwebp-dev \
         make \
         pkg-config \
-        redis-tools \
         rlwrap \
         tk8.6-dev \
         wget \
@@ -136,35 +134,33 @@ RUN apt-get update \
 
 ARG FRAPPE_PATH=https://github.com/frappe/frappe
 ARG FRAPPE_REF=version-16
-ARG FRAPPE_REF_KIND=branch
-ARG FRAPPE_REVISION=
 
-ENV FRAPPE_PATH=${FRAPPE_PATH} \
-    FRAPPE_REF=${FRAPPE_REF} \
-    FRAPPE_REF_KIND=${FRAPPE_REF_KIND} \
-    FRAPPE_REVISION=${FRAPPE_REVISION} \
-    FRAPPE_DOCKER_BUILD=1 \
+ENV FRAPPE_DOCKER_BUILD=1 \
     UV_LINK_MODE=copy
 
-COPY resources/docker/scripts/install-frappe.sh /tmp/install-frappe.sh
-RUN chmod 755 /tmp/install-frappe.sh
-
 USER frappe
-RUN /tmp/install-frappe.sh
+WORKDIR /home/frappe
 
-USER root
-COPY resources/docker/scripts/qota-bake-assets.sh /usr/local/bin/qota-bake-assets
-RUN chmod 755 /usr/local/bin/qota-bake-assets
+RUN bench init \
+    --frappe-path "${FRAPPE_PATH}" \
+    --frappe-branch "${FRAPPE_REF}" \
+    --skip-assets \
+    --no-procfile \
+    --no-backups \
+    --skip-redis-config-generation \
+    /home/frappe/frappe-bench
 
+ARG QOTA_PATH=https://github.com/edalca/qota.git
+ARG QOTA_BRANCH=version-16
 ARG QOTA_VERSION=
-ARG QOTA_REVISION=
-ENV QOTA_VERSION=${QOTA_VERSION} \
-    QOTA_REVISION=${QOTA_REVISION}
 
-COPY --chown=frappe:frappe . /tmp/qota-src
+WORKDIR /home/frappe/frappe-bench
 
-USER frappe
-RUN bash /tmp/qota-src/resources/docker/scripts/install-qota.sh
+RUN bench get-app qota "${QOTA_PATH}" \
+    --branch "${QOTA_VERSION:+v}${QOTA_VERSION:-${QOTA_BRANCH}}" \
+    --skip-assets
+
+RUN bench build
 
 FROM base AS runtime
 
@@ -186,39 +182,17 @@ LABEL org.opencontainers.image.title="Qota" \
       com.edalca.frappe.ref-kind="${FRAPPE_REF_KIND}"
 
 COPY --from=builder --chown=frappe:frappe /home/frappe/frappe-bench /home/frappe/frappe-bench
-COPY resources/docker/nginx/frappe.conf.template /templates/nginx/frappe.conf.template
-COPY resources/docker/nginx/security_headers.conf /etc/nginx/snippets/security_headers.conf
-COPY resources/docker/nginx/nginx-entrypoint.sh /usr/local/bin/nginx-entrypoint.sh
-COPY resources/docker/scripts/qota-entrypoint.sh /usr/local/bin/qota-entrypoint.sh
-COPY resources/docker/scripts/qota-start.sh /usr/local/bin/qota-start.sh
-COPY resources/docker/scripts/qota-bake-assets.sh /usr/local/bin/qota-bake-assets
-
-USER root
-# The bench copy already uses --chown. A later chown -R of that tree
-# copy-ups every file into a new overlay layer and stalls the build.
-# Nginx writable directories are prepared in the base stage.
-RUN chmod 755 \
-        /usr/local/bin/nginx-entrypoint.sh \
-        /usr/local/bin/qota-entrypoint.sh \
-        /usr/local/bin/qota-start.sh \
-        /usr/local/bin/qota-bake-assets \
-    && mkdir -p /templates/nginx \
-    && chown frappe:frappe \
-        /templates/nginx/frappe.conf.template \
-        /etc/nginx/snippets/security_headers.conf \
-        /usr/local/bin/nginx-entrypoint.sh \
-        /usr/local/bin/qota-entrypoint.sh \
-        /usr/local/bin/qota-start.sh \
-        /usr/local/bin/qota-bake-assets
+COPY docker/resources/nginx/frappe.conf.template /templates/nginx/frappe.conf.template
+COPY docker/resources/nginx/security_headers.conf /etc/nginx/snippets/security_headers.conf
+COPY --chmod=755 docker/resources/nginx/nginx-entrypoint.sh /usr/local/bin/
+COPY --chmod=755 docker/resources/scripts/*.sh /usr/local/bin/
 
 USER frappe
 WORKDIR /home/frappe/frappe-bench
 
-# Site data stays on the sites volume. Compiled assets stay in the image at
-# /home/frappe/frappe-bench/assets. Do not declare a nested sites/assets volume.
+# The sites volume contains site data and the sites/assets tree.
 VOLUME ["/home/frappe/frappe-bench/sites", "/home/frappe/frappe-bench/logs"]
 
 EXPOSE 8000 8080 9000
 
-ENTRYPOINT ["/usr/local/bin/qota-entrypoint.sh"]
-CMD ["/usr/local/bin/qota-start.sh"]
+CMD ["/usr/local/bin/backend.sh"]

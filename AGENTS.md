@@ -290,6 +290,25 @@ incomplete log stops migration with `PatchError`. `never_skip_patches` in
 `qota/hooks.py` prevents financial migrations from being skipped with
 `--skip-failing`.
 
+## Docker deployment
+
+The root Dockerfile installs official Frappe v16 and Qota from their repositories.
+Messaging and qota_preset are installed in derived images. Bench builds assets
+under `sites/assets`. The frontend serves `/assets/` from that directory by
+default. For an alternate assets directory, the configurator and frontend use
+the same absolute `ASSETS_PATH` and the same source files.
+
+Docker executes each service command from the Bench working directory.
+`configure.sh` updates the shared Bench configuration. With `ASSETS_PATH` set,
+it validates both source manifests and their referenced files before copying
+changed manifests to `sites/assets`. Without the override, it validates the
+volume's existing manifests. It invalidates Frappe's shared manifest cache
+after successful configuration. `create-site.sh` creates a new site with
+the apps in `INSTALL_APPS`, which defaults to `qota`. Existing sites skip
+provisioning. Frappe migrations for existing sites run separately. Deployment
+processes wait for the site initializer to succeed. The Docker section in
+README.md documents the Compose commands and environment variables.
+
 ## Local development environment
 
 Bench operation for a checkout is documented in `AGENTS.local.md` when that

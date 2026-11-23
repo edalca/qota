@@ -28,8 +28,8 @@ server {
 	real_ip_header ${UPSTREAM_REAL_IP_HEADER};
 	real_ip_recursive ${UPSTREAM_REAL_IP_RECURSIVE};
 
-	location /assets {
-		try_files $uri =404;
+	location ^~ /assets/ {
+		alias "${ASSETS_PATH}/";
 	}
 
 	location ~ ^/protected/(.*) {
