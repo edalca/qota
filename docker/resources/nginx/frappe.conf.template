@@ -29,7 +29,7 @@ server {
 	real_ip_recursive ${UPSTREAM_REAL_IP_RECURSIVE};
 
 	location ^~ /assets/ {
-		alias "${ASSETS_PATH}/";
+		alias /home/frappe/frappe-bench/assets/;
 	}
 
 	location ~ ^/protected/(.*) {

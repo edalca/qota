@@ -292,22 +292,33 @@ incomplete log stops migration with `PatchError`. `never_skip_patches` in
 
 ## Docker deployment
 
-The root Dockerfile installs official Frappe v16 and Qota from their repositories.
-Messaging and qota_preset are installed in derived images. Bench builds assets
-under `sites/assets`. The frontend serves `/assets/` from that directory by
-default. For an alternate assets directory, the configurator and frontend use
-the same absolute `ASSETS_PATH` and the same source files.
+The root Dockerfile follows the official Frappe v16 multistage pattern,
+installing official Frappe v16 and Qota from their repositories without
+declaring any `VOLUME` instructions. Persistence for `sites` and `logs` is
+configured by the operator in Docker Compose with deployment-chosen volume
+names. Compiled assets are built during image creation and moved from
+`sites/assets` to `/home/frappe/frappe-bench/assets` inside the image. Derived
+images (such as `qota-private`) inherit `ENTRYPOINT` and `CMD` unless
+overridden, and can install Messaging and `qota_preset` across separate or
+combined `RUN` instructions before running `bench build` and replacing
+`/home/frappe/frappe-bench/assets`, leaving no divergent tree in `sites`.
 
-Docker executes each service command from the Bench working directory.
-`configure.sh` updates the shared Bench configuration. With `ASSETS_PATH` set,
-it validates both source manifests and their referenced files before copying
-changed manifests to `sites/assets`. Without the override, it validates the
-volume's existing manifests. It invalidates Frappe's shared manifest cache
-after successful configuration. `create-site.sh` creates a new site with
-the apps in `INSTALL_APPS`, which defaults to `qota`. Existing sites skip
-provisioning. Frappe migrations for existing sites run separately. Deployment
-processes wait for the site initializer to succeed. The Docker section in
-README.md documents the Compose commands and environment variables.
+At container startup, `/usr/local/bin/main-entrypoint.sh` inspects
+`sites/assets` for type, mountpoints, and legacy asset safety, refuses
+destructive changes when an independent mount or any unrecognized entry in a
+non-empty directory is present, and creates
+`sites/assets -> /home/frappe/frappe-bench/assets` before running the service
+command. `ASSETS_PATH` has been removed: the frontend serves `/assets/` directly
+from `/home/frappe/frappe-bench/assets/` via Nginx `alias`. `configure.sh`
+updates the shared Bench configuration, verifies that `sites/assets` links to
+`/home/frappe/frappe-bench/assets`, validates `assets.json`, `assets-rtl.json`,
+and their referenced files without copying manifests to the volume, and
+invalidates Frappe's shared `assets_json` Redis key. `create-site.sh` creates a
+new site with the apps in `INSTALL_APPS`, which defaults to `qota`. Existing
+sites skip provisioning. Database upgrades for existing sites remain controlled
+and manual (`bench --site <site> migrate`), never automatic on container
+startup. The Docker section in README.md documents the Compose commands,
+upgrade behavior, and derived image pattern.
 
 ## Local development environment
 

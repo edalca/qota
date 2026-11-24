@@ -14,35 +14,50 @@ bench install-app qota
 
 ### Docker deployments
 
-The root Dockerfile builds Frappe v16 and Qota. Use the same image revision for
-all services in a deployment. In Coolify, keep the existing image reference,
-environment, and named mounts. Replace the inline initialization commands with
-the following Compose commands. Run each job once per deployment.
+The root Dockerfile builds Frappe v16 and Qota without declaring any `VOLUME`
+instructions. Persistence for `/home/frappe/frappe-bench/sites` and
+`/home/frappe/frappe-bench/logs` is managed by the operator in Docker Compose
+(using any site-appropriate volume names) rather than baked into the image. Use
+the same image revision for all services in a deployment. Replace any inline
+initialization commands with the following Compose commands, running each setup
+job once per deployment:
 
 ```yaml
 services:
   configurator:
     command: ["/usr/local/bin/configure.sh"]
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
   create-site:
     command: ["/usr/local/bin/create-site.sh"]
     environment:
       INSTALL_APPS: "${INSTALL_APPS:-qota}"
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
     depends_on:
       configurator:
         condition: service_completed_successfully
   backend:
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
     depends_on:
       create-site:
         condition: service_completed_successfully
 ```
 
-Keep the same `create-site` dependency on frontend, scheduler, workers, and
-WebSocket, alongside their existing dependencies. Clear any general entrypoint
-override so Compose runs the service commands directly. Use
-`/usr/local/bin/backend.sh` for an explicit backend command and
-`/usr/local/bin/nginx-entrypoint.sh` for the frontend. Keep the mounts
-`qota-sites:/home/frappe/frappe-bench/sites` and
-`qota-logs:/home/frappe/frappe-bench/logs` as they are.
+The image entrypoint `/usr/local/bin/main-entrypoint.sh` links
+`/home/frappe/frappe-bench/sites/assets` to `/home/frappe/frappe-bench/assets`
+before executing the service command. Keep any general `entrypoint` override
+cleared in Compose so every service uses this entrypoint and supplies only its
+`command` (for example `/usr/local/bin/configure.sh`,
+`/usr/local/bin/create-site.sh`, `/usr/local/bin/nginx-entrypoint.sh`, or the
+default `/usr/local/bin/backend.sh`). Mount persistent volumes on
+`/home/frappe/frappe-bench/sites` and `/home/frappe/frappe-bench/logs` (the
+exact volume names are up to your Compose stack, such as `sites`/`logs` or
+`qota-sites`/`qota-logs`), and do not mount a separate volume on `sites/assets`.
 
 `configure.sh` reads `DB_HOST`, `REDIS_CACHE` and `REDIS_QUEUE` from the
 environment. `DB_PORT` defaults to 3306, `SOCKETIO_PORT` defaults to 9000, and
@@ -60,49 +75,52 @@ to `qota`. A derived image can use `INSTALL_APPS="qota messaging qota_preset"`.
 The job checks that the apps are available and passes them to `bench new-site`.
 It selects the new site and enables its scheduler. If creation is interrupted
 and leaves a site directory, the job reports the incomplete provisioning.
-Upgrades of existing sites use `bench --site <site> migrate` separately.
+Database upgrades for existing sites are controlled and never automatic at
+startup: run `bench --site <site> migrate` explicitly as a separate operational
+step.
 
-Bench writes bundles and manifests under `/home/frappe/frappe-bench/sites/assets`.
-Nginx serves `/assets/` from that directory by default. To serve bundles from
-another directory, set the same absolute `ASSETS_PATH` on the configurator
-and frontend, and make the same source files available to both. For example,
-add this bind mount alongside the existing mounts.
+Compiled bundles and manifests (`assets.json`, `assets-rtl.json`, and app
+asset links) are built during `docker build` and stored inside the image at
+`/home/frappe/frappe-bench/assets`, outside the persistent `sites` volume.
+`ASSETS_PATH` has been removed: Nginx serves `/assets/` directly from
+`/home/frappe/frappe-bench/assets/` via `alias`, while Frappe reads
+`sites/assets` through the symlink created at startup by `main-entrypoint.sh`.
+`configure.sh` verifies that `sites/assets` links to
+`/home/frappe/frappe-bench/assets`, validates `assets.json`, `assets-rtl.json`,
+and all referenced asset files without copying manifests into the `sites`
+volume, and invalidates the Redis key `assets_json`.
 
-```yaml
-services:
-  configurator:
-    environment:
-      ASSETS_PATH: /mnt/frappe-assets
-    volumes:
-      - /srv/qota-assets:/mnt/frappe-assets:ro
-  frontend:
-    environment:
-      ASSETS_PATH: /mnt/frappe-assets
-    volumes:
-      - /srv/qota-assets:/mnt/frappe-assets:ro
-```
+When upgrading from an older deployment:
 
-Frappe reads `assets.json` and `assets-rtl.json` from `sites/assets` in the
-sites volume. With the override, the configurator validates both source
-manifests and checks that their referenced files resolve inside that directory.
-It copies only changed manifests into `sites/assets`. Populate the alternate
-directory with both manifests and their bundles before running the jobs.
-Without the override, the configurator validates the manifests already in the
-volume. It invalidates the Redis key `assets_json` after successful configuration.
+- If a separate volume or bind mount is attached to
+  `/home/frappe/frappe-bench/sites/assets`, `main-entrypoint.sh` detects the
+  mount conflict, leaves existing data untouched, and stops with an error.
+  Remove the `sites/assets` mount from the service configuration and recreate
+  the containers.
+- If `sites/assets` is a legacy real directory inside the `sites` volume (and
+  not a mountpoint), `main-entrypoint.sh` verifies that it is either empty or
+  contains only recognized Frappe asset entries (`assets.json`,
+  `assets-rtl.json`, `css`, `js`, `locale`, and app links/directories) before
+  replacing it with the symlink to `/home/frappe/frappe-bench/assets`.
+  Directories containing any unrecognized files or folders, or non-directory
+  entries, are left untouched with an error.
 
-When upgrading from 16.10.1, check `sites/assets` in the existing sites volume
-before starting the configurator. If it still links to the retired image
-directory, replace just that link with a real `sites/assets` directory.
-Populate or refresh that directory with assets from the matching image when
-using the default path. With an alternate source, prepare the destination
-directory for the configurator and supply the bundles at the alternate mount.
-
-The private Image Builder can continue to extend this image with Messaging
-and qota_preset. Add both apps to the derived image with Bench before compiling
-their bundles. Bench writes the build output to `sites/assets`.
+Derived images (such as `qota-private`) can extend this image with Messaging
+and `qota_preset`. Because the base image declares no `VOLUME` instructions,
+changes across separate `RUN` instructions persist normally during `docker
+build`, and derived images inherit `ENTRYPOINT` and `CMD` unless they
+explicitly override them. Install the additional apps, build all assets, and
+replace `/home/frappe/frappe-bench/assets` with the newly compiled
+`sites/assets` (leaving no second asset tree under `sites/`):
 
 ```dockerfile
-RUN bench build --app frappe,qota,messaging,qota_preset
+FROM edalca/qota:latest
+
+RUN bench get-app messaging <MESSAGING_REPO> --branch <BRANCH> --skip-assets
+RUN bench get-app qota_preset <QOTA_PRESET_REPO> --branch <BRANCH> --skip-assets
+RUN bench build \
+    && rm -rf /home/frappe/frappe-bench/assets \
+    && mv /home/frappe/frappe-bench/sites/assets /home/frappe/frappe-bench/assets
 ```
 
 ### Contributing

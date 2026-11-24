@@ -31,10 +31,8 @@ redis_url() {
 }
 
 temporary=""
-manifest_staging=""
 trap '
-  if [[ -n "$temporary" ]]; then rm -- "$temporary"; fi
-  if [[ -n "$manifest_staging" ]]; then rm -rf -- "$manifest_staging"; fi
+  if [[ -n "$temporary" ]]; then rm -f -- "$temporary"; fi
 ' EXIT
 
 write_file() {
@@ -86,50 +84,54 @@ decode_asset_reference() {
 resolve_asset_file() {
   local root="$1" relative_path="$2" file
   if ! IFS= read -r -d '' file < <(realpath -ze -- "${root%/}/$relative_path" 2>/dev/null); then
-    printf 'File is missing or unreachable in ASSETS_PATH: %q\n' "$relative_path" >&2
+    printf 'Asset file is missing or unreachable: %q\n' "$relative_path" >&2
     return 1
   fi
-  if [[ "$file" != "${root%/}/"* ]]; then
-    printf 'Path escapes ASSETS_PATH: %q\n' "$relative_path" >&2
+  if [[ "$file" != "${root%/}/"* && "$file" != "/home/frappe/frappe-bench/apps/"*"/public/"* ]]; then
+    printf 'Asset path escapes bench asset trees: %q\n' "$relative_path" >&2
     return 1
   fi
   if [[ ! -f "$file" || ! -r "$file" ]]; then
-    printf 'Expected a readable file in ASSETS_PATH: %q\n' "$relative_path" >&2
+    printf 'Expected a readable asset file: %q\n' "$relative_path" >&2
     return 1
   fi
-  printf '%s\0' "$file"
 }
 
-stage_asset_manifests() {
-  local source="$1" staging="$2" root name file staged reference relative_path
-  shift 2
-  if [[ "$source" != /* || ! -d "$source" || ! -r "$source" || ! -x "$source" ]]; then
-    echo "ASSETS_PATH must be an accessible absolute directory." >&2
+validate_baked_assets() {
+  local baked_root="$1" name manifest reference relative_path
+  shift
+  if [[ ! -d "$baked_root" || ! -r "$baked_root" || ! -x "$baked_root" ]]; then
+    echo "Compiled assets directory $baked_root must exist and be readable." >&2
     return 1
   fi
-  IFS= read -r -d '' root < <(realpath -ze -- "$source")
+  if [[ ! -L sites/assets ]] || [[ "$(realpath -e -- sites/assets 2>/dev/null || true)" != "$baked_root" ]]; then
+    echo "sites/assets must link to $baked_root." >&2
+    return 1
+  fi
 
   for name in "$@"; do
-    IFS= read -r -d '' file < <(resolve_asset_file "$root" "$name")
-    staged="$staging/$name"
-    # Validate the exact bytes that will be copied.
-    cat -- "$file" > "$staged"
+    manifest="${baked_root}/${name}"
+    if [[ ! -f "$manifest" || ! -r "$manifest" ]]; then
+      printf 'Missing asset manifest: %s\n' "$manifest" >&2
+      return 1
+    fi
     # jq can replace malformed UTF-8 bytes, so also verify the raw input round trip.
-    if ! jq -Rrsj '.' "$staged" | cmp -s -- "$staged" - ||
-      ! validate_asset_manifest "$staged"; then
+    if ! jq -Rrsj '.' "$manifest" | cmp -s -- "$manifest" - ||
+      ! validate_asset_manifest "$manifest"; then
       printf 'Invalid asset manifest: %s\n' "$name" >&2
       return 1
     fi
-    jq -r '.[] | if (explode | any(. < 32 or . == 127))
-      then error("Control character in asset path") else . end' \
-      "$staged" > "$staging/references"
     while IFS= read -r reference; do
       if ! relative_path="$(decode_asset_reference "$reference")"; then
         printf 'Unsafe asset path in %s: %q\n' "$name" "$reference" >&2
         return 1
       fi
-      resolve_asset_file "$root" "$relative_path" >/dev/null
-    done < "$staging/references"
+      resolve_asset_file "$baked_root" "$relative_path"
+    done < <(
+      jq -r '.[] | if (explode | any(. < 32 or . == 127))
+        then error("Control character in asset path") else . end' \
+        "$manifest"
+    )
   done
 }
 
@@ -167,30 +169,11 @@ for path in apps/*; do
   fi
 done
 
-if [[ ! -d sites/assets ]]; then
-  echo "sites/assets must be available in the sites volume." >&2
-  exit 1
-fi
 manifests=(assets.json assets-rtl.json)
-if [[ -v ASSETS_PATH ]]; then
-  manifest_staging="$(mktemp -d)"
-  stage_asset_manifests "$ASSETS_PATH" "$manifest_staging" "${manifests[@]}"
-else
-  for name in "${manifests[@]}"; do
-    validate_asset_manifest "sites/assets/$name"
-  done
-fi
+validate_baked_assets /home/frappe/frappe-bench/assets "${manifests[@]}"
 
 write_file sites/apps.txt 644 <<< "$(printf '%s\n' "${apps[@]}")"
 write_file "$config_path" 600 <<< "$config"
-
-if [[ -n "$manifest_staging" ]]; then
-  for name in "${manifests[@]}"; do
-    if ! cmp -s -- "$manifest_staging/$name" "sites/assets/$name"; then
-      write_file "sites/assets/$name" 644 < "$manifest_staging/$name"
-    fi
-  done
-fi
 
 # Use explicit CLI options for IPv6 and database numbers supplied in the URI query.
 cache_url="${redis_cache%%\?*}"

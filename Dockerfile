@@ -158,9 +158,10 @@ WORKDIR /home/frappe/frappe-bench
 
 RUN bench get-app qota "${QOTA_PATH}" \
     --branch "${QOTA_VERSION:+v}${QOTA_VERSION:-${QOTA_BRANCH}}" \
-    --skip-assets
-
-RUN bench build
+    --skip-assets \
+    && bench build \
+    && find apps -mindepth 1 -path "*/.git" -exec rm -rf {} + \
+    && mv /home/frappe/frappe-bench/sites/assets /home/frappe/frappe-bench/assets
 
 FROM base AS runtime
 
@@ -190,9 +191,8 @@ COPY --chmod=755 docker/resources/scripts/*.sh /usr/local/bin/
 USER frappe
 WORKDIR /home/frappe/frappe-bench
 
-# The sites volume contains site data and the sites/assets tree.
-VOLUME ["/home/frappe/frappe-bench/sites", "/home/frappe/frappe-bench/logs"]
 
 EXPOSE 8000 8080 9000
 
+ENTRYPOINT ["/usr/local/bin/main-entrypoint.sh"]
 CMD ["/usr/local/bin/backend.sh"]

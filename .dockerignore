@@ -8,3 +8,4 @@
 !docker/resources/scripts/backend.sh
 !docker/resources/scripts/configure.sh
 !docker/resources/scripts/create-site.sh
+!docker/resources/scripts/main-entrypoint.sh

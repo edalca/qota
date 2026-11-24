@@ -56,20 +56,6 @@ if [[ -z "${CLIENT_MAX_BODY_SIZE:-}" ]]; then
   export CLIENT_MAX_BODY_SIZE=50m
 fi
 
-ASSETS_PATH="${ASSETS_PATH:-/home/frappe/frappe-bench/sites/assets}"
-if [[ "$ASSETS_PATH" != /* || ! -d "$ASSETS_PATH" ]]; then
-  echo "ASSETS_PATH must be an absolute directory in the frontend container." >&2
-  exit 1
-fi
-ASSETS_PATH="$(realpath -- "$ASSETS_PATH")"
-case "$ASSETS_PATH" in
-  / | *'"'* | *'\'* | *'$'* | *[[:cntrl:]]*)
-    echo "ASSETS_PATH cannot be used as an Nginx asset directory." >&2
-    exit 1
-    ;;
-esac
-export ASSETS_PATH
-
 # shellcheck disable=SC2016
 envsubst '${BACKEND}
   ${SOCKETIO}
@@ -80,8 +66,7 @@ envsubst '${BACKEND}
   ${UPSTREAM_REAL_IP_RECURSIVE}
   ${FRAPPE_SITE_NAME_HEADER}
   ${PROXY_READ_TIMEOUT}
-  ${CLIENT_MAX_BODY_SIZE}
-  ${ASSETS_PATH}' \
+  ${CLIENT_MAX_BODY_SIZE}' \
   </templates/nginx/frappe.conf.template >/etc/nginx/conf.d/frappe.conf
 
 # Docker may briefly remove upstream DNS records during a parallel restart.
